@@ -7,19 +7,25 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * User
+ * User Model Class
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T00:05:39.615Z[GMT]")
 
-
+@Entity
+@SequenceGenerator(name = "user_seq", initialValue =  1_000_001)
 public class User   {
+
+  @Id
   @JsonProperty("id")
-  private Integer id = null;
+  @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "user_seq")
+  private Long id = null;
 
   @JsonProperty("firstName")
   private String firstName = null;
@@ -42,14 +48,14 @@ public class User   {
   /**
    * Gets or Sets role
    */
-  public enum RoleEnum {
+  public enum Role {
     EMPLOYEE("employee"),
     
     CUSTOMER("customer");
 
     private String value;
 
-    RoleEnum(String value) {
+    Role(String value) {
       this.value = value;
     }
 
@@ -60,8 +66,8 @@ public class User   {
     }
 
     @JsonCreator
-    public static RoleEnum fromValue(String text) {
-      for (RoleEnum b : RoleEnum.values()) {
+    public static Role fromValue(String text) {
+      for (Role b : Role.values()) {
         if (String.valueOf(b.value).equals(text)) {
           return b;
         }
@@ -70,9 +76,19 @@ public class User   {
     }
   }
   @JsonProperty("role")
-  private RoleEnum role = null;
+  private Role role = null;
 
-  public User id(Integer id) {
+  public User(String firstName, String lastName, String email, String password, String phoneNumber, OffsetDateTime creationDate, Role role) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.password = password;
+    this.phoneNumber = phoneNumber;
+    this.creationDate = OffsetDateTime.now();
+    this.role = role;
+  }
+
+  public User id(Long id) {
     this.id = id;
     return this;
   }
@@ -84,13 +100,13 @@ public class User   {
   @Schema(example = "1", required = true, accessMode = Schema.AccessMode.READ_ONLY, description = "")
       @NotNull
 
-    public Integer getId() {
+    public Long getId() {
     return id;
   }
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
+//  public void setId(Long id) {
+//    this.id = id;
+//  }
 
   public User firstName(String firstName) {
     this.firstName = firstName;
@@ -213,7 +229,7 @@ public class User   {
     this.creationDate = creationDate;
   }
 
-  public User role(RoleEnum role) {
+  public User role(Role role) {
     this.role = role;
     return this;
   }
@@ -225,11 +241,11 @@ public class User   {
   @Schema(required = true, description = "")
       @NotNull
 
-    public RoleEnum getRole() {
+    public User.Role getRole() {
     return role;
   }
 
-  public void setRole(RoleEnum role) {
+  public void setRole(Role role) {
     this.role = role;
   }
 
