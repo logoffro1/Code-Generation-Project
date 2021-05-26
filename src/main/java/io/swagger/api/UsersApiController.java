@@ -2,7 +2,6 @@ package io.swagger.api;
 
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -14,11 +13,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,11 +34,9 @@ import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T00:05:39.615Z[GMT]")
 @RestController
-@RequestMapping(value="users")
 public class UsersApiController implements UsersApi {
 
-    @Autowired
-    private UserService userService;
+
 
     private static final Logger log = LoggerFactory.getLogger(UsersApiController.class);
 
@@ -93,20 +94,18 @@ public class UsersApiController implements UsersApi {
         return new ResponseEntity<List<User>>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @RequestMapping(value="", method = RequestMethod.GET , produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
-//        String accept = request.getHeader("Accept");
-//        if (accept != null && accept.contains("application/json")) {
-//            try {
-//                return new ResponseEntity<List<User>>(objectMapper.readValue("[ {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n}, {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-//            } catch (IOException e) {
-//                log.error("Couldn't serialize response for content type application/json", e);
-//                return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR);
-//            }
-//        }
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            try {
+                return new ResponseEntity<List<User>>(objectMapper.readValue("[ {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n}, {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
+            } catch (IOException e) {
+                log.error("Couldn't serialize response for content type application/json", e);
+                return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
 
-        return ResponseEntity.status(200).body(userService.getUsers());
-        //return new ResponseEntity<List<User>>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<List<User>>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<Void> updateUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
