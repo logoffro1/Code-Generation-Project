@@ -78,7 +78,7 @@ public class User   {
   @JsonProperty("role")
   private Role role = null;
 
-  public User(String firstName, String lastName, String email, String password, String phoneNumber, OffsetDateTime creationDate, Role role) {
+  public User(String firstName, String lastName, String email, String password, String phoneNumber, Role role) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
