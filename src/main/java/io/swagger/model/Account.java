@@ -28,6 +28,9 @@ public class Account   {
   @JsonProperty("IBAN")
   private String IBAN = null;
 
+  @JsonProperty("absoluteLimit")
+  private Double absoluteLimit = null;
+
   @JsonProperty("userId")
   private Integer userId = null;
 
@@ -35,7 +38,8 @@ public class Account   {
 
   }
 
-  public Account(String IBAN, Integer userId, TypeEnum type, StatusEnum status, BigDecimal balance, String token) {
+  public Account(String IBAN,Double absoluteLimit, Integer userId, TypeEnum type, StatusEnum status, BigDecimal balance, String token) {
+    this.absoluteLimit = absoluteLimit;
     this.IBAN = IBAN;
     this.userId = userId;
     this.type = type;
