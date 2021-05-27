@@ -7,6 +7,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -16,10 +20,13 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
 
-
+@Entity
 public class User   {
+
   @JsonProperty("id")
-  private Integer id = null;
+  @Id
+  @GeneratedValue
+  private long id;
 
   @JsonProperty("firstName")
   private String firstName = null;
@@ -38,6 +45,20 @@ public class User   {
 
   @JsonProperty("creationDate")
   private OffsetDateTime creationDate = null;
+
+  public User() {
+  }
+
+  public User(Integer id, String firstName, String lastName, String email, String password, String phoneNumber, RoleEnum role) {
+    this.id = id;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.password = password;
+    this.phoneNumber = phoneNumber;
+    this.role = role;
+    this.creationDate= OffsetDateTime.now();
+  }
 
   /**
    * Gets or Sets role
@@ -84,7 +105,7 @@ public class User   {
   @Schema(example = "1", required = true, accessMode = Schema.AccessMode.READ_ONLY, description = "")
       @NotNull
 
-    public Integer getId() {
+    public long getId() {
     return id;
   }
 

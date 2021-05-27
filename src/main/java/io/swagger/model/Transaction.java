@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -15,10 +17,13 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
 
-
+@Entity
 public class Transaction   {
+  
   @JsonProperty("transactionId")
-  private Integer transactionId = null;
+  @Id
+  @GeneratedValue
+  private long transactionId;
 
   @JsonProperty("dateTimeCreated")
   private OffsetDateTime dateTimeCreated = null;
@@ -26,8 +31,10 @@ public class Transaction   {
   @JsonProperty("senderIBAN")
   private String senderIBAN = null;
 
+
   @JsonProperty("receiverIBAN")
   private String receiverIBAN = null;
+
 
   @JsonProperty("senderUserId")
   private Integer senderUserId = null;
@@ -52,7 +59,7 @@ public class Transaction   {
    **/
   @Schema(example = "2012", description = "")
   
-    public Integer getTransactionId() {
+    public long getTransactionId() {
     return transactionId;
   }
 

@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -16,13 +18,37 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
 
-
+@Entity
 public class Account   {
+
+  @Id
+  @GeneratedValue
+  private long accountId;
+
   @JsonProperty("IBAN")
   private String IBAN = null;
 
+  @ManyToOne(cascade=CascadeType.ALL,fetch=FetchType.LAZY)
   @JsonProperty("userId")
   private Integer userId = null;
+
+  public Account(){
+
+  }
+
+  public Account(Integer accountId, String IBAN, Integer userId, TypeEnum type, StatusEnum status, BigDecimal balance, String token) {
+    this.accountId = accountId;
+    this.IBAN = IBAN;
+    this.userId = userId;
+    this.type = type;
+    this.status = status;
+    this.balance = balance;
+    this.token = token;
+  }
+
+  public long getAccountId() {
+    return accountId;
+  }
 
   /**
    * Gets or Sets type
