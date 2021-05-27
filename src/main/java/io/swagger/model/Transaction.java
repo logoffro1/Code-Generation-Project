@@ -2,6 +2,8 @@ package io.swagger.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.service.AccountService;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -52,11 +54,10 @@ public class Transaction
     {
     }
 
-    public Transaction(int senderID, int receiverID, Double amount, String currencyType)
+    public Transaction(Account senderAccount, Account receiverAccount, Double amount, String currencyType)
     {
-        AccountService accountService = new AccountService();
-        this.senderAccount = accountService.getAccountById(senderID);
-        this.receiverAccount = accountService.getAccountById(receiverID);
+        this.senderAccount = senderAccount;
+        this.receiverAccount = receiverAccount;
         this.amount = amount;
         this.currencyType = currencyType;
     }
@@ -108,10 +109,9 @@ public class Transaction
         this.dateTimeCreated = dateTimeCreated;
     }
 
-    public Transaction senderIBAN(int senderID)
+    public Transaction senderIBAN(Account senderAccount)
     {
-        AccountService accountService = new AccountService();
-        this.senderAccount = accountService.getAccountById(senderID);
+        this.senderAccount = senderAccount;
         return this;
     }
 
@@ -127,16 +127,14 @@ public class Transaction
         return senderAccount;
     }
 
-    public void setSenderAccount(int senderID)
+    public void setSenderAccount(Account senderAccount)
     {
-        AccountService accountService = new AccountService();
-        this.senderAccount = accountService.getAccountById(senderID);
+        this.senderAccount = senderAccount;
     }
 
-    public Transaction receiverIBAN(int receiverID)
+    public Transaction receiverIBAN(Account receiverAccount)
     {
-        AccountService accountService = new AccountService();
-        this.receiverAccount = accountService.getAccountById(receiverID);
+        this.receiverAccount = receiverAccount;
         return this;
     }
 
@@ -152,10 +150,9 @@ public class Transaction
         return receiverAccount;
     }
 
-    public void setReceiverAccount(int receiverID)
+    public void setReceiverAccount(Account receiverAccount)
     {
-        AccountService accountService = new AccountService();
-        this.receiverAccount = accountService.getAccountById(receiverID);
+        this.receiverAccount = receiverAccount;
     }
 
     /**

@@ -12,7 +12,7 @@ public class AccountService  {
     @Autowired
     private AccountRepository accountRepository;
 
-    public Account getAccountById(int id)
+    public Account getAccountById(long id)
     {
        // return accountRepository != null ? accountRepository.findById(id).get() : null;
         return accountRepository.findById(id).get();

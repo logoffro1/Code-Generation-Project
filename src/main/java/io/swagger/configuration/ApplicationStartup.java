@@ -35,8 +35,7 @@ public class ApplicationStartup implements ApplicationRunner
         userService.createUser(new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.CUSTOMER));
         accountService.createAccount(new Account("iban1", 1, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
         accountService.createAccount(new Account("iban2", 2, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
-        AccountService as = new AccountService();
-        Account account = as.getAccountById(2);
-        // transactionService.createTransaction(new Transaction(1,2,100.00,"EUR"));
+        transactionService.createTransaction(new Transaction(accountService.getAccountById(2), accountService.getAccountById(3), 100.00, "EUR"));
+
     }
 }
