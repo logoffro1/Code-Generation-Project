@@ -49,8 +49,7 @@ public class User   {
   public User() {
   }
 
-  public User(Integer id, String firstName, String lastName, String email, String password, String phoneNumber, RoleEnum role) {
-    this.id = id;
+  public User(String firstName, String lastName, String email, String password, String phoneNumber, RoleEnum role) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;

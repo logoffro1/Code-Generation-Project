@@ -35,8 +35,7 @@ public class Account   {
 
   }
 
-  public Account(Integer accountId, String IBAN, Integer userId, TypeEnum type, StatusEnum status, BigDecimal balance, String token) {
-    this.accountId = accountId;
+  public Account(String IBAN, Integer userId, TypeEnum type, StatusEnum status, BigDecimal balance, String token) {
     this.IBAN = IBAN;
     this.userId = userId;
     this.type = type;
