@@ -28,7 +28,6 @@ public class Account   {
   @JsonProperty("IBAN")
   private String IBAN = null;
 
-  @ManyToOne(cascade=CascadeType.ALL,fetch=FetchType.LAZY)
   @JsonProperty("userId")
   private Integer userId = null;
 
