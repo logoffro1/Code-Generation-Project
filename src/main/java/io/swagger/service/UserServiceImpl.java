@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -26,12 +27,28 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getUserById(long id) {
-        return null;
+        User user = new User();
+        try {
+              user = userRepository.findById((int)id).orElseThrow(new Supplier<Throwable>() {
+                @Override
+                public Throwable get() {
+                    return null;
+                }
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+        return user;
     }
 
     @Override
     public void deleteUserById(long id) {
 
-        //TODO: delete transaction and account before deleting the user
+        //IMP: delete transaction and account before deleting the user
+    }
+
+    @Override
+    public void updateUser(User user) {
+
     }
 }

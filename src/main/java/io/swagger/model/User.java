@@ -8,9 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -21,11 +19,12 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
 
 @Entity
+@SequenceGenerator(name = "user_seq", initialValue =  1001)
 public class User   {
 
   @JsonProperty("id")
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "user_seq")
   private long id;
 
   @JsonProperty("firstName")
