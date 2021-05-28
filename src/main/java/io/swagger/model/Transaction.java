@@ -1,13 +1,10 @@
 package io.swagger.model;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.service.AccountService;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
@@ -109,7 +106,7 @@ public class Transaction
         this.dateTimeCreated = dateTimeCreated;
     }
 
-    public Transaction senderIBAN(Account senderAccount)
+    public Transaction senderAccount(Account senderAccount)
     {
         this.senderAccount = senderAccount;
         return this;
@@ -132,7 +129,7 @@ public class Transaction
         this.senderAccount = senderAccount;
     }
 
-    public Transaction receiverIBAN(Account receiverAccount)
+    public Transaction receiverAccount(Account receiverAccount)
     {
         this.receiverAccount = receiverAccount;
         return this;

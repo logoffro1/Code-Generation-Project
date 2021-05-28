@@ -58,6 +58,7 @@ public class User
 
     public User()
     {
+
     }
 
     public User(String firstName, String lastName, String email, String password, String phoneNumber, Double dayLimit, Double transactionLimit, RoleEnum role)

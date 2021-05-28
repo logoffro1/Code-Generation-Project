@@ -31,17 +31,18 @@ public class Account   {
   @JsonProperty("absoluteLimit")
   private Double absoluteLimit = null;
 
-  @JsonProperty("userId")
-  private Integer userId = null;
+  @ManyToOne
+  @JoinColumn(name = "userID")
+  private User user = null;
 
   public Account(){
 
   }
 
-  public Account(String IBAN,Double absoluteLimit, Integer userId, TypeEnum type, StatusEnum status, BigDecimal balance, String token) {
+  public Account(String IBAN,Double absoluteLimit, User user, TypeEnum type, StatusEnum status, BigDecimal balance, String token) {
     this.absoluteLimit = absoluteLimit;
     this.IBAN = IBAN;
-    this.userId = userId;
+    this.user = user;
     this.type = type;
     this.status = status;
     this.balance = balance;
@@ -144,8 +145,8 @@ public class Account   {
     this.IBAN = IBAN;
   }
 
-  public Account userId(Integer userId) {
-    this.userId = userId;
+  public Account user(User user) {
+    this.user = user;
     return this;
   }
 
@@ -156,12 +157,12 @@ public class Account   {
   @Schema(required = true, description = "")
       @NotNull
 
-    public Integer getUserId() {
-    return userId;
+    public User getUser() {
+    return this.user;
   }
 
-  public void setUserId(Integer userId) {
-    this.userId = userId;
+  public void setUser(User user) {
+    this.user = user;
   }
 
   public Account type(TypeEnum type) {
@@ -255,7 +256,7 @@ public class Account   {
     }
     Account account = (Account) o;
     return Objects.equals(this.IBAN, account.IBAN) &&
-        Objects.equals(this.userId, account.userId) &&
+        Objects.equals(this.user, account.user) &&
         Objects.equals(this.type, account.type) &&
         Objects.equals(this.status, account.status) &&
         Objects.equals(this.balance, account.balance) &&
@@ -264,7 +265,7 @@ public class Account   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(IBAN, userId, type, status, balance, token);
+    return Objects.hash(IBAN, user, type, status, balance, token);
   }
 
   @Override
@@ -273,7 +274,7 @@ public class Account   {
     sb.append("class Account {\n");
     
     sb.append("    IBAN: ").append(toIndentedString(IBAN)).append("\n");
-    sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
+    sb.append("    userId: ").append(toIndentedString(user)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    balance: ").append(toIndentedString(balance)).append("\n");

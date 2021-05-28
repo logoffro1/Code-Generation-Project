@@ -31,10 +31,10 @@ public class ApplicationStartup implements ApplicationRunner
     @Override
     public void run(ApplicationArguments args) throws Exception
     {
-
-        userService.createUser(new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983",5000.00,1.000, User.RoleEnum.CUSTOMER));
-        accountService.createAccount(new Account("iban1",0.00, 1, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
-        accountService.createAccount(new Account("iban2",0.00, 2, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
+        User user = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983",5000.00,1.000, User.RoleEnum.CUSTOMER);
+        userService.createUser(user);
+        accountService.createAccount(new Account("iban1",0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
+        accountService.createAccount(new Account("iban2",0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
         transactionService.createTransaction(new Transaction(accountService.getAccountById(2), accountService.getAccountById(3), 100.00, "EUR"));
 
     }
