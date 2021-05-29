@@ -28,18 +28,18 @@ public class ApplicationStartup implements ApplicationRunner
     private UserService userService;
     @Autowired
     private AccountService accountService;
-
+    @Autowired
+    private IbanGenerator gen;
     @Override
     public void run(ApplicationArguments args) throws Exception
     {
         User user = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983",5000.00,1.000, User.RoleEnum.CUSTOMER);
         userService.createUser(user);
-        accountService.createAccount(new Account("iban1",0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
-        accountService.createAccount(new Account("iban2",0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
+        accountService.createAccount(new Account(gen.generateIban(),0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
+        accountService.createAccount(new Account(gen.generateIban(),0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
         transactionService.createTransaction(new Transaction(accountService.getAccountById(2), accountService.getAccountById(3), 100.00, "EUR"));
-         IbanGenerator  gen = new IbanGenerator();
 
 
-         gen.generateIban();
+
     }
 }

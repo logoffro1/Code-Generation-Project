@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -37,6 +38,7 @@ public class Account   {
   @ManyToOne
   @JoinColumn(name = "userID")
   private User user = null;
+
 
   public Account(){
 
