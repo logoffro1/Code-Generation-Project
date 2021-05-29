@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -26,19 +26,8 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User getUserById(long id) {
-        User user = new User();
-        try {
-              user = userRepository.findById((int)id).orElseThrow(new Supplier<Throwable>() {
-                @Override
-                public Throwable get() {
-                    return null;
-                }
-            });
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-        return user;
+    public User getUserById(long id) throws Exception {
+        return userRepository.findById(id).orElseThrow(Exception::new);
     }
 
     @Override
