@@ -47,7 +47,7 @@ public interface AccountApi {
     @RequestMapping(value = "/account",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Void> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be created", schema=@Schema()) @Valid @RequestBody Account body);
+    ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be created", schema=@Schema()) @Valid @RequestBody Account body);
 
 
     @Operation(summary = "edit existed account", description = "get the account by id to edit the info of the account", security = {
@@ -57,7 +57,7 @@ public interface AccountApi {
     @RequestMapping(value = "/account/{userId}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Void> editAccountById(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required=true, schema=@Schema()) @PathVariable("userId") Integer userId, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema=@Schema()) @Valid @RequestBody Account body);
+    ResponseEntity<Account> editAccountById(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required=true, schema=@Schema()) @PathVariable("userId") Integer userId, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema=@Schema()) @Valid @RequestBody Account body);
 
 
     @Operation(summary = "get account by id", description = "get account by id", security = {

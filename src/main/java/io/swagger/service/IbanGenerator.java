@@ -1,18 +1,15 @@
 package io.swagger.service;
 
-import io.swagger.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+
 import java.util.Random;
 
 @Component
 public class IbanGenerator {
 
     @Autowired
-    private AccountService accountService;
+    private AccountServiceImpl accountServiceImpl;
 
     // General format that needs to be created : NLxxINHO0xxxxxxxxx
 
@@ -26,7 +23,7 @@ public class IbanGenerator {
             int ibanNumbers=randomRange(100000000,999999999);
             int afterPrefixNumbers=randomRange(10,99);
             newIban=String.format("%s%d%s%d",this.prefix,afterPrefixNumbers,this.prefixInh,ibanNumbers);
-        }while(accountService.isIbanTaken(newIban));
+        }while(accountServiceImpl.isIbanTaken(newIban));
         return newIban;
     }
 

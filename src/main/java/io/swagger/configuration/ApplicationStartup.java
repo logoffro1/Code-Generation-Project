@@ -3,7 +3,7 @@ package io.swagger.configuration;
 import io.swagger.model.Account;
 import io.swagger.model.Transaction;
 import io.swagger.model.User;
-import io.swagger.service.AccountService;
+import io.swagger.service.AccountServiceImpl;
 import io.swagger.service.IbanGenerator;
 import io.swagger.service.TransactionService;
 import io.swagger.service.UserService;
@@ -27,7 +27,7 @@ public class ApplicationStartup implements ApplicationRunner
     @Autowired
     private UserService userService;
     @Autowired
-    private AccountService accountService;
+    private AccountServiceImpl accountServiceImpl;
     @Autowired
     private IbanGenerator gen;
     @Override
@@ -35,9 +35,9 @@ public class ApplicationStartup implements ApplicationRunner
     {
         User user = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983",5000.00,1.000, User.RoleEnum.CUSTOMER);
         userService.createUser(user);
-        accountService.createAccount(new Account(gen.generateIban(),0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
-        accountService.createAccount(new Account(gen.generateIban(),0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
-        transactionService.createTransaction(new Transaction(accountService.getAccountById(2), accountService.getAccountById(3), 100.00, "EUR"));
+        accountServiceImpl.createAccount(new Account(gen.generateIban(),0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
+        accountServiceImpl.createAccount(new Account(gen.generateIban(),0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
+        transactionService.createTransaction(new Transaction(accountServiceImpl.getAccountById(2), accountServiceImpl.getAccountById(3), 100.00, "EUR"));
 
 
 
