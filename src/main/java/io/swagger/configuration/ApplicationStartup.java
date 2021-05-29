@@ -4,6 +4,7 @@ import io.swagger.model.Account;
 import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.service.AccountService;
+import io.swagger.service.IbanGenerator;
 import io.swagger.service.TransactionService;
 import io.swagger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class ApplicationStartup implements ApplicationRunner
         accountService.createAccount(new Account("iban1",0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
         accountService.createAccount(new Account("iban2",0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
         transactionService.createTransaction(new Transaction(accountService.getAccountById(2), accountService.getAccountById(3), 100.00, "EUR"));
+
 
     }
 }
