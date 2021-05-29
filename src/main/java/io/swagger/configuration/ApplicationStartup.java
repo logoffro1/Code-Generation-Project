@@ -37,7 +37,9 @@ public class ApplicationStartup implements ApplicationRunner
         accountService.createAccount(new Account("iban1",0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
         accountService.createAccount(new Account("iban2",0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
         transactionService.createTransaction(new Transaction(accountService.getAccountById(2), accountService.getAccountById(3), 100.00, "EUR"));
+         IbanGenerator  gen = new IbanGenerator();
 
 
+         gen.generateIban();
     }
 }

@@ -1,11 +1,15 @@
 package io.swagger.service;
 
+import io.swagger.repository.AccountRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.Random;
+
 
 public class IbanGenerator {
 
-
-    private static final AccountService accountService =new AccountService();
+    @Autowired
+    private AccountService accountService;
 
     // General format that needs to be created : NLxxINHO0xxxxxxxxx
 
