@@ -6,6 +6,7 @@
 package io.swagger.api;
 
 import io.swagger.model.Account;
+import io.swagger.model.Transaction;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -44,7 +45,7 @@ public interface AccountApi {
         @ApiResponse(responseCode = "400", description = "account was not found"),
         
         @ApiResponse(responseCode = "5XX", description = "unexpected error") })
-    @RequestMapping(value = "/account",
+    @RequestMapping(value = "/accounts",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
     ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be created", schema=@Schema()) @Valid @RequestBody Account body);
@@ -54,10 +55,10 @@ public interface AccountApi {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "success") })
-    @RequestMapping(value = "/account/{userId}",
+    @RequestMapping(value = "/account/{accountId}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Account> editAccountById(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required=true, schema=@Schema()) @PathVariable("userId") Integer userId, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema=@Schema()) @Valid @RequestBody Account body);
+    ResponseEntity<Account> editAccountById(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required=true, schema=@Schema()) @PathVariable("accountId") Integer accountId, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema=@Schema()) @Valid @RequestBody Account body);
 
 
     @Operation(summary = "get account by id", description = "get account by id", security = {
@@ -86,19 +87,18 @@ public interface AccountApi {
 )) @PathVariable("status") String status, @Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("userId") Integer userId);
 
 
-    @Operation(summary = "account type", description = "get the type of the account (either current or savings)", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = Account.class))),
-        
-        @ApiResponse(responseCode = "400", description = "account was not found"),
-        
-        @ApiResponse(responseCode = "5XX", description = "unexpected error") })
-    @RequestMapping(value = "/account/{type}/{userId}",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<Account> getAccountType(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema(allowableValues={ "current", "savings" }
-)) @PathVariable("type") String type, @Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("userId") Integer userId);
 
+    @Operation(summary = "Get accounts", description = "Get the Accounts according to offset and limit values", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = Account.class))),
+
+            @ApiResponse(responseCode = "400", description = "account was not found"),
+
+            @ApiResponse(responseCode = "5XX", description = "unexpected error") })
+    @RequestMapping(value = "/accounts",
+            produces = { "application/json" },
+            method = RequestMethod.GET)
+    ResponseEntity<List<Account>> getAccounts(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit);
 }
 

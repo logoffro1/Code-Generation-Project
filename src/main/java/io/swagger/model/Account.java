@@ -40,6 +40,10 @@ public class Account   {
   private User user = null;
 
 
+  public void setAccountId(long accountId) {
+    this.accountId = accountId;
+  }
+
   public Account(){
 
   }
