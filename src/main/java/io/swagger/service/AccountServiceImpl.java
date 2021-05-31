@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class AccountServiceImpl {
+public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private AccountRepository accountRepository;
@@ -20,6 +20,9 @@ public class AccountServiceImpl {
         // return accountRepository != null ? accountRepository.findById(id).get() : null;
         return accountRepository.findById(id).get();
     }
+//    public Account updateAccount(Integer accountId,Account newAccount){
+//        need an update method and delete account method.
+//    }
 
     public List<Account> getAllAccounts() {
         return (List<Account>) accountRepository.findAll();

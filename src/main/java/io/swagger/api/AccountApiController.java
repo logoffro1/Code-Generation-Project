@@ -47,7 +47,7 @@ public class AccountApiController implements AccountApi {
     }
 
     //Done and working
-    @RequestMapping(value = "/accounts",
+    @RequestMapping(value = "",
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be created", schema = @Schema()) @Valid @RequestBody Account newAccount) {
@@ -58,7 +58,7 @@ public class AccountApiController implements AccountApi {
     }
 
     //Usable method however doesn't work
-    @RequestMapping(value = "/accounts/{accountId}",
+    @RequestMapping(value = "/{accountId}",
             consumes = {"application/json"},
             method = RequestMethod.PUT)
     public ResponseEntity<Account> editAccountById(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required = true, schema = @Schema()) @PathVariable("accountId") Integer accountId, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema = @Schema()) @Valid @RequestBody Account updatedAccount) {
@@ -72,46 +72,39 @@ public class AccountApiController implements AccountApi {
         return new ResponseEntity<Account>(HttpStatus.ACCEPTED).status(200).body(dbAccount);
     }
 
-    //Work on this next
-    @RequestMapping(value = "/accounts/{userId}",
+    //Done
+    @RequestMapping(value = "/id/{accountId}",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    public ResponseEntity<Account> getAccountById(@Parameter(in = ParameterIn.PATH, description = "the id of the user who owns the account", required = true, schema = @Schema()) @PathVariable("accountId") Integer accountId, @NotNull @Parameter(in = ParameterIn.QUERY, description = "", required = true, schema = @Schema(allowableValues = {"active", "closed"}
-    )) @Valid @RequestParam(value = "status", required = true) String status) {
+    public ResponseEntity<Account> getAccountById(@Parameter(in = ParameterIn.PATH, description = "the id of the account", required = true, schema = @Schema()) @PathVariable("accountId") Integer accountId) {
         String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<Account>(objectMapper.readValue("{\n  \"IBAN\" : \"IBAN\",\n  \"balance\" : 6.027456183070403,\n  \"type\" : \"current\",\n  \"userId\" : 0,\n  \"status\" : \"active\",\n  \"token\" : \"token\"\n}", Account.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<Account>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
 
-        return new ResponseEntity<Account>(HttpStatus.NOT_IMPLEMENTED);
+        Account requestedAccount = accountServiceImpl.getAccountById(accountId);
+
+        if (requestedAccount != null)
+            return new ResponseEntity<Account>(HttpStatus.ACCEPTED).status(200).body(requestedAccount);
+        else {
+            return new ResponseEntity<Account>(HttpStatus.NO_CONTENT);
+        }
     }
 
-    @RequestMapping(value = "/accounts/{status}/{userId}",
+    @RequestMapping(value = "/iban/{iban}",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    public ResponseEntity<Account> getAccountStatus(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema(allowableValues = {"active", "closed"}
-    )) @PathVariable("status") String status, @Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("userId") Integer userId) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<Account>(objectMapper.readValue("{\n  \"IBAN\" : \"IBAN\",\n  \"balance\" : 6.027456183070403,\n  \"type\" : \"current\",\n  \"userId\" : 0,\n  \"status\" : \"active\",\n  \"token\" : \"token\"\n}", Account.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<Account>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the user who owns the account", required = true, schema = @Schema()) @PathVariable("iban") String iban) {
+        List<Account> allAccounts = accountServiceImpl.getAllAccounts();
+
+        for (Account account : allAccounts) {
+            if (account.getIBAN().equals(iban)) {
+                return new ResponseEntity<Account>(HttpStatus.FOUND).status(200).body(account);
             }
         }
-
-        return new ResponseEntity<Account>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<Account>(HttpStatus.NO_CONTENT);
     }
 
 
     //Done and working
-    @RequestMapping(value = "/accounts",
+    @RequestMapping(value = "",
             produces = {"application/json"},
             method = RequestMethod.GET)
     public ResponseEntity<List<Account>> getAccounts(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return", schema = @Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
@@ -124,7 +117,7 @@ public class AccountApiController implements AccountApi {
                 continue;
             }
 
-            if (limit==0) {
+            if (limit == 0) {
                 break;
             } else {
                 sortedAccounts.add(allAccounts.get(i));
@@ -132,7 +125,7 @@ public class AccountApiController implements AccountApi {
             }
 
         }
-        for(Account c: sortedAccounts){
+        for (Account c : sortedAccounts) {
             System.out.println(c);
         }
         return new ResponseEntity<List<Account>>(HttpStatus.ACCEPTED).status(200).body(sortedAccounts);
