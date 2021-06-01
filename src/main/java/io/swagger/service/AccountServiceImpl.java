@@ -8,7 +8,9 @@ import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -17,12 +19,18 @@ public class AccountServiceImpl implements AccountService {
     private AccountRepository accountRepository;
 
     public Account getAccountById(long id) {
-        // return accountRepository != null ? accountRepository.findById(id).get() : null;
         return accountRepository.findById(id).get();
     }
-//    public Account updateAccount(Integer accountId,Account newAccount){
-//        need an update method and delete account method.
-//    }
+
+    public Account updateAccount(Long accountId,Account newAccount){
+        Account oldAccount = accountRepository.findById(accountId).get();
+        oldAccount.setBalance(newAccount.getBalance());
+        oldAccount.setAbsoluteLimit(newAccount.getAbsoluteLimit());
+        oldAccount.setStatus(newAccount.getStatus());
+        oldAccount.setType(newAccount.getType());
+        accountRepository.save(oldAccount);
+        return oldAccount;
+    }
 
     public List<Account> getAllAccounts() {
         return (List<Account>) accountRepository.findAll();

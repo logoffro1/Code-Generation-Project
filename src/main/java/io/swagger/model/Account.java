@@ -39,11 +39,6 @@ public class Account   {
   @JoinColumn(name = "userID")
   private User user = null;
 
-
-  public void setAccountId(long accountId) {
-    this.accountId = accountId;
-  }
-
   public Account(){
 
   }
@@ -56,6 +51,14 @@ public class Account   {
     this.status = status;
     this.balance = balance;
     this.token = token;
+  }
+
+  public Double getAbsoluteLimit() {
+    return absoluteLimit;
+  }
+
+  public void setAbsoluteLimit(Double absoluteLimit) {
+    this.absoluteLimit = absoluteLimit;
   }
 
   public long getAccountId() {
