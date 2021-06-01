@@ -46,11 +46,6 @@ public class Transaction
     @JsonProperty("currencyType")
     private String currencyType = null;
 
-
-    public Transaction()
-    {
-    }
-
     public Transaction(Account senderAccount, Account receiverAccount, Double amount, String currencyType)
     {
         this.senderAccount = senderAccount;

@@ -1,6 +1,5 @@
 package io.swagger.service;
 
-import com.sun.xml.bind.v2.model.core.ID;
 import io.swagger.model.Transaction;
 import io.swagger.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,14 +36,8 @@ public class TransactionServiceImpl implements TransactionService
     }
 
     @Override
-    public void deleteAllTransactions(List<Transaction> transactions)
+    public void deleteTransaction(Transaction transaction)
     {
-        transactionRepository.deleteAll(transactions);
-    }
-
-    @Override
-    public void deleteAllTransactions()
-    {
-        transactionRepository.deleteAll();
+        transactionRepository.delete(transaction);
     }
 }

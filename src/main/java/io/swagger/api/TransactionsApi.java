@@ -53,7 +53,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<Transaction> transactionsGet(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit);
+    ResponseEntity<List<Transaction>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit);
 
 
     @Operation(summary = "", description = "Create a transaction", security = {
@@ -72,7 +72,7 @@ public interface TransactionsApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Transaction> transactionsPost(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body);
+    ResponseEntity<Transaction> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body);
 
 
     @Operation(summary = "", description = "", security = {
@@ -89,7 +89,7 @@ public interface TransactionsApi {
         @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
     @RequestMapping(value = "/{transactionId}",
         method = RequestMethod.DELETE)
-    ResponseEntity<Void> transactionsTransactionIdDelete(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
+    ResponseEntity<Void> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
 
 
     @Operation(summary = "", description = "", security = {
@@ -107,7 +107,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "/{transactionId}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<Transaction> transactionsTransactionIdGet(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
+    ResponseEntity<Transaction> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
 
 
     @Operation(summary = "", description = "", security = {
@@ -127,7 +127,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "/{transactionId}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Void> transactionsTransactionIdPut(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body);
+    ResponseEntity<Void> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body);
 
 }
 
