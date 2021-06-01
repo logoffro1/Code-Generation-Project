@@ -5,7 +5,7 @@ import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.service.AccountServiceImpl;
 import io.swagger.service.IbanGenerator;
-import io.swagger.service.TransactionService;
+import io.swagger.service.TransactionServiceImpl;
 import io.swagger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -23,7 +23,7 @@ public class ApplicationStartup implements ApplicationRunner
 {
 
     @Autowired
-    private TransactionService transactionService;
+    private TransactionServiceImpl transactionServiceImpl;
     @Autowired
     private UserService userService;
     @Autowired
@@ -37,7 +37,7 @@ public class ApplicationStartup implements ApplicationRunner
         userService.createUser(user);
         accountServiceImpl.createAccount(new Account(gen.generateIban(),0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
         accountServiceImpl.createAccount(new Account(gen.generateIban(),0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
-        transactionService.createTransaction(new Transaction(accountServiceImpl.getAccountById(2), accountServiceImpl.getAccountById(3), 100.00, "EUR"));
+        transactionServiceImpl.createTransaction(new Transaction(accountServiceImpl.getAccountById(2), accountServiceImpl.getAccountById(3), 100.00, "EUR"));
 
 
 
