@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.*;
 
 //Written by Egehan Cinarli.
 //This class is ran at the once the application starts running. Mostly being used to enter the initial data to the database.
@@ -39,6 +40,9 @@ public class ApplicationStartup implements ApplicationRunner
         accountServiceImpl.createAccount(new Account(gen.generateIban(), 0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
         accountServiceImpl.createAccount(new Account(gen.generateIban(), 0.00, user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
         transactionServiceImpl.createTransaction(new Transaction(accountServiceImpl.getAccountById(2), accountServiceImpl.getAccountById(3), 100.00, "EUR"));
+        int x = 0,b = 0,c,d;
+        List<Integer> nr = Arrays.asList(x,b);
+
 
     }
 }

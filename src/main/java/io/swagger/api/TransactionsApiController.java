@@ -61,18 +61,7 @@ public class TransactionsApiController implements TransactionsApi
 
     public ResponseEntity<Transaction> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody Transaction body)
     {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json"))
-        {
-            try
-            {
-                return new ResponseEntity<Transaction>(objectMapper.readValue("{\n  \"currencyType\" : \"EUR\",\n  \"amountLimit\" : 4800,\n  \"dateTimeCreated\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"amount\" : 4800,\n  \"senderUserId\" : 20939,\n  \"senderIBAN\" : \"NL23RABO2298608059\",\n  \"receiverIBAN\" : \"NL67ABNA8265634552\",\n  \"transactionId\" : 2012\n}", Transaction.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e)
-            {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<Transaction>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+
 
         return new ResponseEntity<Transaction>(HttpStatus.NOT_IMPLEMENTED);
     }
