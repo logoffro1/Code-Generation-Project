@@ -20,7 +20,7 @@ public class TransactionServiceImpl implements TransactionService
         return (List<Transaction>) transactionRepository.findAll();
     }
 
-    public Transaction getTransactionById(int id)
+    public Transaction getTransactionById(long id)
     {
         return transactionRepository.findById(id).get();
     }
@@ -28,5 +28,23 @@ public class TransactionServiceImpl implements TransactionService
     public void createTransaction(Transaction transaction)
     {
         transactionRepository.save(transaction);
+    }
+
+    @Override
+    public void deleteTransactionById(long id)
+    {
+        transactionRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteAllTransactions(List<Transaction> transactions)
+    {
+        transactionRepository.deleteAll(transactions);
+    }
+
+    @Override
+    public void deleteAllTransactions()
+    {
+        transactionRepository.deleteAll();
     }
 }
