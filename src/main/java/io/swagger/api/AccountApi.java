@@ -93,5 +93,24 @@ public interface AccountApi {
             produces = { "application/json" },
             method = RequestMethod.GET)
     ResponseEntity<List<Account>> getAccounts(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit);
+
+    @Operation(summary = "", description = "", security = {
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully deleted."),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden, you do not have access rights"),
+
+            @ApiResponse(responseCode = "404", description = "Not found"),
+
+            @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
+    @RequestMapping(value = "/{accountId}",
+            method = RequestMethod.DELETE)
+    ResponseEntity<Account> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("accountId") Long accountId);
 }
+
+
+
 

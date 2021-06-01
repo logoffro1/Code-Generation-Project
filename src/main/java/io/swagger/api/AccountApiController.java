@@ -63,7 +63,6 @@ public class AccountApiController implements AccountApi {
             method = RequestMethod.PUT)
     public ResponseEntity<Account> editAccountById(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required = true, schema = @Schema()) @PathVariable("accountId") Long accountId, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema = @Schema()) @Valid @RequestBody Account updatedAccount) {
         String accept = request.getHeader("Accept");
-
         //This method will not create any new rows. It will simply update the row with the ID.
         Account dbAccount= accountServiceImpl.updateAccount(accountId,updatedAccount);
         return new ResponseEntity<Account>(HttpStatus.ACCEPTED).status(200).body(dbAccount);
@@ -128,5 +127,9 @@ public class AccountApiController implements AccountApi {
         return new ResponseEntity<List<Account>>(HttpStatus.ACCEPTED).status(200).body(sortedAccounts);
     }
 
+    public  ResponseEntity<Account> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("accountId") Long accountId){
+        Account changedAccount= accountServiceImpl.softDeleteAccount(accountId);
+        return new ResponseEntity<Account>(HttpStatus.ACCEPTED).status(200).body(changedAccount);
+    }
 
 }

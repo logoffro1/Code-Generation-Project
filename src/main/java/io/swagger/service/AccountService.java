@@ -10,5 +10,7 @@ public interface AccountService {
      List<Account> getAllAccounts();
     void createAccount(Account account);
     boolean isIbanTaken(String iban);
+    Account softDeleteAccount(Long accountId);
+    Account updateAccount(Long accountId,Account newAccount);
 
 }

@@ -53,4 +53,20 @@ public class AccountServiceImpl implements AccountService {
         return false;
     }
 
+
+    public Account softDeleteAccount(Long accountId) {
+
+       Account account= accountRepository.findById(accountId).get();
+
+       //Since deleting accounts are dangerous, Deleting accounts means simply closing them
+       account.setStatus(Account.StatusEnum.CLOSED);
+       accountRepository.save(account);
+
+       return account;
+
+    }
+
+
+
+
 }
