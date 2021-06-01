@@ -67,7 +67,7 @@ public interface UsersApi {
         @ApiResponse(responseCode = "404", description = "A user with the specified was not found"),
         
         @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
-    @RequestMapping(value = "/users/{userId}",
+    @RequestMapping(value = "users/{userId}",
         produces = { "application/json" }, 
         method = RequestMethod.DELETE)
     ResponseEntity<List<User>> deleteUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"

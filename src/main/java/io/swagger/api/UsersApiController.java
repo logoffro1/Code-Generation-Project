@@ -23,7 +23,7 @@ import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
 @RestController
-//@RequestMapping(value="/users")
+@RequestMapping(value="/users")
 public class UsersApiController implements UsersApi {
 
     @Autowired
@@ -41,33 +41,17 @@ public class UsersApiController implements UsersApi {
         this.request = request;
     }
 
+    @RequestMapping(value="", method = RequestMethod.POST , consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "User registered", required=true, schema=@Schema()) @Valid @RequestBody User user) {
-//        String accept = request.getHeader("Accept");
-//        if (accept != null && accept.contains("application/json")) {
-//            try {
-//                return new ResponseEntity<User>(objectMapper.readValue("{\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n}", User.class), HttpStatus.NOT_IMPLEMENTED);
-//            } catch (IOException e) {
-//                log.error("Couldn't serialize response for content type application/json", e);
-//                return new ResponseEntity<User>(HttpStatus.INTERNAL_SERVER_ERROR);
-//            }
-//        }
-//
-//        return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);
+        String accept = request.getHeader("Accept");
         userService.createUser(user);
-        return ResponseEntity.status(201).body(user);
+        return new ResponseEntity<User>(HttpStatus.CREATED).status(201).body(user);
     }
 
+    //TO DO
     public ResponseEntity<List<User>> deleteUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId) {
         String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<User>>(objectMapper.readValue("[ {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n}, {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
 
         return new ResponseEntity<List<User>>(HttpStatus.NOT_IMPLEMENTED);
     }
@@ -75,40 +59,21 @@ public class UsersApiController implements UsersApi {
     @RequestMapping(value="/{userId}", method = RequestMethod.GET , produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getUserById(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId) throws Exception {
-//        String accept = request.getHeader("Accept");
-//        if (accept != null && accept.contains("application/json")) {
-//            try {
-//                return new ResponseEntity<List<User>>(objectMapper.readValue("[ {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n}, {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-//            } catch (IOException e) {
-//                log.error("Couldn't serialize response for content type application/json", e);
-//                return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR);
-//            }
-//        }
-
-        //return new ResponseEntity<List<User>>(HttpStatus.NOT_IMPLEMENTED);
+        String accept = request.getHeader("Accept");
 
         User user = userService.getUserById(userId);
-        return new ResponseEntity<>(user, HttpStatus.OK);
-        //return ResponseEntity.status(200).body(userService.getUserById(userId));
+        return new ResponseEntity<User>(HttpStatus.FOUND).status(200).body(user);
     }
 
+    //TO DO: put off set limit
     @RequestMapping(value="", method = RequestMethod.GET , produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
-//        String accept = request.getHeader("Accept");
-//        if (accept != null && accept.contains("application/json")) {
-//            try {
-//                return new ResponseEntity<List<User>>(objectMapper.readValue("[ {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n}, {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-//            } catch (IOException e) {
-//                log.error("Couldn't serialize response for content type application/json", e);
-//                return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR);
-//            }
-//        }
-//
-//        return new ResponseEntity<List<User>>(HttpStatus.NOT_IMPLEMENTED);
+        String accept = request.getHeader("Accept");
 
         return ResponseEntity.status(200).body(userService.getUsers());
     }
 
+    @RequestMapping(value="", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId) {
         String accept = request.getHeader("Accept");

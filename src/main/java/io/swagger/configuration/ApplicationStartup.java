@@ -5,12 +5,10 @@ import io.swagger.model.User;
 import io.swagger.service.AccountService;
 import io.swagger.service.TransactionService;
 import io.swagger.service.UserService;
-import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-import org.threeten.bp.OffsetDateTime;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
