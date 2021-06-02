@@ -1,5 +1,6 @@
 package io.swagger.api;
 
+import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.UserDTO;
@@ -27,6 +28,7 @@ import java.util.List;
 @RequestMapping(value="/users")
 public class UsersApiController implements UsersApi {
 
+    //Example throw new ApiRequestException("Tammy is a programmer",HttpStatus.ACCEPTED);
     @Autowired
     private UserService userService;
 
@@ -40,6 +42,7 @@ public class UsersApiController implements UsersApi {
     public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
+
     }
 
     @RequestMapping(value="", method = RequestMethod.POST , consumes = MediaType.APPLICATION_JSON_VALUE)

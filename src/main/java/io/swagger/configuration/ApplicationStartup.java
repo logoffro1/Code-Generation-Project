@@ -30,8 +30,8 @@ public class ApplicationStartup implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
 
         userService.createUser(new User("John","Doe","JohnDoe@gmail.com","johnnie123","213712983", User.RoleEnum.CUSTOMER));
-        accountService.createAccount(new Account(2,"NL1291232112902",1, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE,BigDecimal.valueOf(2020),"token"));
+        accountService.createAccount(new Account("12312",422.00,1, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE,BigDecimal.valueOf(2020),"token"));
 
-       userService.createUser(new User("Williams","smith","willliamSmith@gmail.com","william123","213712983", User.RoleEnum.CUSTOMER));
+        userService.createUser(new User("Williams","smith","willliamSmith@gmail.com","william123","213712983", User.RoleEnum.CUSTOMER));
     }
 }
