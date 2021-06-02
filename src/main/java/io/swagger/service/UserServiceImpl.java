@@ -1,13 +1,14 @@
 package io.swagger.service;
 
 
+import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
+import io.swagger.model.UserDTO;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void updateUser(User user) {
+    public void updateUser(ModifyUserDTO user) {
 
     }
 }

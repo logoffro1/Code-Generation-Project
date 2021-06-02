@@ -48,8 +48,7 @@ public class User   {
   public User() {
   }
 
-  public User(Integer id, String firstName, String lastName, String email, String password, String phoneNumber, RoleEnum role) {
-    this.id = id;
+  public User(String firstName, String lastName, String email, String password, String phoneNumber, RoleEnum role) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
@@ -95,21 +94,6 @@ public class User   {
   public User id(Integer id) {
     this.id = id;
     return this;
-  }
-
-  /**
-   * Get id
-   * @return id
-   **/
-  @Schema(example = "1", required = true, accessMode = Schema.AccessMode.READ_ONLY, description = "")
-      @NotNull
-
-    public long getId() {
-    return id;
-  }
-
-  public void setId(Integer id) {
-    this.id = id;
   }
 
   public User firstName(String firstName) {

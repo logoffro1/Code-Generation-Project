@@ -2,6 +2,7 @@ package io.swagger.api;
 
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.model.UserDTO;
 import io.swagger.service.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -66,8 +67,10 @@ public class UsersApiController implements UsersApi {
     }
 
     //TO DO: put off set limit
-    @RequestMapping(value="", method = RequestMethod.GET , produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
+    @RequestMapping(value="",
+            method = RequestMethod.GET ,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
         String accept = request.getHeader("Accept");
 
         return ResponseEntity.status(200).body(userService.getUsers());
@@ -79,5 +82,9 @@ public class UsersApiController implements UsersApi {
         String accept = request.getHeader("Accept");
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
-
+//
+//    private UserDTO convertToUserDto(User user) {
+//        UserDTO publicUser = modelMapper.map(user, UserDTO.class);
+//        return publicUser;
+//    }
 }
