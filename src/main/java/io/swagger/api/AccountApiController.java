@@ -1,5 +1,6 @@
 package io.swagger.api;
 
+import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.Account;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.models.Response;
@@ -58,44 +59,21 @@ public class AccountApiController implements AccountApi {
     }
 
     //Usable method however doesn't work
-    @RequestMapping(value = "/{accountId}",
+    @RequestMapping(value = "/{iban}",
             consumes = {"application/json"},
             method = RequestMethod.PUT)
-    public ResponseEntity<Account> editAccountById(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required = true, schema = @Schema()) @PathVariable("accountId") Long accountId, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema = @Schema()) @Valid @RequestBody Account updatedAccount) {
+    public ResponseEntity<Account> editAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required = true, schema = @Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema = @Schema()) @Valid @RequestBody Account updatedAccount) {
         String accept = request.getHeader("Accept");
-        //This method will not create any new rows. It will simply update the row with the ID.
-        Account dbAccount= accountServiceImpl.updateAccount(accountId,updatedAccount);
+        Account dbAccount = accountServiceImpl.updateAccount(iban, updatedAccount);
         return new ResponseEntity<Account>(HttpStatus.ACCEPTED).status(200).body(dbAccount);
     }
 
-    //Done
-    @RequestMapping(value = "/id/{accountId}",
+    @RequestMapping(value = "/{iban}",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    public ResponseEntity<Account> getAccountById(@Parameter(in = ParameterIn.PATH, description = "the id of the account", required = true, schema = @Schema()) @PathVariable("accountId") Integer accountId) {
-        String accept = request.getHeader("Accept");
-
-        Account requestedAccount = accountServiceImpl.getAccountById(accountId);
-
-        if (requestedAccount != null)
-            return new ResponseEntity<Account>(HttpStatus.ACCEPTED).status(200).body(requestedAccount);
-        else {
-            return new ResponseEntity<Account>(HttpStatus.NO_CONTENT);
-        }
-    }
-
-    @RequestMapping(value = "/iban/{iban}",
-            produces = {"application/json"},
-            method = RequestMethod.GET)
-    public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the user who owns the account", required = true, schema = @Schema()) @PathVariable("iban") String iban) {
-        List<Account> allAccounts = accountServiceImpl.getAllAccounts();
-
-        for (Account account : allAccounts) {
-            if (account.getIBAN().equals(iban)) {
-                return new ResponseEntity<Account>(HttpStatus.FOUND).status(200).body(account);
-            }
-        }
-        return new ResponseEntity<Account>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the user who owns the account", required=true, schema=@Schema()) @PathVariable("iban") String iban) {
+       Account account= accountServiceImpl.getAccountByIban(iban);
+       return new ResponseEntity<Account>(HttpStatus.ACCEPTED).status(HttpStatus.ACCEPTED).body(account);
     }
 
 
@@ -105,31 +83,14 @@ public class AccountApiController implements AccountApi {
             method = RequestMethod.GET)
     public ResponseEntity<List<Account>> getAccounts(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return", schema = @Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
 
-        List<Account> allAccounts = accountServiceImpl.getAllAccounts();
-        List<Account> sortedAccounts = new ArrayList<Account>();
-        for (int i = 0; i < allAccounts.stream().count(); i++) {
-
-            if (i < offset) {
-                continue;
-            }
-
-            if (limit == 0) {
-                break;
-            } else {
-                sortedAccounts.add(allAccounts.get(i));
-                limit--;
-            }
-
-        }
-        for (Account c : sortedAccounts) {
-            System.out.println(c);
-        }
-        return new ResponseEntity<List<Account>>(HttpStatus.ACCEPTED).status(200).body(sortedAccounts);
+        List<Account> allAccounts = accountServiceImpl.getAllAccounts(limit,offset);
+        return new ResponseEntity<List<Account>>(HttpStatus.ACCEPTED).status(200).body(allAccounts);
     }
 
-    public  ResponseEntity<Account> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("accountId") Long accountId){
-        Account changedAccount= accountServiceImpl.softDeleteAccount(accountId);
+    public  ResponseEntity<Account> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("iban") String iban){
+        Account changedAccount= accountServiceImpl.softDeleteAccount(iban);
         return new ResponseEntity<Account>(HttpStatus.ACCEPTED).status(200).body(changedAccount);
+
     }
 
 }

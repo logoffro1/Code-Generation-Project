@@ -61,10 +61,6 @@ public class Account   {
     this.absoluteLimit = absoluteLimit;
   }
 
-  public long getAccountId() {
-    return accountId;
-  }
-
   /**
    * Gets or Sets type
    */

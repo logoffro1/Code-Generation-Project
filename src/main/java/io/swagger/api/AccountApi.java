@@ -55,26 +55,17 @@ public interface AccountApi {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "success") })
-    @RequestMapping(value = "/{accountId}",
+    @RequestMapping(value = "/{iban}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Account> editAccountById(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required=true, schema=@Schema()) @PathVariable("accountId") Long accountId, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema=@Schema()) @Valid @RequestBody Account body);
+    ResponseEntity<Account> editAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema=@Schema()) @Valid @RequestBody Account body);
 
-
-    @Operation(summary = "get account by id", description = "get account by id", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = Account.class))) })
-    @RequestMapping(value = "/id/{accountId}",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<Account> getAccountById(@Parameter(in = ParameterIn.PATH, description = "the id of the user who owns the account", required=true, schema=@Schema()) @PathVariable("accountId") Integer accountId);
 
     @Operation(summary = "get account by Iban", description = "get account by Iban", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = Account.class))) })
-    @RequestMapping(value = "/iban/{iban}",
+    @RequestMapping(value = "/{iban}",
             produces = { "application/json" },
             method = RequestMethod.GET)
     ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the user who owns the account", required=true, schema=@Schema()) @PathVariable("iban") String iban);
@@ -106,9 +97,9 @@ public interface AccountApi {
             @ApiResponse(responseCode = "404", description = "Not found"),
 
             @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
-    @RequestMapping(value = "/{accountId}",
+    @RequestMapping(value = "/{iban}",
             method = RequestMethod.DELETE)
-    ResponseEntity<Account> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("accountId") Long accountId);
+    ResponseEntity<Account> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("iban") String iban);
 }
 
 

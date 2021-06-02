@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface AccountService {
 
-     Account getAccountById(long id);
-     List<Account> getAllAccounts();
+     Account getAccountByIban(String iban);
+     List<Account> getAllAccounts(Integer limit, Integer offset);
     void createAccount(Account account);
     boolean isIbanTaken(String iban);
-    Account softDeleteAccount(Long accountId);
-    Account updateAccount(Long accountId,Account newAccount);
+    Account softDeleteAccount(String iban);
+    Account updateAccount(String iban,Account newAccount);
 
 }
