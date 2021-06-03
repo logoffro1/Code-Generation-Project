@@ -1,11 +1,13 @@
 package io.swagger.model;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.engine.internal.Cascade;
+import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
