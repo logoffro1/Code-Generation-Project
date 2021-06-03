@@ -5,6 +5,7 @@
  */
 package io.swagger.api;
 
+import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
 import io.swagger.model.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -127,9 +128,10 @@ public interface UsersApi {
         
         @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
     @RequestMapping(value = "/users/{userId}",
-        method = RequestMethod.PUT)
+            consumes = { "application/json" },
+            method = RequestMethod.PUT)
     ResponseEntity<Void> updateUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
-)) @PathVariable("userId") Long userId);
+)) @PathVariable("userId") Long userId,  @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody ModifyUserDTO body);
 
 }
 

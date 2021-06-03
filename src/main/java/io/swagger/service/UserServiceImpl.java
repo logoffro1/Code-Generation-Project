@@ -1,11 +1,16 @@
 package io.swagger.service;
 
 
+import io.swagger.exceptions.ApiRequestException;
+import io.swagger.exceptions.UserNotFoundException;
 import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
 import io.swagger.model.UserDTO;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +22,10 @@ public class UserServiceImpl implements UserService{
     private UserRepository userRepository;
 
     @Override
-    public List<User> getUsers() {
-        return (List<User>)userRepository.findAll();
+    public List<User> getUsers(Integer limit,Integer offset) {
+
+        Pageable pageable= PageRequest.of(offset,limit);
+        return userRepository.findAll(pageable).getContent();
     }
 
     @Override
@@ -27,18 +34,39 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User getUserById(long id) throws Exception {
-        return userRepository.findById(id).orElseThrow(Exception::new);
+    public User getUserById(long id)  {
+
+        return userRepository.findById(id).orElseThrow(() -> new ApiRequestException("User with the specified Id was not found",HttpStatus.BAD_REQUEST));
     }
 
     @Override
     public void deleteUserById(long id) {
 
-        //IMP: delete transaction and account before deleting the user
+        //TO DO: delete the transactions and account too
+        userRepository.deleteById(id);
     }
 
     @Override
-    public void updateUser(ModifyUserDTO user) {
+    public void updateUser(ModifyUserDTO modifyUser, long id) {
 
+        User user = getUserById(id);
+
+        if (modifyUser.getFirstName() != null && !modifyUser.getFirstName().isEmpty()) {
+            user.setFirstName(modifyUser.getFirstName());
+        }
+        if (modifyUser.getLastName() != null && !modifyUser.getLastName().isEmpty()) {
+            user.setLastName(modifyUser.getLastName());
+        }
+        if (modifyUser.getEmailAddress() != null && !modifyUser.getEmailAddress().isEmpty()) {
+            user.setEmail(modifyUser.getEmailAddress());
+        }
+        if (modifyUser.getPassword() != null && !modifyUser.getPassword().isEmpty()) {
+            user.setPassword(modifyUser.getPassword());
+        }
+        if (modifyUser.getPhoneNumber() != null && !modifyUser.getPhoneNumber().isEmpty()) {
+            user.setPhoneNumber(modifyUser.getPhoneNumber());
+        }
+
+        userRepository.save(user);
     }
 }
