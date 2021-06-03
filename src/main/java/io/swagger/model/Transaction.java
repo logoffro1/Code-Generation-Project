@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.hibernate.engine.internal.Cascade;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
@@ -29,11 +30,11 @@ public class Transaction
     @JsonProperty("dateTimeCreated")
     private OffsetDateTime dateTimeCreated = null;
 
-    @ManyToOne
+    @ManyToOne(cascade= CascadeType.ALL)
     @JoinColumn(name = "senderIBAN")
     private Account senderAccount = null;
 
-    @ManyToOne
+    @ManyToOne(cascade= CascadeType.ALL)
     @JoinColumn(name = "receiverIBAN")
     private Account receiverAccount = null;
 

@@ -6,14 +6,15 @@ import java.util.List;
 
 public interface TransactionService
 {
-    List<Transaction> getAllTransactions();
+    List<Transaction> getAllTransactions(int offset, int limit);
 
     Transaction getTransactionById(long id);
 
-    void createTransaction(Transaction transaction);
+    Transaction createTransaction(Transaction transaction);
 
-    void deleteTransactionById(long id);
+    Transaction deleteTransactionById(long id);
 
-    void deleteTransaction(Transaction transaction);
+    Transaction deleteTransaction(Transaction transaction);
+    Transaction updateTransaction(long transactionId, Transaction newTransaction);
 
 }

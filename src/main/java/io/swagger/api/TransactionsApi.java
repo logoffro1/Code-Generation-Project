@@ -89,7 +89,7 @@ public interface TransactionsApi {
         @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
     @RequestMapping(value = "/{transactionId}",
         method = RequestMethod.DELETE)
-    ResponseEntity<Void> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
+    ResponseEntity<Transaction> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
 
 
     @Operation(summary = "", description = "", security = {
@@ -127,7 +127,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "/{transactionId}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Void> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body);
+    ResponseEntity<Transaction> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body);
 
 }
 

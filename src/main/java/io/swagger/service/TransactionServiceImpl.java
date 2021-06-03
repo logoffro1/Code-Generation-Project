@@ -3,6 +3,8 @@ package io.swagger.service;
 import io.swagger.model.Transaction;
 import io.swagger.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,9 +16,10 @@ public class TransactionServiceImpl implements TransactionService
     @Autowired
     private TransactionRepository transactionRepository;
 
-    public List<Transaction> getAllTransactions()
+    public List<Transaction> getAllTransactions(int offset, int limit)
     {
-        return (List<Transaction>) transactionRepository.findAll();
+        Pageable pageable= PageRequest.of(offset,limit);
+        return  transactionRepository.findAll(pageable).getContent();
     }
 
     public Transaction getTransactionById(long id)
@@ -24,20 +27,38 @@ public class TransactionServiceImpl implements TransactionService
         return transactionRepository.findById(id).get();
     }
 
-    public void createTransaction(Transaction transaction)
+    public Transaction createTransaction(Transaction transaction)
     {
-        transactionRepository.save(transaction);
+        if(transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit())
+            return null;
+      //  transaction.getSenderAccount().getUser().
+     //   transactionRepository.save(transaction);
+
+        return transaction;
     }
 
     @Override
-    public void deleteTransactionById(long id)
+    public Transaction deleteTransactionById(long id)
     {
+
+        Transaction transaction = transactionRepository.findById(id).get();
         transactionRepository.deleteById(id);
+        return transaction;
     }
 
     @Override
-    public void deleteTransaction(Transaction transaction)
+    public Transaction deleteTransaction(Transaction transaction)
     {
         transactionRepository.delete(transaction);
+        return transaction;
+    }
+
+    @Override
+    public Transaction updateTransaction(long transactionId, Transaction newTransaction)
+    {
+        Transaction oldTransaction = transactionRepository.findById(transactionId).get();
+        oldTransaction.setAmount(newTransaction.getAmount());
+        transactionRepository.save(oldTransaction);
+        return oldTransaction;
     }
 }
