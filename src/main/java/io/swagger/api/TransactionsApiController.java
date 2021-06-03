@@ -50,7 +50,10 @@ public class TransactionsApiController implements TransactionsApi
 
     public ResponseEntity<Transaction> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody Transaction transaction)
     {
-        transactionService.createTransaction(transaction);
+
+        if(transactionService.createTransaction(transaction) == null)
+            return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(null);
+
         return new ResponseEntity<Transaction>(HttpStatus.CREATED).status(201).body(transaction);
     }
 

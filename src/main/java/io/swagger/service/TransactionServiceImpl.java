@@ -1,12 +1,16 @@
 package io.swagger.service;
 
 import io.swagger.model.Transaction;
+import io.swagger.model.User;
+import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
+import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -16,10 +20,16 @@ public class TransactionServiceImpl implements TransactionService
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    private UserService userService;
+
     public List<Transaction> getAllTransactions(int offset, int limit)
     {
-        Pageable pageable= PageRequest.of(offset,limit);
-        return  transactionRepository.findAll(pageable).getContent();
+        Pageable pageable = PageRequest.of(offset, limit);
+        return transactionRepository.findAll(pageable).getContent();
     }
 
     public Transaction getTransactionById(long id)
@@ -29,10 +39,17 @@ public class TransactionServiceImpl implements TransactionService
 
     public Transaction createTransaction(Transaction transaction)
     {
-        if(transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit())
+        User senderUser = transaction.getSenderAccount().getUser();
+        if (transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit()) return null;
+        if (senderUser.getTransactionLimit() > transaction.getAmount()) return null;
+        if (senderUser.getCurrentTransactionsAmount() + transaction.getAmount() > senderUser.getDayLimit()) return null;
+
+        senderUser.setCurrentTransactionsAmount(senderUser.getCurrentTransactionsAmount() + transaction.getAmount());
+        //get balance, subtract transaction amount, if that is less than absolute limit, return null (also convert a bunch of double to BigDecimal)
+        if (transaction.getSenderAccount().getBalance().subtract(BigDecimal.valueOf(transaction.getAmount())).compareTo(BigDecimal.valueOf(transaction.getSenderAccount().getAbsoluteLimit())) < 0)
             return null;
-      //  transaction.getSenderAccount().getUser().
-     //   transactionRepository.save(transaction);
+
+        transactionRepository.save(transaction);
 
         return transaction;
     }
