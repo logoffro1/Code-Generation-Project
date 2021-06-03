@@ -40,12 +40,17 @@ public class TransactionServiceImpl implements TransactionService
 
     public Transaction createTransaction(Transaction transaction)
     {
-        User senderUser = transaction.getSenderAccount().getUser();
+        User senderUser = transaction.getSenderAccount().getUser(); //store sender
+        //if the amount is less than 0 or it's more than the limit
         if (transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit()) return null;
+
+        //make sure the amount is less than the limit
         if (senderUser.getTransactionLimit() < transaction.getAmount()) return null;
+
+        //check so the user doesn't exceed the daily limit amount
         if (senderUser.getCurrentTransactionsAmount() + transaction.getAmount() > senderUser.getDayLimit()) return null;
 
-        //increase the user's daily transactions amount
+        //increase the user's  current daily transactions amount
         senderUser.setCurrentTransactionsAmount(senderUser.getCurrentTransactionsAmount() + transaction.getAmount());
 
         //get balance, subtract transaction amount, if that is less than absolute limit, return null (also convert a bunch of double to BigDecimal)
@@ -72,6 +77,7 @@ public class TransactionServiceImpl implements TransactionService
     @Override
     public Transaction deleteTransaction(Transaction transaction)
     {
+
         transactionRepository.delete(transaction);
         return transaction;
     }
