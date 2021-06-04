@@ -169,6 +169,36 @@ public class User
         return this;
     }
 
+    public Double getTransactionLimit()
+    {
+        return transactionLimit;
+    }
+
+    public void setTransactionLimit(Double transactionLimit)
+    {
+        this.transactionLimit = transactionLimit;
+    }
+
+    public Double getDayLimit()
+    {
+        return dayLimit;
+    }
+
+    public void setDayLimit(Double dayLimit)
+    {
+        this.dayLimit = dayLimit;
+    }
+
+    public Double getCurrentTransactionsAmount()
+    {
+        return currentTransactionsAmount;
+    }
+
+    public void setCurrentTransactionsAmount(Double currentTransactionsAmount)
+    {
+        this.currentTransactionsAmount = currentTransactionsAmount;
+    }
+
     /**
      * Get lastName
      *
