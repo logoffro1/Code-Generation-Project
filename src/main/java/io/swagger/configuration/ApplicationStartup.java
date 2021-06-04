@@ -37,6 +37,8 @@ public class ApplicationStartup implements ApplicationRunner
     {
         User user = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", 5000.00, 2000.00, User.RoleEnum.CUSTOMER);
         userService.createUser(user);
+        User bank = new User("bank","bank","bank@gmail.com","bankbankbankbank","00000000",10000000000000.0,10000000.0, User.RoleEnum.EMPLOYEE);
+//        Account bankAccount = new Account("NL01INHO0000000001",)
        Account account1 = new Account(gen.generateIban(), BigDecimal.valueOf(00), user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
        Account account2 = new Account(gen.generateIban(), BigDecimal.valueOf(00), user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020));
         accountServiceImpl.createAccount(account1);

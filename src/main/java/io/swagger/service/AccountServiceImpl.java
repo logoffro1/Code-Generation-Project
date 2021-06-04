@@ -25,7 +25,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     //Change this to only update account type for EMPLOYEE
-    public Account updateAccount(String iban,Account newAccount){
+    public Account updateAccount(String iban, Account newAccount) {
         Account oldAccount = accountRepository.findByIBAN(iban);
         oldAccount.setType(newAccount.getType());
         accountRepository.save(oldAccount);
@@ -33,23 +33,31 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public List<Account> getAllAccounts(Integer limit, Integer offset) {
-        Pageable pageable= PageRequest.of(offset,limit);
-        return  accountRepository.findAll(pageable).getContent();
+        Pageable pageable = PageRequest.of(offset, limit);
+        return accountRepository.findAll(pageable).getContent();
     }
 
     public void createAccount(Account account) {
+        saveAccount(account);
+    }
+
+    private void saveAccount(Account account) {
+        if (account.getBalance().compareTo(account.getAbsoluteLimit()) == -1)
+            throw new ApiRequestException("Balance can not be less than absoluteLimit", HttpStatus.BAD_REQUEST);
+//            if(!userService.existsById((int) account.getUser().getId()))
+//                throw new ApiRequestException("User is not present in database",HttpStatus.FORBIDDEN);
+        if (account.getStatus() == Account.StatusEnum.CLOSED)
+            throw new ApiRequestException("Account must not be closed when it is created", HttpStatus.FORBIDDEN);
+
 
         accountRepository.save(account);
+
+        //Add User/Employee error handling as well
     }
 
-    private void saveAccount (Account account){
-            if(account.getBalance().compareTo(account.getAbsoluteLimit())==-1)
-                throw new ApiRequestException("Balance can not be less than absoluteLimit", HttpStatus.BAD_REQUEST);
-    }
+    public boolean isIbanPresent(String iban) {
 
-    public boolean isIbanTaken(String iban) {
-
-        if(accountRepository.findByIBAN(iban)!=null)
+        if (accountRepository.findByIBAN(iban) != null)
             return true;
         else
             return false;
@@ -59,18 +67,19 @@ public class AccountServiceImpl implements AccountService {
 
     public Account softDeleteAccount(String iban) {
 
-       Account account= accountRepository.findByIBAN(iban);
+        if (!isIbanPresent(iban))
+            throw new ApiRequestException("Iban is not found", HttpStatus.BAD_REQUEST);
+
+        Account account = accountRepository.findByIBAN(iban);
         System.out.println(account);
 
-       //Since deleting accounts are dangerous, Deleting accounts means simply closing them
-       account.setStatus(Account.StatusEnum.CLOSED);
-       accountRepository.save(account);
+        //Since deleting accounts are dangerous, Deleting accounts means simply closing them
+        account.setStatus(Account.StatusEnum.CLOSED);
+        accountRepository.save(account);
 
-       return account;
+        return account;
 
     }
-
-
 
 
 }

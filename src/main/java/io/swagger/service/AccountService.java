@@ -9,7 +9,7 @@ public interface AccountService {
      Account getAccountByIban(String iban);
      List<Account> getAllAccounts(Integer limit, Integer offset);
     void createAccount(Account account);
-    boolean isIbanTaken(String iban);
+    boolean isIbanPresent(String iban);
     Account softDeleteAccount(String iban);
     Account updateAccount(String iban,Account newAccount);
 

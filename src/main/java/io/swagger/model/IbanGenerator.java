@@ -28,7 +28,7 @@ public class IbanGenerator
             int afterPrefixNumbers = randomRange(10, 99);
 
             newIban = String.format("%s%d%s%d", this.PREFIX, afterPrefixNumbers, this.PREFIX_INH, ibanNumbers);
-        } while (accountServiceImpl.isIbanTaken(newIban));
+        } while (accountServiceImpl.isIbanPresent(newIban));
         return newIban;
     }
 
