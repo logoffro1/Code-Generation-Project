@@ -1,5 +1,4 @@
 .idea
-.target
 /target/classes/io/swagger/model/Account$StatusEnum.class
 /target/classes/io/swagger/model/Account$TypeEnum.class
 /target/classes/io/swagger/model/Account.class
@@ -51,3 +50,4 @@
 /target/classes/io/swagger/api/UsersApi.class
 /target/classes/io/swagger/api/UsersApiController.class
 /target/classes/io/swagger/service/UserService.class
+/target/classes/io/swagger/service/UserServiceImpl.class
