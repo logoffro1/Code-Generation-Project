@@ -2,10 +2,7 @@ package io.swagger.service;
 
 
 import io.swagger.exceptions.ApiRequestException;
-import io.swagger.exceptions.UserNotFoundException;
-import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
-import io.swagger.model.UserDTO;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
