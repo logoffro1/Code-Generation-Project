@@ -5,7 +5,9 @@
  */
 package io.swagger.api;
 
+import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
+import io.swagger.model.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -67,10 +69,10 @@ public interface UsersApi {
         @ApiResponse(responseCode = "404", description = "A user with the specified was not found"),
         
         @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
-    @RequestMapping(value = "/users/{userId}",
+    @RequestMapping(value = "users/{userId}",
         produces = { "application/json" }, 
         method = RequestMethod.DELETE)
-    ResponseEntity<List<User>> deleteUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
+    ResponseEntity<Void> deleteUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId);
 
 
@@ -89,8 +91,8 @@ public interface UsersApi {
     @RequestMapping(value = "/users/{userId}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<User>> getUserById(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
-)) @PathVariable("userId") Long userId);
+    ResponseEntity<User> getUserById(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
+)) @PathVariable("userId") Long userId) throws Exception;
 
 
     @Operation(summary = "returns a list of users", description = "Returns a list of users", security = {
@@ -126,9 +128,10 @@ public interface UsersApi {
         
         @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
     @RequestMapping(value = "/users/{userId}",
-        method = RequestMethod.PUT)
+            consumes = { "application/json" },
+            method = RequestMethod.PUT)
     ResponseEntity<Void> updateUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
-)) @PathVariable("userId") Long userId);
+)) @PathVariable("userId") Long userId,  @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody User body);
 
 }
 

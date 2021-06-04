@@ -1,40 +1,41 @@
 package io.swagger.api;
 
+import io.swagger.exceptions.ApiRequestException;
+import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.model.UserDTO;
+import io.swagger.service.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
 @RestController
+@RequestMapping(value="/users")
 public class UsersApiController implements UsersApi {
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
+    private UserService userService;
 
     private static final Logger log = LoggerFactory.getLogger(UsersApiController.class);
 
@@ -46,70 +47,92 @@ public class UsersApiController implements UsersApi {
     public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
+
     }
 
-    public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "User registered", required=true, schema=@Schema()) @Valid @RequestBody User body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<User>(objectMapper.readValue("{\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n}", User.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<User>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+    @RequestMapping(value="",
+            method = RequestMethod.POST ,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "User registered", required=true, schema=@Schema()) @Valid @RequestBody User user)
+    {
+        try {
+            if(userService.createUser(user) == null){
+                return new ResponseEntity<User>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(null);}
+
+            userService.createUser(user);
+            return new ResponseEntity<User>(HttpStatus.CREATED).status(201).body(user);
+
+        } catch(Exception e) {
+            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
         }
-
-        return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<List<User>> deleteUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
+    @RequestMapping(value="",
+            method = RequestMethod.DELETE ,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<User>>(objectMapper.readValue("[ {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n}, {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
 
-        return new ResponseEntity<List<User>>(HttpStatus.NOT_IMPLEMENTED);
+        try {
+            userService.deleteUserById(userId);
+            return new ResponseEntity<Void>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
+        }
     }
 
-    public ResponseEntity<List<User>> getUserById(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
-)) @PathVariable("userId") Long userId) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<User>>(objectMapper.readValue("[ {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n}, {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+    @RequestMapping(value="/{userId}",
+            method = RequestMethod.GET ,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> getUserById(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
+)) @PathVariable("userId") Long userId) throws Exception {
 
-        return new ResponseEntity<List<User>>(HttpStatus.NOT_IMPLEMENTED);
+        try {
+
+            User user = userService.getUserById(userId);
+            return new ResponseEntity<User>(HttpStatus.FOUND).status(200).body(user);
+
+        } catch (Exception e ){
+
+            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
+        }
     }
 
-    public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<User>>(objectMapper.readValue("[ {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n}, {\n  \"firstName\" : \"john\",\n  \"lastName\" : \"winchester\",\n  \"password\" : \"whatever\",\n  \"phoneNumber\" : \"090078601\",\n  \"role\" : \"employee\",\n  \"id\" : 1,\n  \"creationDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"email\" : \"john@gmail.com\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+    @RequestMapping(value="",
+            method = RequestMethod.GET ,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
 
-        return new ResponseEntity<List<User>>(HttpStatus.NOT_IMPLEMENTED);
+        List<User> users = userService.getUsers(offset, limit);
+//        List<UserDTO> publicUsers = new ArrayList<>();
+//
+//        for (User user: users) {
+//            publicUsers.add(convertToUserDTO(user));
+//        }
+        return new ResponseEntity<List<User>>(HttpStatus.ACCEPTED).status(200).body(users);
+
+//        return new ResponseEntity<List<UserDTO>>(publicUsers,HttpStatus.ACCEPTED);
     }
 
+    @RequestMapping(value="/{userId}",
+            method = RequestMethod.PUT,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
-)) @PathVariable("userId") Long userId) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+)) @PathVariable("userId") Long userId, @Valid @RequestBody User body) {
+
+        try {
+            userService.updateUser(body,userId);
+            return new ResponseEntity<Void>(HttpStatus.OK);
+
+        } catch (Exception e){
+
+            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
+        }
     }
 
+    private UserDTO convertToUserDTO(User user) {
+        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        return userDTO;
+    }
 }

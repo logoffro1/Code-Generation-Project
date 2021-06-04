@@ -1,7 +1,6 @@
 package io.swagger.configuration;
 
 import io.swagger.model.Account;
-import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.service.AccountService;
 import io.swagger.service.TransactionService;
@@ -18,24 +17,21 @@ import java.math.BigDecimal;
 //This class is ran at the once the application starts running. Mostly being used to enter the initial data to the database.
 @Component
 @Transactional
-public class ApplicationStartup implements ApplicationRunner
-{
+public class ApplicationStartup implements ApplicationRunner {
 
     @Autowired
     private TransactionService transactionService;
     @Autowired
     private UserService userService;
     @Autowired
-    private AccountService accountService;
+    private  AccountService accountService;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception
-    {
+    public void run(ApplicationArguments args) throws Exception {
 
-        userService.createUser(new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983",5000.00,1.000, User.RoleEnum.CUSTOMER));
-        accountService.createAccount(new Account("iban1",0.00, 1, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
-        accountService.createAccount(new Account("iban2",0.00, 2, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020), "token"));
-        transactionService.createTransaction(new Transaction(accountService.getAccountById(2), accountService.getAccountById(3), 100.00, "EUR"));
+        userService.createUser(new User("John","Doe","JohnDoe@gmail.com","johnnie123","213712983", User.RoleEnum.CUSTOMER));
+        accountService.createAccount(new Account("12312",422.00,1, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE,BigDecimal.valueOf(2020),"token"));
 
+        userService.createUser(new User("Williams","smith","willliamSmith@gmail.com","william123","213712983", User.RoleEnum.CUSTOMER));
     }
 }

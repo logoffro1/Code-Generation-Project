@@ -1,24 +1,17 @@
 package io.swagger.service;
 
+import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
-import io.swagger.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import io.swagger.model.UserDTO;
 
 import java.util.List;
+import java.util.Optional;
 
-@Service
-public class UserService {
-
-    @Autowired
-    private UserRepository userRepository;
-
-    public void createUser(User user){
-
-        userRepository.save(user);
-    }
-
-    public List<User> getAllUsers(){
-        return (List<User>) userRepository.findAll();
-    }
+public interface UserService {
+    List<User> getUsers(Integer limit,Integer offset);
+    User createUser(User user);
+    User getUserById(long id);
+    void deleteUserById(long id);
+    void updateUser(User user,long id);
+    boolean isUserPresent(long id);
 }
