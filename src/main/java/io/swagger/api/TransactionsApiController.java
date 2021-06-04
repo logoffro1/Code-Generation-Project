@@ -62,10 +62,12 @@ public class TransactionsApiController implements TransactionsApi
     {
         try
         {
-            if (transactionService.createTransaction(transaction) == null)
-                return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(null);
+   /*         if (transactionService.createTransaction(transaction) == null)
+                return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(null);*/
 
-            return new ResponseEntity<Transaction>(HttpStatus.CREATED).status(201).body(transaction);
+            Transaction tmpTransaction = transactionService.createTransaction(transaction);
+
+            return new ResponseEntity<Transaction>(HttpStatus.CREATED).status(201).body(tmpTransaction);
         } catch (Exception e)
         {
             e.printStackTrace();

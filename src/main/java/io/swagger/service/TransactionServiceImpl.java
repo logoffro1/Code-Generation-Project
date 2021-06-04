@@ -1,5 +1,6 @@
 package io.swagger.service;
 
+import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.Account;
 import io.swagger.model.Transaction;
 import io.swagger.model.User;
@@ -9,6 +10,7 @@ import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -43,20 +45,23 @@ public class TransactionServiceImpl implements TransactionService
         // throw new ApiRequestException("message",HttpStatus.BAD_REQUEST);
         User senderUser = transaction.getSenderAccount().getUser(); //store sender
         //if the amount is less than 0 or it's more than the limit
-        if (transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit()) return null;
+        if (transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit())
+            throw new ApiRequestException("Invalid amount!", HttpStatus.BAD_REQUEST);
 
         //make sure the amount is less than the limit
-        if (senderUser.getTransactionLimit() < transaction.getAmount()) return null;
+        if (senderUser.getTransactionLimit() < transaction.getAmount())
+            throw new ApiRequestException("Amount is higher than the limit!", HttpStatus.BAD_REQUEST);
 
         //check so the user doesn't exceed the daily limit amount
-        if (senderUser.getCurrentTransactionsAmount() + transaction.getAmount() > senderUser.getDayLimit()) return null;
+        if (senderUser.getCurrentTransactionsAmount() + transaction.getAmount() > senderUser.getDayLimit())
+            throw new ApiRequestException("Daily limit ammount exceeded!", HttpStatus.BAD_REQUEST);
 
         //increase the user's  current daily transactions amount
         senderUser.setCurrentTransactionsAmount(senderUser.getCurrentTransactionsAmount() + transaction.getAmount());
 
         //get balance, subtract transaction amount, if that is less than absolute limit, return null (also convert a bunch of double to BigDecimal)
         if (transaction.getSenderAccount().getBalance().subtract(BigDecimal.valueOf(transaction.getAmount())).compareTo(transaction.getSenderAccount().getAbsoluteLimit()) < 0)
-            return null;
+            throw new ApiRequestException("You can't have that little money in your account!", HttpStatus.BAD_REQUEST);
 
         sendMoney(transaction.getSenderAccount(), transaction.getReceiverAccount(), transaction.getAmount());
 
