@@ -66,4 +66,9 @@ public class UserServiceImpl implements UserService{
 
         userRepository.save(user);
     }
+
+    @Override
+    public boolean isUserPresent(long id) {
+        return userRepository.existsById(id);
+    }
 }

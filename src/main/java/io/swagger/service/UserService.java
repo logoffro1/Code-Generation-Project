@@ -13,4 +13,5 @@ public interface UserService {
     User getUserById(long id);
     void deleteUserById(long id);
     void updateUser(User user,long id);
+    boolean isUserPresent(long id);
 }
