@@ -54,7 +54,7 @@ public class TransactionServiceImpl implements TransactionService
         senderUser.setCurrentTransactionsAmount(senderUser.getCurrentTransactionsAmount() + transaction.getAmount());
 
         //get balance, subtract transaction amount, if that is less than absolute limit, return null (also convert a bunch of double to BigDecimal)
-        if (transaction.getSenderAccount().getBalance().subtract(BigDecimal.valueOf(transaction.getAmount())).compareTo(BigDecimal.valueOf(transaction.getSenderAccount().getAbsoluteLimit())) < 0)
+        if (transaction.getSenderAccount().getBalance().subtract(BigDecimal.valueOf(transaction.getAmount())).compareTo(transaction.getSenderAccount().getAbsoluteLimit()) < 0)
             return null;
 
         sendMoney(transaction.getSenderAccount(), transaction.getReceiverAccount(), transaction.getAmount());

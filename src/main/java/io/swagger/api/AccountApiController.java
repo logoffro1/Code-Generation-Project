@@ -1,11 +1,9 @@
 package io.swagger.api;
 
-import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.Account;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.models.Response;
 import io.swagger.service.AccountServiceImpl;
-import io.swagger.service.IbanGenerator;
+import io.swagger.model.IbanGenerator;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,13 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.NotAcceptableStatusException;
 
-import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
@@ -52,13 +47,16 @@ public class AccountApiController implements AccountApi {
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be created", schema = @Schema()) @Valid @RequestBody Account newAccount) {
-        String accept = request.getHeader("Accept");
         newAccount.setIBAN(this.ibanGenerator.generateIban());
-        accountServiceImpl.createAccount(newAccount);
-        return new ResponseEntity<Account>(HttpStatus.CREATED).status(201).body(newAccount);
+        try{
+            accountServiceImpl.createAccount(newAccount);
+            return new ResponseEntity<Account>(HttpStatus.CREATED).status(201).body(newAccount);
+        }
+        catch(NotAcceptableStatusException exception){
+            return new ResponseEntity<Account>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(newAccount);
+        }
     }
 
-    //Usable method however doesn't work
     @RequestMapping(value = "/{iban}",
             consumes = {"application/json"},
             method = RequestMethod.PUT)

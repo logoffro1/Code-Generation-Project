@@ -1,5 +1,6 @@
-package io.swagger.service;
+package io.swagger.model;
 
+import io.swagger.service.AccountServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

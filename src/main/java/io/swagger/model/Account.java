@@ -4,12 +4,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.service.IbanGenerator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -33,7 +30,7 @@ public class Account   {
   private String IBAN = null;
 
   @JsonProperty("absoluteLimit")
-  private Double absoluteLimit = null;
+  private BigDecimal absoluteLimit = null;
 
   @ManyToOne
   @JoinColumn(name = "userID")
@@ -43,21 +40,20 @@ public class Account   {
 
   }
 
-  public Account(String IBAN,Double absoluteLimit, User user, TypeEnum type, StatusEnum status, BigDecimal balance, String token) {
+  public Account(String IBAN,BigDecimal absoluteLimit, User user, TypeEnum type, StatusEnum status, BigDecimal balance) {
     this.absoluteLimit = absoluteLimit;
     this.IBAN = IBAN;
     this.user = user;
     this.type = type;
     this.status = status;
     this.balance = balance;
-    this.token = token;
   }
 
-  public Double getAbsoluteLimit() {
+  public BigDecimal getAbsoluteLimit() {
     return absoluteLimit;
   }
 
-  public void setAbsoluteLimit(Double absoluteLimit) {
+  public void setAbsoluteLimit(BigDecimal absoluteLimit) {
     this.absoluteLimit = absoluteLimit;
   }
 
@@ -130,8 +126,6 @@ public class Account   {
   @JsonProperty("balance")
   private BigDecimal balance = null;
 
-  @JsonProperty("token")
-  private String token = null;
 
   public Account IBAN(String IBAN) {
     this.IBAN = IBAN;
@@ -234,24 +228,6 @@ public class Account   {
     this.balance = balance;
   }
 
-  public Account token(String token) {
-    this.token = token;
-    return this;
-  }
-
-  /**
-   * Get token
-   * @return token
-   **/
-  @Schema(description = "")
-  
-    public String getToken() {
-    return token;
-  }
-
-  public void setToken(String token) {
-    this.token = token;
-  }
 
 
   @Override
@@ -267,13 +243,12 @@ public class Account   {
         Objects.equals(this.user, account.user) &&
         Objects.equals(this.type, account.type) &&
         Objects.equals(this.status, account.status) &&
-        Objects.equals(this.balance, account.balance) &&
-        Objects.equals(this.token, account.token);
+        Objects.equals(this.balance, account.balance);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(IBAN, user, type, status, balance, token);
+    return Objects.hash(IBAN, user, type, status, balance);
   }
 
   @Override
@@ -286,7 +261,6 @@ public class Account   {
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    balance: ").append(toIndentedString(balance)).append("\n");
-    sb.append("    token: ").append(toIndentedString(token)).append("\n");
     sb.append("}");
     return sb.toString();
   }
