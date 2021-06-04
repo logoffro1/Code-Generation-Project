@@ -72,7 +72,7 @@ public interface UsersApi {
     @RequestMapping(value = "users/{userId}",
         produces = { "application/json" }, 
         method = RequestMethod.DELETE)
-    ResponseEntity<List<User>> deleteUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
+    ResponseEntity<Void> deleteUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId);
 
 
@@ -131,7 +131,7 @@ public interface UsersApi {
             consumes = { "application/json" },
             method = RequestMethod.PUT)
     ResponseEntity<Void> updateUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
-)) @PathVariable("userId") Long userId,  @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody ModifyUserDTO body);
+)) @PathVariable("userId") Long userId,  @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody User body);
 
 }
 

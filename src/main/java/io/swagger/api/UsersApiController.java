@@ -33,7 +33,7 @@ public class UsersApiController implements UsersApi {
 
     @Autowired
     private ModelMapper modelMapper;
-    //Example throw new ApiRequestException("Tammy is a programmer",HttpStatus.ACCEPTED);
+
     @Autowired
     private UserService userService;
 
@@ -53,18 +53,33 @@ public class UsersApiController implements UsersApi {
     @RequestMapping(value="",
             method = RequestMethod.POST ,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "User registered", required=true, schema=@Schema()) @Valid @RequestBody User user) {
-        String accept = request.getHeader("Accept");
-        userService.createUser(user);
-        return new ResponseEntity<User>(HttpStatus.CREATED).status(201).body(user);
+    public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "User registered", required=true, schema=@Schema()) @Valid @RequestBody User user)
+    {
+        try {
+            if(userService.createUser(user) == null){
+                return new ResponseEntity<User>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(null);}
+
+            userService.createUser(user);
+            return new ResponseEntity<User>(HttpStatus.CREATED).status(201).body(user);
+
+        } catch(Exception e) {
+            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
+        }
     }
 
-    //TO DO
-    public ResponseEntity<List<User>> deleteUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
+    @RequestMapping(value="",
+            method = RequestMethod.DELETE ,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId) {
-        String accept = request.getHeader("Accept");
 
-        return new ResponseEntity<List<User>>(HttpStatus.NOT_IMPLEMENTED);
+        try {
+            userService.deleteUserById(userId);
+            return new ResponseEntity<Void>(HttpStatus.OK);
+
+        } catch (Exception e) {
+            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
+        }
     }
 
     @RequestMapping(value="/{userId}",
@@ -72,17 +87,22 @@ public class UsersApiController implements UsersApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getUserById(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId) throws Exception {
-        String accept = request.getHeader("Accept");
 
-        User user = userService.getUserById(userId);
-        return new ResponseEntity<User>(HttpStatus.FOUND).status(200).body(user);
+        try {
+
+            User user = userService.getUserById(userId);
+            return new ResponseEntity<User>(HttpStatus.FOUND).status(200).body(user);
+
+        } catch (Exception e ){
+
+            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
+        }
     }
 
     @RequestMapping(value="",
             method = RequestMethod.GET ,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
-        String accept = request.getHeader("Accept");
 
         List<User> users = userService.getUsers(offset, limit);
 //        List<UserDTO> publicUsers = new ArrayList<>();
@@ -90,24 +110,25 @@ public class UsersApiController implements UsersApi {
 //        for (User user: users) {
 //            publicUsers.add(convertToUserDTO(user));
 //        }
-
-        //return new ResponseEntity<List<User>>(users,HttpStatus.ACCEPTED);
         return new ResponseEntity<List<User>>(HttpStatus.ACCEPTED).status(200).body(users);
-
 
 //        return new ResponseEntity<List<UserDTO>>(publicUsers,HttpStatus.ACCEPTED);
     }
 
-    @RequestMapping(value="",
+    @RequestMapping(value="/{userId}",
             method = RequestMethod.PUT,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
-)) @PathVariable("userId") Long userId, @Valid @RequestBody ModifyUserDTO body) {
-        String accept = request.getHeader("Accept");
+)) @PathVariable("userId") Long userId, @Valid @RequestBody User body) {
 
-        //User user = userService.getUserById(userId);
+        try {
+            userService.updateUser(body,userId);
+            return new ResponseEntity<Void>(HttpStatus.OK);
 
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+        } catch (Exception e){
+
+            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
+        }
     }
 
     private UserDTO convertToUserDTO(User user) {

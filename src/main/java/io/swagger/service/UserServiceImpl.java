@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void updateUser(ModifyUserDTO modifyUser, long id) {
+    public void updateUser(User modifyUser, long id) {
 
         User user = getUserById(id);
 
@@ -57,8 +57,8 @@ public class UserServiceImpl implements UserService{
         if (modifyUser.getLastName() != null && !modifyUser.getLastName().isEmpty()) {
             user.setLastName(modifyUser.getLastName());
         }
-        if (modifyUser.getEmailAddress() != null && !modifyUser.getEmailAddress().isEmpty()) {
-            user.setEmail(modifyUser.getEmailAddress());
+        if (modifyUser.getEmail() != null && !modifyUser.getEmail().isEmpty()) {
+            user.setEmail(modifyUser.getEmail());
         }
         if (modifyUser.getPassword() != null && !modifyUser.getPassword().isEmpty()) {
             user.setPassword(modifyUser.getPassword());
