@@ -37,7 +37,7 @@ import java.util.Map;
 @Validated
 public interface AccountApi {
 
-    @Operation(summary = "Creates an account", description = "Creates an account for a normal user", security = {
+    @Operation(summary = "Creates an account", description = "Creates an account for a normal user only the ID is needed", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "success"),
