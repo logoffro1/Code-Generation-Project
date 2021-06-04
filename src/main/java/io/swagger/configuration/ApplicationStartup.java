@@ -3,6 +3,7 @@ package io.swagger.configuration;
 import io.swagger.model.Account;
 import io.swagger.model.User;
 import io.swagger.service.AccountService;
+import io.swagger.service.IbanGeneratorService;
 import io.swagger.service.TransactionService;
 import io.swagger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +26,19 @@ public class ApplicationStartup implements ApplicationRunner {
     private UserService userService;
     @Autowired
     private  AccountService accountService;
+    @Autowired
+    private IbanGeneratorService ibanService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        userService.createUser(new User("John","Doe","JohnDoe@gmail.com","johnnie123","213712983", User.RoleEnum.CUSTOMER));
-//        accountService.createAccount(new Account("12312",BigDecimal.valueOf(2020),, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE,BigDecimal.valueOf(2020),"token"));
+        User user=new User("John","Doe","JohnDoe@gmail.com","johnnie123","213712983", User.RoleEnum.CUSTOMER);
+
+        userService.createUser(user);
+
+        accountService.createAccount(new Account(ibanService.generateIban(),BigDecimal.valueOf(2020),user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE,BigDecimal.valueOf(2020)));
 
         userService.createUser(new User("Williams","smith","willliamSmith@gmail.com","william123","213712983", User.RoleEnum.CUSTOMER));
+
     }
 }

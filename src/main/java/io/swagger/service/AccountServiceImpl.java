@@ -18,7 +18,7 @@ public class AccountServiceImpl implements AccountService {
     private AccountRepository accountRepository;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userService;
 
     public Account getAccountByIban(String iban) {
         return accountRepository.findByIBAN(iban);
@@ -44,8 +44,8 @@ public class AccountServiceImpl implements AccountService {
     private void saveAccount(Account account) {
         if (account.getBalance().compareTo(account.getAbsoluteLimit()) == -1)
             throw new ApiRequestException("Balance can not be less than absoluteLimit", HttpStatus.BAD_REQUEST);
-//            if(!userService.existsById((int) account.getUser().getId()))
-//                throw new ApiRequestException("User is not present in database",HttpStatus.FORBIDDEN);
+              if(!userService.isUserPresent((int) account.getUser().getId()))
+                  throw new ApiRequestException("User is not present in database",HttpStatus.FORBIDDEN);
         if (account.getStatus() == Account.StatusEnum.CLOSED)
             throw new ApiRequestException("Account must not be closed when it is created", HttpStatus.FORBIDDEN);
 

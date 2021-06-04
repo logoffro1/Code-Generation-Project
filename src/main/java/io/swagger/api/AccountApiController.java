@@ -2,8 +2,10 @@ package io.swagger.api;
 
 import io.swagger.model.Account;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.model.User;
 import io.swagger.service.AccountServiceImpl;
 import io.swagger.model.IbanGenerator;
+import io.swagger.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,6 +30,9 @@ public class AccountApiController implements AccountApi {
     private AccountServiceImpl accountServiceImpl;
 
     @Autowired
+    private UserServiceImpl userService;
+
+    @Autowired
     private IbanGenerator ibanGenerator;
 
     private static final Logger log = LoggerFactory.getLogger(AccountApiController.class);
@@ -49,6 +54,8 @@ public class AccountApiController implements AccountApi {
     public ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be created", schema = @Schema()) @Valid @RequestBody Account newAccount) {
         newAccount.setIBAN(this.ibanGenerator.generateIban());
         try{
+            User realUser= userService.getUserById(newAccount.getUser().getId());
+            newAccount.setUser(realUser);
             accountServiceImpl.createAccount(newAccount);
             return new ResponseEntity<Account>(HttpStatus.CREATED).status(201).body(newAccount);
         }

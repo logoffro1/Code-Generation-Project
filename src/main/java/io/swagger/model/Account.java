@@ -32,7 +32,7 @@ public class Account   {
   @JsonProperty("absoluteLimit")
   private BigDecimal absoluteLimit = null;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
   @JoinColumn(name = "userID")
   private User user = null;
 

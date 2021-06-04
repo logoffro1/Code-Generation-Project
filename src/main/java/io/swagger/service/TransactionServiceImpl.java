@@ -40,6 +40,7 @@ public class TransactionServiceImpl implements TransactionService
 
     public Transaction createTransaction(Transaction transaction)
     {
+        // throw new ApiRequestException("message",HttpStatus.BAD_REQUEST);
         User senderUser = transaction.getSenderAccount().getUser(); //store sender
         //if the amount is less than 0 or it's more than the limit
         if (transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit()) return null;
