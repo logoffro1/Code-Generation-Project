@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.NotAcceptableStatusException;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +51,7 @@ public class TransactionsApiController implements TransactionsApi
             return new ResponseEntity<List<Account>>(HttpStatus.ACCEPTED)
                     .status(200)
                     .body(transactionService.getAllTransactions(offset, limit));
-        } catch (Exception e)
+        } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
             return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -62,32 +63,31 @@ public class TransactionsApiController implements TransactionsApi
     {
         try
         {
-   /*         if (transactionService.createTransaction(transaction) == null)
-                return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(null);*/
 
-            Transaction tmpTransaction = transactionService.createTransaction(transaction);
+            transactionService.createTransaction(transaction);
 
-            return new ResponseEntity<Transaction>(HttpStatus.CREATED).status(201).body(tmpTransaction);
-        } catch (Exception e)
+            return new ResponseEntity<Transaction>(HttpStatus.CREATED).status(201).body(transaction);
+        } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
+            return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transaction);
         }
 
 
-        return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
 
     public ResponseEntity<Transaction> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId)
     {
         try
         {
-            Transaction transaction = transactionService.deleteTransactionById(transactionId);
+            Transaction transaction = transactionService.getTransactionById(transactionId);
+            transactionService.deleteTransactionById(transactionId);
             return new ResponseEntity<Account>(HttpStatus.ACCEPTED).status(200).body(transaction);
-        } catch (Exception e)
+        } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
+            return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
 
     public ResponseEntity<Transaction> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId)
@@ -96,11 +96,12 @@ public class TransactionsApiController implements TransactionsApi
         {
             Transaction transaction = transactionService.getTransactionById(transactionId);
             return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction);
-        } catch (Exception e)
+        } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
+            return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+
 
     }
 
@@ -108,13 +109,14 @@ public class TransactionsApiController implements TransactionsApi
     {
         try
         {
-            Transaction transaction = transactionService.updateTransaction(transactionId, newTransaction);
+            transactionService.updateTransaction(transactionId, newTransaction);
+            Transaction transaction = transactionService.getTransactionById(transactionId);
             return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction);
-        } catch (Exception e)
+        } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
+            return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 
     }
 

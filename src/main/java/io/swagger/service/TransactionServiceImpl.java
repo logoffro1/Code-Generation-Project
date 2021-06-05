@@ -23,27 +23,32 @@ public class TransactionServiceImpl implements TransactionService
     @Autowired
     private TransactionRepository transactionRepository;
 
-    @Autowired
-    private AccountRepository accountRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    public List<Transaction> getAllTransactions(int offset, int limit)
+    public List<Transaction> getAllTransactions(Integer offset, Integer limit)
     {
+        if (offset == null || offset < 0)
+            throw new ApiRequestException("Offset can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
+
+        if (limit == null || limit < 0)
+            throw new ApiRequestException("Limit can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
+
         Pageable pageable = PageRequest.of(offset, limit);
         return transactionRepository.findAll(pageable).getContent();
     }
 
     public Transaction getTransactionById(long id)
     {
+        if (!transactionRepository.findById(id).isPresent())
+            throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
+
         return transactionRepository.findById(id).get();
     }
 
-    public Transaction createTransaction(Transaction transaction)
+    public void createTransaction(Transaction transaction)
     {
-        // throw new ApiRequestException("message",HttpStatus.BAD_REQUEST);
         User senderUser = transaction.getSenderAccount().getUser(); //store sender
+
+        if (senderUser == null)
+            throw new ApiRequestException("Could not retrieve user!", HttpStatus.BAD_REQUEST);
         //if the amount is less than 0 or it's more than the limit
         if (transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit())
             throw new ApiRequestException("Invalid amount!", HttpStatus.BAD_REQUEST);
@@ -54,57 +59,66 @@ public class TransactionServiceImpl implements TransactionService
 
         //check so the user doesn't exceed the daily limit amount
         if (senderUser.getCurrentTransactionsAmount() + transaction.getAmount() > senderUser.getDayLimit())
-            throw new ApiRequestException("Daily limit ammount exceeded!", HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("Daily limit amount exceeded!", HttpStatus.BAD_REQUEST);
 
         //increase the user's  current daily transactions amount
         senderUser.setCurrentTransactionsAmount(senderUser.getCurrentTransactionsAmount() + transaction.getAmount());
-
         //get balance, subtract transaction amount, if that is less than absolute limit, return null (also convert a bunch of double to BigDecimal)
         if (transaction.getSenderAccount().getBalance().subtract(BigDecimal.valueOf(transaction.getAmount())).compareTo(transaction.getSenderAccount().getAbsoluteLimit()) < 0)
             throw new ApiRequestException("You can't have that little money in your account!", HttpStatus.BAD_REQUEST);
 
+        //transfer money
         sendMoney(transaction.getSenderAccount(), transaction.getReceiverAccount(), transaction.getAmount());
 
         transactionRepository.save(transaction);
-
-
-        return transaction;
     }
 
     @Override
-    public Transaction deleteTransactionById(long id)
+    public void deleteTransactionById(long id)
     {
 
-        Transaction transaction = transactionRepository.findById(id).get();
+        if (!transactionRepository.findById(id).isPresent())
+            throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
+        Transaction transaction = getTransactionById(id);
+
+        //send the money  back
+        sendMoney(transaction.getReceiverAccount(), transaction.getSenderAccount(), transaction.getAmount());
         transactionRepository.deleteById(id);
-        return transaction;
     }
 
     @Override
-    public Transaction deleteTransaction(Transaction transaction)
+    public void deleteTransaction(Transaction transaction)
     {
+        if (transaction == null)
+            throw new ApiRequestException("Transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
 
+        //send the money back
+        sendMoney(transaction.getReceiverAccount(), transaction.getSenderAccount(), transaction.getAmount());
         transactionRepository.delete(transaction);
-        return transaction;
     }
 
     @Override
-    public Transaction updateTransaction(long transactionId, Transaction newTransaction)
+    public void updateTransaction(long transactionId, Transaction newTransaction)
     {
+
+        if (!transactionRepository.findById(transactionId).isPresent())
+            throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
+        if (newTransaction == null)
+            throw new ApiRequestException("New transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
+
         Transaction oldTransaction = transactionRepository.findById(transactionId).get();
         oldTransaction.setAmount(newTransaction.getAmount());
         transactionRepository.save(oldTransaction);
-        return oldTransaction;
     }
 
     private void sendMoney(Account senderAccount, Account receiverAccount, Double amount)
     {
         //subtract money from the sender and save
         senderAccount.setBalance(senderAccount.getBalance().subtract(BigDecimal.valueOf(amount)));
-        accountRepository.save(senderAccount);
+        // accountRepository.save(senderAccount);
 
         //add money to the receiver and save
         receiverAccount.setBalance(receiverAccount.getBalance().add(BigDecimal.valueOf(amount)));
-        accountRepository.save(receiverAccount);
+        // accountRepository.save(receiverAccount);
     }
 }
