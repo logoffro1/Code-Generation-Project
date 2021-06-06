@@ -20,6 +20,7 @@ io\swagger\api\UsersApiController.class
 io\swagger\service\UserService.class
 io\swagger\configuration\CustomInstantDeserializer$9.class
 io\swagger\repository\AccountRepository.class
+testing\Model\TransactionTest.class
 io\swagger\api\AccountApi.class
 io\swagger\model\User.class
 io\swagger\configuration\CustomInstantDeserializer$12.class
