@@ -1,6 +1,7 @@
 package io.swagger.api;
 
 import io.swagger.exceptions.ApiRequestException;
+import io.swagger.model.CreateUserDTO;
 import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +25,9 @@ import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
 @RestController
@@ -53,14 +56,15 @@ public class UsersApiController implements UsersApi {
     @RequestMapping(value="",
             method = RequestMethod.POST ,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "User registered", required=true, schema=@Schema()) @Valid @RequestBody User user)
+    public ResponseEntity<CreateUserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "User registered", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO userDTO)
     {
         try {
-            if(userService.createUser(user) == null){
-                return new ResponseEntity<User>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(null);}
+            if(userDTO == null )
+                //throw new ApiRequestException("User can't be null",HttpStatus.BAD_REQUEST);
+                throw new NullPointerException("User can't be null");
 
-            userService.createUser(user);
-            return new ResponseEntity<User>(HttpStatus.CREATED).status(201).body(user);
+            userService.createUser(convertToUser(userDTO));
+            return new ResponseEntity<CreateUserDTO>(HttpStatus.CREATED).status(201).body(userDTO);
 
         } catch(Exception e) {
             throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
@@ -94,7 +98,6 @@ public class UsersApiController implements UsersApi {
             return new ResponseEntity<User>(HttpStatus.FOUND).status(200).body(user);
 
         } catch (Exception e ){
-
             throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
         }
     }
@@ -102,17 +105,28 @@ public class UsersApiController implements UsersApi {
     @RequestMapping(value="",
             method = RequestMethod.GET ,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
+    public ResponseEntity<List<UserDTO>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
 
-        List<User> users = userService.getUsers(offset, limit);
-//        List<UserDTO> publicUsers = new ArrayList<>();
-//
-//        for (User user: users) {
-//            publicUsers.add(convertToUserDTO(user));
-//        }
-        return new ResponseEntity<List<User>>(HttpStatus.ACCEPTED).status(200).body(users);
+        List<UserDTO> publicUsers = new ArrayList<>();
 
-//        return new ResponseEntity<List<UserDTO>>(publicUsers,HttpStatus.ACCEPTED);
+        try {
+          if(offset ==null || limit == null) {
+              for (User user: userService.getAllUsers()) {
+                  publicUsers.add(convertToUserDTO(user));
+              }
+              return new ResponseEntity<List<UserDTO>>(HttpStatus.ACCEPTED).status(200).body(publicUsers);
+          }
+
+            if (offset != null && offset == 0)
+                throw new ApiRequestException("Page size must not be less than one!", HttpStatus.BAD_REQUEST);
+
+            List<User> users = userService.getUsers(offset, limit);
+
+            return new ResponseEntity<List<UserDTO>>(HttpStatus.ACCEPTED).status(200).body(publicUsers);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @RequestMapping(value="/{userId}",
@@ -127,12 +141,17 @@ public class UsersApiController implements UsersApi {
 
         } catch (Exception e){
 
-            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
+            return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     private UserDTO convertToUserDTO(User user) {
-        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
-        return userDTO;
+//        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+//        return userDTO;
+        return new UserDTO(user.getFirstName(),user.getLastName(),user.getPhoneNumber() ,user.getEmail(), Arrays.asList(user.getRole().values()));
+    }
+
+    private User convertToUser(CreateUserDTO userDTO){
+        return new User(userDTO.getFirstName(),userDTO.getLastName(), userDTO.getEmailAddress(),userDTO.getPassword(),userDTO.getPhoneNumber(),userDTO.getRole() );
     }
 }

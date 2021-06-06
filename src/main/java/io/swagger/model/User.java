@@ -52,6 +52,7 @@ public class User
 
   @JsonProperty("transactionLimit")
   private Double transactionLimit = null;
+
   @JsonProperty("creationDate")
   private OffsetDateTime creationDate = null;
 
@@ -134,9 +135,7 @@ public class User
    *
    * @return id
    **/
-  @Schema(example = "1", required = true, accessMode = Schema.AccessMode.READ_ONLY, description = "")
-  @NotNull
-
+  @Schema(required = false)
   public long getId()
   {
     return id;
@@ -372,7 +371,7 @@ public class User
   @Override
   public int hashCode()
   {
-    return Objects.hash(id, firstName, lastName, email, password, phoneNumber, creationDate, role);
+    return Objects.hash(firstName, lastName, email, password, phoneNumber, creationDate, role);
   }
 
   @Override

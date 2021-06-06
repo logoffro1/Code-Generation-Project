@@ -26,14 +26,21 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
     public User createUser(User user) {
         return userRepository.save(user);
     }
 
     @Override
     public User getUserById(long id)  {
+        if(id < 1001)
+            throw new ApiRequestException("Id less than 1001 doesn't exist.Try putting an id in the range of 1000",HttpStatus.BAD_REQUEST);
 
-        return userRepository.findById(id).orElseThrow(() -> new ApiRequestException("User with the specified Id was not found",HttpStatus.BAD_REQUEST));
+        return userRepository.findById(id).orElseThrow(() -> new ApiRequestException("User with the specified Id was not found",HttpStatus.NOT_FOUND));
     }
 
     @Override
@@ -47,6 +54,10 @@ public class UserServiceImpl implements UserService{
     public void updateUser(User modifyUser, long id) {
 
         User user = getUserById(id);
+
+        if (modifyUser.equals(user)){
+            throw new ApiRequestException("Nothing was updated",HttpStatus.NOT_MODIFIED);
+        }
 
         if (modifyUser.getFirstName() != null && !modifyUser.getFirstName().isEmpty()) {
             user.setFirstName(modifyUser.getFirstName());
