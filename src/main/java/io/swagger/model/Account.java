@@ -225,6 +225,9 @@ public class Account   {
   }
 
   public void setBalance(BigDecimal balance) {
+    if(balance.compareTo(this.absoluteLimit)==-1)
+    throw new IllegalArgumentException("Balance can not be lower than absolute limit");
+
     this.balance = balance;
   }
 
