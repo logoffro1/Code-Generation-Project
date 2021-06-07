@@ -4,6 +4,7 @@ package io.swagger.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import io.swagger.model.User;
+import io.swagger.repository.UserRepository;
 import io.swagger.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -37,6 +39,7 @@ public class UsersApiControllerTest {
     @MockBean
     @Autowired
     private UserService userService;
+    private UserRepository userRepository;
 
     private User user;
 
@@ -48,6 +51,7 @@ public class UsersApiControllerTest {
          user.setId(1003);
     }
 
+    //stopped working for some reason
     @Test
     public void getUsersShouldReturnJsonArray() throws Exception{
        given(userService.getAllUsers()).willReturn(List.of(user));
@@ -78,14 +82,14 @@ public class UsersApiControllerTest {
     }
 
     @Test
-    public void getUsers() throws Exception {
+    public void CanGetAllUsers() throws Exception {
 
         this.mvc.perform(get("/users"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void getUserById() throws Exception {
+    void CanGetUserById() throws Exception {
 
         mvc.perform((get("/users/" + user.getId()))
         ).andExpect(status().isOk());
@@ -93,23 +97,20 @@ public class UsersApiControllerTest {
 
     //also doesn't work
     @Test
-    void deleteUser() throws Exception {
+    void CanDeleteUser() throws Exception {
 
-//        mvc.perform(delete("/users/" + user.getId())
-//                .contentType(MediaType.APPLICATION_JSON)
-//        ).andExpect(status().isOk());
+        mvc.perform(delete("/users/" + user.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
     }
 
     //doeesn't work
     @Test
-    void updateUser() throws Exception {
-//
-//        userService.createUser(user);
-//        user.setId(1003);
-//        mvc.perform((put("/users/" + user.getId()))
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(mapper.writeValueAsString(user)))
-//                .andExpect(status().is2xxSuccessful());
+    void CanUpdateUser() throws Exception {
+
+        mvc.perform((put("/users/1003"))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test
