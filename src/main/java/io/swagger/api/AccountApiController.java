@@ -85,7 +85,7 @@ public class AccountApiController implements AccountApi {
     public ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the user who owns the account", required=true, schema=@Schema()) @PathVariable("iban") String iban) {
         try{
             Account account= accountServiceImpl.getAccountByIban(iban);
-            return new ResponseEntity<Account>(HttpStatus.ACCEPTED).status(HttpStatus.ACCEPTED).body(account);
+            return new ResponseEntity<Account>(HttpStatus.OK).status(HttpStatus.OK).body(account);
         }catch (NotAcceptableStatusException exception){
             return new ResponseEntity<Account>(HttpStatus.NOT_FOUND).status(HttpStatus.NOT_FOUND).body(null);
         }

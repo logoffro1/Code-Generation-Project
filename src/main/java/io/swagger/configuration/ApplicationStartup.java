@@ -37,6 +37,8 @@ public class ApplicationStartup implements ApplicationRunner {
         userService.createUser(user);
 
         accountService.createAccount(new Account(ibanService.generateIban(),BigDecimal.valueOf(2020),user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE,BigDecimal.valueOf(2020)));
+        accountService.createAccount(new Account(ibanService.generateIban(),BigDecimal.valueOf(2020),user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE,BigDecimal.valueOf(2020)));
+        accountService.createAccount(new Account(ibanService.generateIban(),BigDecimal.valueOf(2020),user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE,BigDecimal.valueOf(2020)));
 
         userService.createUser(new User("Williams","smith","willliamSmith@gmail.com","william123","213712983", User.RoleEnum.CUSTOMER));
 
