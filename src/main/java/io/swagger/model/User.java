@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.core.GrantedAuthority;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
@@ -35,7 +36,7 @@ public class User
   @JsonProperty("lastName")
   private String lastName = null;
 
-  @JsonProperty("email")
+  @JsonProperty("Email")
   private String email = null;
 
   @JsonProperty("password")
@@ -98,11 +99,11 @@ public class User
   /**
    * Gets or Sets role
    */
-  public enum RoleEnum
+  public enum RoleEnum implements GrantedAuthority
   {
-    EMPLOYEE("employee"),
+    ROLE_EMPLOYEE("employee"),
 
-    CUSTOMER("customer");
+    ROLE_CUSTOMER("customer");
 
     private String value;
 
@@ -130,6 +131,11 @@ public class User
       }
       return null;
     }
+
+    @Override
+    public String getAuthority() {
+      return name();
+      }
   }
 
   @JsonProperty("role")

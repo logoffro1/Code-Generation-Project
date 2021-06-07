@@ -40,7 +40,7 @@ class UserServiceImplTest {
     public void setUp() {
 
         userList = new ArrayList<>();
-        mockUser = new User("John","Doe","JohnDoe@gmail.com","johnnie123","213712983", User.RoleEnum.CUSTOMER);
+        mockUser = new User("John","Doe","JohnDoe@gmail.com","johnnie123","213712983", User.RoleEnum.ROLE_CUSTOMER);
 
         userList.add(mockUser);
     }

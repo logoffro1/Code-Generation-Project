@@ -15,7 +15,7 @@ public class MyStepdefs {
 
     @Given("the user is an employee")
     public void theUserIsAnEmployee() {
-        User user = new User("John","Doe","JohnDoe@gmail.com","johnnie123","213712983", User.RoleEnum.EMPLOYEE);
+        User user = new User("John","Doe","JohnDoe@gmail.com","johnnie123","213712983", User.RoleEnum.ROLE_EMPLOYEE);
     }
 
     @SneakyThrows

@@ -13,7 +13,7 @@ public class UserTest {
 
     @BeforeEach
     public void init() {
-        mockUser = new User("John", "William", "johnWilliam@gmail.com", "John123", "090078601", User.RoleEnum.EMPLOYEE);
+        mockUser = new User("John", "William", "johnWilliam@gmail.com", "John123", "090078601", User.RoleEnum.ROLE_EMPLOYEE);
     }
 
     @Test

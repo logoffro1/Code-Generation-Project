@@ -1,0 +1,82 @@
+package io.swagger.configuration;
+
+import io.swagger.filter.JwtTokenFilter;
+import io.swagger.service.MyUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    /**
+     * Start path with API, because we use it as contextPath
+     */
+    private static final String[] AUTH_WHITELIST = {
+            // Swagger UI v2
+            "/login",
+            "/h2-console/**/**",
+            "/swagger-ui/**/**",
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/api-docs",
+            "webjars/**"
+    };
+
+
+    @Autowired
+    private MyUserDetailsService myUserDetailsService;
+
+    @Autowired
+    private JwtTokenFilter jwtTokenFilter;
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable();
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class); // add the filter
+
+        http.authorizeRequests()
+                .antMatchers("/login")
+                .permitAll()
+                .antMatchers("/swagger-ui/**/**")
+                .permitAll()
+                .antMatchers("/h2-console/**/**")
+                .permitAll()
+                .antMatchers("/swagger-resources/**")
+                .permitAll()
+                .antMatchers("/swagger-ui.html")
+                .permitAll()
+                .antMatchers("/api-docs")
+                .permitAll()
+                .anyRequest().authenticated();
+
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(myUserDetailsService);
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/h2-console/**/**");;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+}

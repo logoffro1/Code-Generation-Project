@@ -47,7 +47,7 @@ public class UsersApiControllerTest {
 
     @BeforeEach
     public void init(){
-         user = new User("firstName","lastName","email","password","090078601", User.RoleEnum.EMPLOYEE);
+         user = new User("firstName","lastName","email","password","090078601", User.RoleEnum.ROLE_EMPLOYEE);
          user.setId(1003);
     }
 
