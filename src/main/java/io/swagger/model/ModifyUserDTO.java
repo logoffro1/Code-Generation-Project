@@ -1,5 +1,8 @@
 package io.swagger.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 import lombok.NonNull;
 import org.springframework.data.annotation.Id;
 
@@ -9,28 +12,33 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import java.util.Collection;
 
+@Data
 public class ModifyUserDTO {
 
-    @Id
+    @JsonProperty("firstName")
     private String firstName;
+
+    @JsonProperty("lastName")
     private String lastName;
+
+    @JsonProperty("phoneNumber")
     private String phoneNumber;
+
+    @JsonProperty("emailAddress")
     private String emailAddress;
+
+    @JsonProperty("password")
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @ElementCollection(targetClass = User.RoleEnum.class)
-    private Collection<User.RoleEnum> roles;
-
-    public ModifyUserDTO(@NonNull String firstName, @NonNull String lastName, @NonNull String phoneNumber, @NonNull String emailAddress, @NonNull String password, @NonNull Collection<User.RoleEnum> roles) {
+    public ModifyUserDTO(@NonNull String firstName, @NonNull String lastName, @NonNull String phoneNumber, @NonNull String emailAddress, @NonNull String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.emailAddress = emailAddress;
         this.password = password;
-        this.roles = roles;
     }
 
+    @Schema(example = "john", required = true, description = "")
     public String getFirstName() {
         return firstName;
     }
@@ -39,6 +47,7 @@ public class ModifyUserDTO {
         this.firstName = firstName;
     }
 
+    @Schema(example = "doe", required = true, description = "")
     public String getLastName() {
         return lastName;
     }
@@ -47,6 +56,7 @@ public class ModifyUserDTO {
         this.lastName = lastName;
     }
 
+    @Schema(example = "090078601", required = true, description = "")
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -55,6 +65,7 @@ public class ModifyUserDTO {
         this.phoneNumber = phoneNumber;
     }
 
+    @Schema(example = "johnDoe@gmail.com", required = true, description = "")
     public String getEmailAddress() {
         return emailAddress;
     }
@@ -63,19 +74,12 @@ public class ModifyUserDTO {
         this.emailAddress = emailAddress;
     }
 
+    @Schema(example = "whatever", required = true, description = "")
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public Collection<User.RoleEnum> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Collection<User.RoleEnum> roles) {
-        this.roles = roles;
     }
 }

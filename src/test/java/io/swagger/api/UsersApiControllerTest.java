@@ -69,22 +69,19 @@ public class UsersApiControllerTest {
     }
 
     @Test
+    public void createUserShouldReturnCreated() throws Exception{
+
+        this.mvc.perform(post("/users")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{}"))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
     public void getUsers() throws Exception {
 
         this.mvc.perform(get("/users"))
                 .andExpect(status().isOk());
-    }
-
-    //doeesn't work
-    @Test
-    void updateUser() throws Exception {
-
-//        userService.createUser(user);
-//        user.setId(1003);
-//        mvc.perform((put("/users/" + user.getId()))
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(mapper.writeValueAsString(user)))
-//                .andExpect(status().isAccepted());
     }
 
     @Test
@@ -103,6 +100,18 @@ public class UsersApiControllerTest {
 //        ).andExpect(status().isOk());
     }
 
+    //doeesn't work
+    @Test
+    void updateUser() throws Exception {
+//
+//        userService.createUser(user);
+//        user.setId(1003);
+//        mvc.perform((put("/users/" + user.getId()))
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(mapper.writeValueAsString(user)))
+//                .andExpect(status().is2xxSuccessful());
+    }
+
     @Test
     public void CreateUserShouldNotBeNull() throws Exception{
 
@@ -115,4 +124,5 @@ public class UsersApiControllerTest {
         );
         assertEquals("user cannot be null",exception.getMessage());
     }
+
 }

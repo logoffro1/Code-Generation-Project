@@ -84,6 +84,17 @@ public class User
 
   }
 
+  public User(String firstName, String lastName, String emailAddress, String password, String phoneNumber) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.password = password;
+    this.phoneNumber = phoneNumber;
+    this.dayLimit = dayLimit;
+    this.transactionLimit = transactionLimit;
+    this.creationDate = OffsetDateTime.now();
+  }
+
   /**
    * Gets or Sets role
    */

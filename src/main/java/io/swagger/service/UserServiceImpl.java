@@ -21,6 +21,12 @@ public class UserServiceImpl implements UserService{
     @Override
     public List<User> getUsers(Integer limit,Integer offset) {
 
+        if (offset == null || offset < 0)
+            throw new ApiRequestException("Offset can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
+
+        if (limit == null || limit < 0)
+            throw new ApiRequestException("Limit can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
+
         Pageable pageable= PageRequest.of(offset,limit);
         return userRepository.findAll(pageable).getContent();
     }
