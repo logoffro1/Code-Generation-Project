@@ -1,5 +1,8 @@
 package io.swagger.configuration;
 
+import io.swagger.annotations.ApiKeyAuthDefinition;
+import io.swagger.annotations.SecurityDefinition;
+import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.filter.JwtTokenFilter;
 import io.swagger.service.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,24 +18,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@SwaggerDefinition(securityDefinition = @SecurityDefinition(apiKeyAuthDefinitions = {@ApiKeyAuthDefinition(key = "X-Auth-Token",
+        in = ApiKeyAuthDefinition.ApiKeyLocation.HEADER, name = "X-Auth-Token")}))
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true,securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    /**
-     * Start path with API, because we use it as contextPath
-     */
-    private static final String[] AUTH_WHITELIST = {
-            // Swagger UI v2
-            "/login",
-            "/h2-console/**/**",
-            "/swagger-ui/**/**",
-            "/swagger-resources/**",
-            "/swagger-ui.html",
-            "/api-docs",
-            "webjars/**"
-    };
 
 
     @Autowired

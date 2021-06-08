@@ -37,8 +37,7 @@ import java.util.Map;
 @Validated
 public interface LoginApi {
 
-    @Operation(summary = "Get authorization token", description = "", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Login" })
+    @Operation(summary = "Get authorization token", description = "", tags={ "Login" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = InlineResponse200.class))),
         
