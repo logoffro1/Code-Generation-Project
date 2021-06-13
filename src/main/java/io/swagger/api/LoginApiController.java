@@ -51,13 +51,10 @@ public class LoginApiController implements LoginApi {
     }
 
     @RequestMapping(value = "/login")
-    public ResponseEntity<String> login(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody UserLogin user) {
+    public ResponseEntity<UserLogin> login(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody UserLogin user) {
        String token = loginService.login(user.getEmailAddress(), user.getPassword());
-      return new ResponseEntity<>(token,HttpStatus.OK);
+      return new ResponseEntity<UserLogin>(HttpStatus.OK).status(HttpStatus.OK).body(user);
     }
 
-    @Override
-    public ResponseEntity<InlineResponse200> login(Body body) {
-        return null;
-    }
+
 }
