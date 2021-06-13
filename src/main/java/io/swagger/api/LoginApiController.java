@@ -28,6 +28,7 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,10 +51,18 @@ public class LoginApiController implements LoginApi {
         this.request = request;
     }
 
-    @RequestMapping(value = "/login")
+    @PostMapping("/login")
     public ResponseEntity<String> login(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody UserLogin user) {
        String token = loginService.login(user.getEmailAddress(), user.getPassword());
+       log.info("Token "+ token);
       return new ResponseEntity<>(token,HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/add")
+    public ResponseEntity<String> addUser(@RequestBody UserLogin user) {
+
+        String token  = loginService.add(user.getEmailAddress(), user.getPassword(), new ArrayList<>());
+        return ResponseEntity.ok(token);
     }
 
     @Override

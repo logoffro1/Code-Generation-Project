@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
+@Log
 public class LoginService {
 
     @Autowired
@@ -37,6 +38,23 @@ public class LoginService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid credentials");
         }
     }
+
+    public String add(String email, String password, List<User.RoleEnum> roles) {
+        if (userRepository.findUserByEmail(email) == null) {
+            User user = new User();
+            user.setEmail(email);
+            user.setPassword(passwordEncoder().encode(password));
+            user.setRole(User.RoleEnum.ROLE_EMPLOYEE);
+
+            log.info(user.toString());
+            userRepository.save(user);
+            String token = jwtTokenProvider.createToken(user.getEmail(), List.of(user.getRole()));
+            return token;
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username already in use");
+        }
+    }
+
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
