@@ -6,6 +6,8 @@
 package io.swagger.api;
 
 import io.swagger.model.Account;
+import io.swagger.model.AccountDTO;
+import io.swagger.model.ModifyAccountDTO;
 import io.swagger.model.Transaction;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,7 +50,7 @@ public interface AccountApi {
     @RequestMapping(value = "",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be created", schema=@Schema()) @Valid @RequestBody Account body);
+    ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be created", schema=@Schema()) @Valid @RequestBody AccountDTO body);
 
 
     @Operation(summary = "edit existed account", description = "get the account by id to edit the info of the account", security = {
@@ -58,7 +60,7 @@ public interface AccountApi {
     @RequestMapping(value = "/{iban}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Account> editAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema=@Schema()) @Valid @RequestBody Account body);
+    ResponseEntity<Account> editAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema=@Schema()) @Valid @RequestBody ModifyAccountDTO body);
 
 
     @Operation(summary = "get account by Iban", description = "get account by Iban", security = {

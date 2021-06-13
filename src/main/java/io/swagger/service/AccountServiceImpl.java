@@ -2,6 +2,7 @@ package io.swagger.service;
 
 import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.Account;
+import io.swagger.model.ModifyAccountDTO;
 import io.swagger.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -29,13 +30,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     //Change this to only update account type for EMPLOYEE
-    public Account updateAccount(String iban, Account newAccount) {
+    public Account updateAccount(Account oldAccount, ModifyAccountDTO newAccount) {
 
-        if (!isIbanPresent(iban))
+        if (!isIbanPresent(oldAccount.getIBAN()))
             throw new ApiRequestException("Iban is not found, please input the correct iban to modify the account", HttpStatus.NOT_FOUND);
 
-
-        Account oldAccount = accountRepository.findByIBAN(iban);
         oldAccount.setType(newAccount.getType());
         accountRepository.save(oldAccount);
         return oldAccount;
@@ -44,17 +43,18 @@ public class AccountServiceImpl implements AccountService {
     public List<Account> getAllAccounts(Integer limit, Integer offset) {
 
         if (offset == null || offset < 0)
-            throw new ApiRequestException("Offset can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("Offset can't be lower than 0 or Null.", HttpStatus.BAD_REQUEST);
 
-        if (limit == null || limit < 0)
-            throw new ApiRequestException("Limit can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
+        // !!!!!!!!!! <=?
+        if (limit == null || limit <= 0)
+            throw new ApiRequestException("Limit can't be lower or equal to 0 or Null", HttpStatus.BAD_REQUEST);
 
         Pageable pageable = PageRequest.of(offset, limit);
         return accountRepository.findAll(pageable).getContent();
     }
 
     public void createAccount(Account account) {
-        //Account should contain a balance more than absolute limit from the start
+     //   Account should contain a balance more than absolute limit from the start
         if (account.getBalance().compareTo(account.getAbsoluteLimit()) == -1)
             throw new ApiRequestException("Balance can not be less than absoluteLimit", HttpStatus.BAD_REQUEST);
 
@@ -75,21 +75,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public boolean isIbanPresent(String iban) {
-
-        if (accountRepository.findByIBAN(iban) != null)
-            return true;
-        else
-            return false;
-
+        return (accountRepository.findByIBAN(iban) != null);
     }
 
 
     public Account softDeleteAccount(String iban) {
 
-        if (!isIbanPresent(iban))
-            throw new ApiRequestException("Iban is not found", HttpStatus.NOT_FOUND);
-
-        Account account = accountRepository.findByIBAN(iban);
+        Account account = getAccountByIban(iban);
 
         if(account.getStatus()==Account.StatusEnum.CLOSED)
             throw new ApiRequestException("Account is already closed",HttpStatus.BAD_REQUEST);

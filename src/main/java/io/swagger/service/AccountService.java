@@ -1,6 +1,7 @@
 package io.swagger.service;
 
 import io.swagger.model.Account;
+import io.swagger.model.ModifyAccountDTO;
 
 import java.util.List;
 
@@ -11,6 +12,6 @@ public interface AccountService {
     void createAccount(Account account);
     boolean isIbanPresent(String iban);
     Account softDeleteAccount(String iban);
-    Account updateAccount(String iban,Account newAccount);
+    Account updateAccount(Account oldAccount, ModifyAccountDTO newAccount);
 
 }

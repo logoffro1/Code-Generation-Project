@@ -1,11 +1,9 @@
 package io.swagger.api;
 
 import io.swagger.exceptions.ApiRequestException;
-import io.swagger.model.Account;
+import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.model.User;
 import io.swagger.service.AccountServiceImpl;
-import io.swagger.model.IbanGenerator;
 import io.swagger.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -52,29 +50,30 @@ public class AccountApiController implements AccountApi {
     @RequestMapping(value = "",
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be created", schema = @Schema()) @Valid @RequestBody Account newAccount) {
-        newAccount.setIBAN(this.ibanGenerator.generateIban());
+    public ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be created", schema = @Schema()) @Valid @RequestBody AccountDTO newAccount) {
         try{
             User realUser= userService.getUserById(newAccount.getUser().getId());
-            newAccount.setUser(realUser);
-            accountServiceImpl.createAccount(newAccount);
-            return new ResponseEntity<Account>(HttpStatus.CREATED).status(201).body(newAccount);
+            Account account= new Account(this.ibanGenerator.generateIban(),newAccount.getAbsoluteLimit(),realUser,newAccount.getType(),newAccount.getStatus(),newAccount.getBalance());
+
+            accountServiceImpl.createAccount(account);
+            return new ResponseEntity<Account>(HttpStatus.CREATED).status(201).body(account);
         }
         catch(NotAcceptableStatusException exception){
-            return new ResponseEntity<Account>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(newAccount);
+            return new ResponseEntity<Account>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(new Account());
         }
     }
 
     @RequestMapping(value = "/{iban}",
             consumes = {"application/json"},
             method = RequestMethod.PUT)
-    public ResponseEntity<Account> editAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required = true, schema = @Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema = @Schema()) @Valid @RequestBody Account updatedAccount) {
-        String accept = request.getHeader("Accept");
+    public ResponseEntity<Account> editAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required = true, schema = @Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema = @Schema()) @Valid @RequestBody ModifyAccountDTO modifiedDTOAccount) {
         try{
-            Account dbAccount = accountServiceImpl.updateAccount(iban, updatedAccount);
+
+            Account dbAccount = accountServiceImpl.getAccountByIban(iban);
+            Account updatedAccount= accountServiceImpl.updateAccount(dbAccount,modifiedDTOAccount);
             return new ResponseEntity<Account>(HttpStatus.ACCEPTED).status(200).body(dbAccount);
         }catch (NotAcceptableStatusException exception){
-            return new ResponseEntity<Account>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(updatedAccount);
+            return new ResponseEntity<Account>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(null);
         }
 
     }

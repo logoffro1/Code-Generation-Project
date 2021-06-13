@@ -1,12 +1,15 @@
 package io.swagger.model;
 
+import java.security.Timestamp;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.exceptions.ApiRequestException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -29,6 +32,7 @@ public class Account   {
   @JsonProperty("IBAN")
   private String IBAN = null;
 
+  @Column(precision=10, scale=2)
   @JsonProperty("absoluteLimit")
   private BigDecimal absoluteLimit = null;
 
@@ -68,7 +72,11 @@ public class Account   {
     private String value;
 
     TypeEnum(String value) {
-      this.value = value;
+      if(value=="current" || value=="savings")
+        this.value = value;
+      else{
+        throw new ApiRequestException("Please enter a valid Account Type (current/savings)", HttpStatus.BAD_REQUEST);
+      }
     }
 
     @Override
@@ -101,7 +109,12 @@ public class Account   {
     private String value;
 
     StatusEnum(String value) {
-      this.value = value;
+
+      if(value=="active" || value=="closed")
+        this.value = value;
+      else{
+        throw new ApiRequestException("Please enter a valid Account Status (active/closed)", HttpStatus.BAD_REQUEST);
+      }
     }
 
     @Override
@@ -123,6 +136,7 @@ public class Account   {
   @JsonProperty("status")
   private StatusEnum status = null;
 
+  @Column(precision=10, scale=2)
   @JsonProperty("balance")
   private BigDecimal balance = null;
 
