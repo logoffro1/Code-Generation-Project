@@ -3,12 +3,10 @@ package io.swagger.controller;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.model.Account;
-import io.swagger.model.AccountDTO;
-import io.swagger.model.IbanGenerator;
-import io.swagger.model.User;
+import io.swagger.model.*;
 import io.swagger.repository.UserRepository;
 import io.swagger.service.AccountServiceImpl;
+import io.swagger.service.IbanGeneratorService;
 import io.swagger.service.UserService;
 import io.swagger.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +25,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,25 +37,35 @@ public class AccountApiControllerTest {
     private MockMvc mvc;
 
     @MockBean
-    @Autowired
     private AccountServiceImpl accountService;
 
     @MockBean
-    @Autowired
     private UserServiceImpl userService;
 
     @Autowired
-    private IbanGenerator ibanGenerator;
+    private IbanGeneratorService ibanGenerator;
 
     private Account account;
 
+    @MockBean
     private AccountDTO postAccount;
+
+    @MockBean
+
+    private ModifyAccountDTO modifyAccountDTO;
+
 
     private ObjectMapper mapper = new ObjectMapper();
 
+    @MockBean
+   private User mockUser;
+
     @BeforeEach
     public void init() {
-        User mockUser= userService.getUserById(1001);
+        User mockUser = new User("firstName","lastName","email","password","090078601", User.RoleEnum.EMPLOYEE);
+        mockUser.setId(1003);
+
+        modifyAccountDTO= new ModifyAccountDTO(Account.TypeEnum.CURRENT);
         this.account = new Account(ibanGenerator.generateIban(), BigDecimal.valueOf(20000), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000));
         this.postAccount= new AccountDTO(BigDecimal.valueOf(20000),mockUser, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000), Account.TypeEnum.CURRENT);
     }
@@ -71,17 +78,10 @@ public class AccountApiControllerTest {
                 status().isOk());
     }
 
-    @Test
-    public void createAccountShouldReturnCreated() throws Exception{
-
-        this.mvc.perform(post("/accounts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{}"))
-                .andExpect(status().isCreated());
-    }
 
     @Test
     public void whenCreateAccountShouldReturnCreated() throws Exception{
+        this.postAccount.setUser(mockUser);
         this.mvc.perform(post("/accounts")
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
         .content(mapper.writeValueAsString(this.postAccount))).andExpect((status().isCreated()));
@@ -104,5 +104,19 @@ public class AccountApiControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void updateAccountShoukdReturnOk() throws Exception
+    {
+        ObjectMapper mapper = new ObjectMapper();
+        accountService.createAccount(this.account);
+        this.mvc.perform(put("/accounts/"+this.account.getIBAN()).contentType(MediaType.APPLICATION_JSON_VALUE).content(mapper.writeValueAsString(this.modifyAccountDTO))).andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteAccountShouldReturnOk() throws Exception
+    {
+        accountService.createAccount(this.account);
+        this.mvc.perform(delete("/accounts/"+this.account.getIBAN())).andExpect(status().isOk());
+    }
 
 }
