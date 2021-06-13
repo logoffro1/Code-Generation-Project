@@ -14,9 +14,7 @@ import java.math.BigDecimal;
 
 public class AccountDTO {
 
-
     private BigDecimal absoluteLimit;
-
 
     private User user;
 
