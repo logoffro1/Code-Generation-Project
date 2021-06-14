@@ -50,7 +50,8 @@ public class TransactionDTO
 
     public void setAmount(Double amount)
     {
-        this.amount = amount;
+        if(amount <= 0) throw new IllegalArgumentException("Amount cannot be less or equal to zero.");
+    this.amount = amount;
     }
 
     public String getCurrencyType()

@@ -5,9 +5,7 @@ import io.swagger.model.Account;
 import io.swagger.model.ModifyTransactionDTO;
 import io.swagger.model.Transaction;
 import io.swagger.model.User;
-import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
-import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,9 +45,12 @@ public class TransactionServiceImpl implements TransactionService
     public void createTransaction(Transaction transaction)
     {
         User senderUser = transaction.getSenderAccount().getUser(); //store sender
-
+        User receiverUser = transaction.getReceiverAccount().getUser();
         if (senderUser == null)
-            throw new ApiRequestException("Could not retrieve user!", HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("Could not retrieve sender user!", HttpStatus.BAD_REQUEST);
+
+        if (receiverUser == null)
+            throw new ApiRequestException("Could not retrieve receiver user", HttpStatus.BAD_REQUEST);
         //if the amount is less than 0 or it's more than the limit
         if (transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit())
             throw new ApiRequestException("Invalid amount!", HttpStatus.BAD_REQUEST);
@@ -67,6 +68,17 @@ public class TransactionServiceImpl implements TransactionService
         //get balance, subtract transaction amount, if that is less than absolute limit, return null (also convert a bunch of double to BigDecimal)
         if (transaction.getSenderAccount().getBalance().subtract(BigDecimal.valueOf(transaction.getAmount())).compareTo(transaction.getSenderAccount().getAbsoluteLimit()) < 0)
             throw new ApiRequestException("You can't have that little money in your account!", HttpStatus.BAD_REQUEST);
+
+        if (transaction.getSenderAccount().getStatus() == Account.StatusEnum.CLOSED)
+            throw new ApiRequestException("Account cannot be a CLOSED account.", HttpStatus.BAD_REQUEST);
+
+        //One cannot directly transfer from a savings account to an account that is not of the same customer
+        //One cannot directly transfer to a savings account from an account that is not from the same customer
+        if (transaction.getSenderAccount().getType() == Account.TypeEnum.SAVINGS
+                || transaction.getReceiverAccount().getType() == Account.TypeEnum.SAVINGS)
+            if (senderUser != receiverUser)
+                throw new ApiRequestException("Invalid request", HttpStatus.BAD_REQUEST);
+
 
         //transfer money
         sendMoney(transaction.getSenderAccount(), transaction.getReceiverAccount(), transaction.getAmount());

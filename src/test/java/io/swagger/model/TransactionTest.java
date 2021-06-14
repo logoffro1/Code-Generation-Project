@@ -9,11 +9,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 class TransactionTest
 {
 
 
-    private Transaction transaction;
+    private TransactionDTO transaction;
 
     @MockBean
     private User mockUser;
@@ -21,11 +23,10 @@ class TransactionTest
     @BeforeEach
     public void init()
     {
-      //  User mockUser = new User("Egemin", "Cilierli", "egecilierli@gmail.com", "thisisnotapaassword", "+31 06 29297273", User.RoleEnum.CUSTOMER);
         Account senderAccount = new Account("iban1", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
         Account receivingAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
 
-        this.transaction = new Transaction(senderAccount, receivingAccount, 5000.00, "EUR");
+        this.transaction = new TransactionDTO(senderAccount.getIBAN(), receivingAccount.getIBAN(), 5000.00, "EUR");
     }
 
     @Test
@@ -37,12 +38,39 @@ class TransactionTest
     @Test
     public void transactionHasCorrectCurrencyType()
     {
-        Assertions.assertEquals("EUR", this.transaction.getCurrencyType());
+        Assertions.assertEquals("EUR", transaction.getCurrencyType());
     }
 
     @Test
     public void transactionHasCorrectAmount()
     {
-        Assertions.assertEquals((Double) 5000.00, this.transaction.getAmount());
+        Assertions.assertEquals((Double) 5000.00, transaction.getAmount());
     }
+
+    @Test
+    public void transactionAmountShouldBeSetCorrectly(){
+        transaction.setAmount(1000.00);
+        Assertions.assertEquals((Double)1000.00,transaction.getAmount());
+    }
+
+    @Test
+    public void transactionCurrencyTypeShouldBeSetCorrectly(){
+        transaction.setCurrencyType("RON");
+        Assertions.assertEquals("RON",transaction.getCurrencyType());
+    }
+
+    @Test
+    public void transactionHasCorrectSenderIBAN(){
+        Assertions.assertEquals("iban1",transaction.getSenderIBAN());
+    }
+    @Test
+    public void transactionHasCorrectReceiverIBAN(){
+        Assertions.assertEquals("iban2",transaction.getReceiverIBAN());
+    }
+@Test
+    public void settingAmountBelowZeroShouldThrowException(){
+    Exception exception = assertThrows(IllegalArgumentException.class,
+            () -> transaction.setAmount(-0.00));
+    Assertions.assertEquals("Amount cannot be less or equal to zero.", exception.getMessage());
+}
 }
