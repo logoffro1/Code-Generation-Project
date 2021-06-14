@@ -1,5 +1,6 @@
 package io.swagger.service;
 
+import io.swagger.model.ModifyTransactionDTO;
 import io.swagger.model.Transaction;
 
 import java.util.List;
@@ -15,6 +16,6 @@ public interface TransactionService
     void deleteTransactionById(long id);
 
     void deleteTransaction(Transaction transaction);
-    void updateTransaction(long transactionId, Transaction newTransaction);
+    void updateTransaction(Transaction oldTransaction, ModifyTransactionDTO newTransaction);
 
 }

@@ -2,6 +2,7 @@ package io.swagger.service;
 
 import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.Account;
+import io.swagger.model.ModifyTransactionDTO;
 import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.repository.AccountRepository;
@@ -98,15 +99,15 @@ public class TransactionServiceImpl implements TransactionService
     }
 
     @Override
-    public void updateTransaction(long transactionId, Transaction newTransaction)
+    public void updateTransaction(Transaction oldTransaction, ModifyTransactionDTO newTransaction)
     {
 
-        if (!transactionRepository.findById(transactionId).isPresent())
+        if (oldTransaction == null)
             throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
         if (newTransaction == null)
             throw new ApiRequestException("New transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
 
-        Transaction oldTransaction = transactionRepository.findById(transactionId).get();
+
         oldTransaction.setAmount(newTransaction.getAmount());
         transactionRepository.save(oldTransaction);
     }

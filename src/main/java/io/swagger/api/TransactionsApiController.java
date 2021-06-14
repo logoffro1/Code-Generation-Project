@@ -1,6 +1,7 @@
 package io.swagger.api;
 
 import io.swagger.model.Account;
+import io.swagger.model.ModifyTransactionDTO;
 import io.swagger.model.Transaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.service.AccountServiceImpl;
@@ -105,11 +106,12 @@ public class TransactionsApiController implements TransactionsApi
 
     }
 
-    public ResponseEntity<Transaction> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody Transaction newTransaction)
+    public ResponseEntity<Transaction> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody ModifyTransactionDTO newTransaction)
     {
         try
         {
-            transactionService.updateTransaction(transactionId, newTransaction);
+
+            transactionService.updateTransaction(transactionService.getTransactionById(transactionId), newTransaction);
             Transaction transaction = transactionService.getTransactionById(transactionId);
             return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction);
         } catch (NotAcceptableStatusException e)
