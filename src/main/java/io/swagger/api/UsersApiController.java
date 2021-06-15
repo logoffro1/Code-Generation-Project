@@ -52,7 +52,7 @@ public class UsersApiController implements UsersApi {
 
     }
 
-    @PreAuthorize("hasRole('ROLE_EMPOYEE')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @RequestMapping(value="",
             method = RequestMethod.POST ,
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -70,6 +70,7 @@ public class UsersApiController implements UsersApi {
         }
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @RequestMapping(value="",
             method = RequestMethod.DELETE ,
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -85,6 +86,7 @@ public class UsersApiController implements UsersApi {
         }
     }
 
+    @PreAuthorize("hasAnyRole('EMPLOYEE','CUSTOMER')")
     @RequestMapping(value="/{userId}",
             method = RequestMethod.GET ,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -101,6 +103,7 @@ public class UsersApiController implements UsersApi {
         }
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @RequestMapping(value="",
             method = RequestMethod.GET ,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -122,6 +125,7 @@ public class UsersApiController implements UsersApi {
         }
     }
 
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @RequestMapping(value="/{userId}",
             method = RequestMethod.PUT,
             consumes = MediaType.APPLICATION_JSON_VALUE)

@@ -1,5 +1,6 @@
 package io.swagger.model;
 
+import java.util.Locale;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -111,32 +112,57 @@ public class User
     {
       this.value = value;
     }
-
-    @Override
-    @JsonValue
-    public String toString()
-    {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static RoleEnum fromValue(String text)
-    {
-      for (RoleEnum b : RoleEnum.values())
-      {
-        if (String.valueOf(b.value).equals(text))
-        {
-          return b;
-        }
-      }
-      return null;
-    }
-
-    @Override
-    public String getAuthority() {
-      return name();
-      }
+//
+//    @Override
+//    @JsonValue
+//    public String toString()
+//    {
+//      return String.valueOf(value);
+//    }
+//
+//    @JsonCreator
+//    public static RoleEnum fromValue(String text)
+//    {
+//      for (RoleEnum b : RoleEnum.values())
+//      {
+//        if (String.valueOf(b.value).equals(text))
+//        {
+//          return b;
+//        }
+//      }
+//      return null;
+//    }
+//
+//    @Override
+//    public String getAuthority() {
+//      return name();
+//      }
+@JsonCreator
+public static RoleEnum fromValue(String text) {
+  if (String.valueOf(RoleEnum.ROLE_CUSTOMER.value.toUpperCase(Locale.ROOT)).equals(text.toUpperCase(Locale.ROOT))) {
+    return RoleEnum.ROLE_CUSTOMER;
   }
+  if (String.valueOf(RoleEnum.ROLE_EMPLOYEE.value.toUpperCase(Locale.ROOT)).equals(text.toUpperCase(Locale.ROOT))) {
+    return RoleEnum.ROLE_EMPLOYEE;
+  }
+
+  return null;
+}
+
+
+
+    @Override
+  @JsonValue
+  public String toString() {
+    return String.valueOf(value);
+  }
+
+  @Override
+  public String getAuthority() {
+    return name();
+  }
+
+}
 
   @JsonProperty("role")
   private RoleEnum role = null;

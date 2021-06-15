@@ -94,8 +94,4 @@ public class SwaggerDocumentationConfig {
         return new ModelMapper();
     }
 
-    @Bean
-    public PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
-    }
 }

@@ -3,7 +3,9 @@ package io.swagger.api;
 import io.swagger.model.Body;
 import io.swagger.model.InlineResponse200;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.model.User;
 import io.swagger.model.UserLogin;
+import io.swagger.repository.UserRepository;
 import io.swagger.service.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,6 +44,8 @@ public class LoginApiController implements LoginApi {
     @Autowired
     private LoginService loginService;
 
+    @Autowired
+    private UserRepository userRepository;
     private static final Logger log = LoggerFactory.getLogger(LoginApiController.class);
 
     private final ObjectMapper objectMapper;
@@ -54,14 +58,15 @@ public class LoginApiController implements LoginApi {
         this.request = request;
     }
 
-    public ResponseEntity<InlineResponse200> login(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody UserLogin body) {
+    public ResponseEntity<String> login(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody UserLogin body) {
 
         try {
-            String token = loginService.login(body.getEmailAddress(), body.getPassword());
-            return new ResponseEntity<InlineResponse200>(objectMapper.readValue(token,InlineResponse200.class),HttpStatus.OK);
-        } catch (IOException e) {
+            User user = userRepository.findUserByEmail(body.getEmailAddress());
+            String token = "Token: " + loginService.login(body.getEmailAddress(), body.getPassword());
+            return new ResponseEntity<String>(token,HttpStatus.OK);
+        } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<InlineResponse200>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 
         }
 

@@ -2,6 +2,7 @@ package io.swagger.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.EnumType;
@@ -10,7 +11,9 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
+@Data
 public class UserLogin   {
+
     @Schema(required = true, description = "")
     @NotNull
     @JsonProperty("emailAddress")
@@ -32,27 +35,4 @@ public class UserLogin   {
         this.password = password;
     }
 
-    public String getEmailAddress() {
-        return emailAddress;
-    }
-
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Collection<User.RoleEnum> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Collection<User.RoleEnum> roles) {
-        this.roles = roles;
-    }
 }

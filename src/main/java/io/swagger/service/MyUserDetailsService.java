@@ -1,18 +1,13 @@
 package io.swagger.service;
 
+import io.swagger.model.SecurityUser;
 import io.swagger.model.User;
-import io.swagger.model.UserLogin;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
@@ -28,14 +23,6 @@ public class MyUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException(String.format("Username %s not found", email));
         }
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(email)
-                .password(user.getPassword())
-                .authorities(user.getRole().toString())
-                .accountExpired(false)
-                .accountLocked(false)
-                .credentialsExpired(false)
-                .disabled(false)
-                .build();
+        return new SecurityUser(user);
   }
 }

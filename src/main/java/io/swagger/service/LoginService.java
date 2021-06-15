@@ -5,7 +5,6 @@ import lombok.extern.java.Log;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,9 +32,10 @@ public class LoginService {
     public String login(String email, String password) {
         try {
             manager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-            return jwtTokenProvider.createToken(email, List.of(userRepository.findUserByEmail(email).getRole()));
+            System.out.println(userRepository.findUserByEmail(email).getRole());
+            return jwtTokenProvider.createToken(email, userRepository.findUserByEmail(email).getRole());
         } catch (AuthenticationException ae) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid credentials");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, ae.getMessage());
         }
     }
 
@@ -48,7 +48,7 @@ public class LoginService {
 
             log.info(user.toString());
             userRepository.save(user);
-            String token = jwtTokenProvider.createToken(user.getEmail(), List.of(user.getRole()));
+            String token = jwtTokenProvider.createToken(user.getEmail(),user.getRole());
             return token;
         } else {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Username already in use");
