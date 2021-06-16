@@ -28,7 +28,8 @@ public class TransactionServiceImpl implements TransactionService
             throw new ApiRequestException("Offset can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
 
         if (limit == null || limit < 0)
-            throw new ApiRequestException("Limit can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("Limit can't be lower than 1 or NULL.", HttpStatus.BAD_REQUEST);
+
 
         Pageable pageable = PageRequest.of(offset, limit);
         return transactionRepository.findAll(pageable).getContent();
@@ -45,22 +46,22 @@ public class TransactionServiceImpl implements TransactionService
     public void createTransaction(Transaction transaction)
     {
         User senderUser = transaction.getSenderAccount().getUser(); //store sender
-        User receiverUser = transaction.getReceiverAccount().getUser();
+        User receiverUser = transaction.getReceiverAccount().getUser(); //store receiver
         if (senderUser == null)
             throw new ApiRequestException("Could not retrieve sender user!", HttpStatus.BAD_REQUEST);
 
         if (receiverUser == null)
-            throw new ApiRequestException("Could not retrieve receiver user", HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("Could not retrieve receiver user!", HttpStatus.BAD_REQUEST);
         //if the amount is less than 0 or it's more than the limit
         if (transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit())
             throw new ApiRequestException("Invalid amount!", HttpStatus.BAD_REQUEST);
 
         //make sure the amount is less than the limit
-        if (senderUser.getTransactionLimit() < transaction.getAmount())
+        if (senderUser.getTransactionLimit() != null && senderUser.getTransactionLimit() < transaction.getAmount())
             throw new ApiRequestException("Amount is higher than the limit!", HttpStatus.BAD_REQUEST);
 
         //check so the user doesn't exceed the daily limit amount
-        if (senderUser.getCurrentTransactionsAmount() + transaction.getAmount() > senderUser.getDayLimit())
+        if (senderUser.getDayLimit() != null && senderUser.getCurrentTransactionsAmount() + transaction.getAmount() > senderUser.getDayLimit())
             throw new ApiRequestException("Daily limit amount exceeded!", HttpStatus.BAD_REQUEST);
 
         //increase the user's  current daily transactions amount
@@ -115,7 +116,7 @@ public class TransactionServiceImpl implements TransactionService
     {
 
         if (oldTransaction == null)
-            throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("Old transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
         if (newTransaction == null)
             throw new ApiRequestException("New transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
 
@@ -128,10 +129,8 @@ public class TransactionServiceImpl implements TransactionService
     {
         //subtract money from the sender and save
         senderAccount.setBalance(senderAccount.getBalance().subtract(BigDecimal.valueOf(amount)));
-        // accountRepository.save(senderAccount);
 
         //add money to the receiver and save
         receiverAccount.setBalance(receiverAccount.getBalance().add(BigDecimal.valueOf(amount)));
-        // accountRepository.save(receiverAccount);
     }
 }
