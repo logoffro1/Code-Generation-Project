@@ -105,7 +105,7 @@ public class AccountApiControllerTest {
     }
 
     @Test
-    public void updateAccountShoukdReturnOk() throws Exception
+    public void updateAccountShouldReturnOk() throws Exception
     {
         ObjectMapper mapper = new ObjectMapper();
         accountService.createAccount(this.account);
