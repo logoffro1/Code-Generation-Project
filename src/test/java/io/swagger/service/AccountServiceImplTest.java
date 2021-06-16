@@ -18,15 +18,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,17 +72,6 @@ class AccountServiceImplTest {
     }
 
 
-//    @AfterEach
-//     void tearDown()
-//    {
-//        this.mockUser=null;
-//        this.accountList =null;
-//    }
-
-    @Test
-    void getAccountByIban() {
-
-    }
 
     @Test
     void updateAccount() {
@@ -84,17 +79,26 @@ class AccountServiceImplTest {
 
     @Test
     void getAllAccounts() {
+
+        List<Account> accountList=new ArrayList<>();
         Account account1= new Account(ibanGenerator.generateIban(),postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
         Account account2= new Account(ibanGenerator.generateIban(),postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
-        when(accountRepo.save(account1)).thenReturn(account1);
-        when(accountRepo.save(account2)).thenReturn(account2);
-        accountServiceImpl.createAccount(account1);
-        accountServiceImpl.createAccount(account2);
-        List<Account>accounts1 = accountServiceImpl.getAllAccounts(2,0);
-        verify(accountRepo.findAll());
+        accountList.add(account1);
+        accountList.add(account2);
 
+        //Since we have done pagination in our gets in order to reduce the huge chunks of data, we also have to mock the
+        // paged data.
+        Page<Account> accountListPaged= new PageImpl<Account>(accountList);
+
+        Pageable pageable = PageRequest.of(0, 2);
+
+        given(accountRepo.findAll(pageable)).willReturn(accountListPaged);
+        List<Account>accounts1 = accountServiceImpl.getAllAccounts(2,0);
+        assertEquals(accounts1,accountListPaged);
+        verify(accountRepo).findAll(pageable);
 
     }
+
 
     @Test
     void createdAccountShouldntHaveLessBalanceThanAbsoluteLimit(){
@@ -116,9 +120,23 @@ class AccountServiceImplTest {
     }
 
     @Test
+    void getAccountByIbanShouldReturnTheRightAccount() {
+        //We mock the data to see if everything is working right.
+        when(accountRepo.findByIBAN(this.account.getIBAN())).thenReturn(this.account);
+        Account returnedAccount = accountServiceImpl.getAccountByIban(this.account.getIBAN());
+        assertEquals(returnedAccount,this.account);
+    }
+
+    @Test
     void createAccountShouldNotHavePresentIbanInDatabase() {
 
-        Account account1= new Account(ibanGenerator.generateIban(),postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
+        Account account1= new Account(
+                ibanGenerator.generateIban(),
+                postAccount.getAbsoluteLimit(),
+                mockUser,postAccount.getType(),
+                postAccount.getStatus(),
+                postAccount.getBalance());
+
         Mockito.when(accountRepo.save(account1)).thenReturn(account1);
         accountServiceImpl.createAccount(account1);
 
