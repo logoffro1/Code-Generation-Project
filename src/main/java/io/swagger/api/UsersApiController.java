@@ -1,12 +1,10 @@
 package io.swagger.api;
 
 import io.swagger.exceptions.ApiRequestException;
-import io.swagger.model.CreateUserDTO;
-import io.swagger.model.ModifyUserDTO;
-import io.swagger.model.User;
+import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.model.UserDTO;
 import io.swagger.service.UserService;
+import io.swagger.util.LoggedInUser;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -86,21 +85,37 @@ public class UsersApiController implements UsersApi {
         }
     }
 
-    @PreAuthorize("hasAnyRole('EMPLOYEE','CUSTOMER')")
     @RequestMapping(value="/{userId}",
             method = RequestMethod.GET ,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getUserById(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId) throws Exception {
+//
+//        try {
+//
+//            if(!LoggedInUser.isEmployee())
+//            {
+//                if (userId != LoggedInUser.getUserId())
+//                {
+//                    throw new ApiRequestException("You are not allowed to get this user details",HttpStatus.UNAUTHORIZED);
+//                }
+//            }
+//            User user = userService.getUserById(userId);
+//            return new ResponseEntity<User>(HttpStatus.FOUND).status(200).body(user);
+//
+//        } catch (Exception e ){
+//            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
+//        }
 
-        try {
-
-            User user = userService.getUserById(userId);
-            return new ResponseEntity<User>(HttpStatus.FOUND).status(200).body(user);
-
-        } catch (Exception e ){
-            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
+        if(!LoggedInUser.isEmployee())
+        {
+            if (userId != LoggedInUser.getUserId())
+            {
+                throw new ApiRequestException("You are not allowed to get this user details",HttpStatus.UNAUTHORIZED);
+            }
         }
+        User user = userService.getUserById(userId);
+        return new ResponseEntity<User>(HttpStatus.FOUND).status(200).body(user);
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")

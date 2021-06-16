@@ -7,12 +7,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class SecurityUser implements UserDetails {
+public class AuthorizedUser implements UserDetails {
 
   ArrayList<GrantedAuthority> authorities = null;
   private User user;
 
-  public SecurityUser(User user) {
+  public AuthorizedUser(User user) {
     this.user = user;
   }
 

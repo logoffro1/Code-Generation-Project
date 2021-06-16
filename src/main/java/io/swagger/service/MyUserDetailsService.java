@@ -1,6 +1,6 @@
 package io.swagger.service;
 
-import io.swagger.model.SecurityUser;
+import io.swagger.model.AuthorizedUser;
 import io.swagger.model.User;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,6 @@ public class MyUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException(String.format("Username %s not found", email));
         }
 
-        return new SecurityUser(user);
+        return new AuthorizedUser(user);
   }
 }

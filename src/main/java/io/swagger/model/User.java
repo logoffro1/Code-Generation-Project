@@ -6,6 +6,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.util.LoggedInUser;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.security.core.GrantedAuthority;
 import org.threeten.bp.OffsetDateTime;
@@ -23,8 +24,7 @@ import javax.validation.constraints.*;
 
 @Entity
 @SequenceGenerator(name = "user_seq", initialValue =  1001)
-public class User
-{
+public class User {
 
   @JsonProperty("id")
   @Id
