@@ -54,13 +54,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public void createAccount(Account account) {
+        //IMPORTANT NOTE: I do not check if the user with the given id is present in the database because it is checked in userService
+        //Layer which I get the user from. Therefore it would have been redundant for me to check it.
      //   Account should contain a balance more than absolute limit from the start
         if (account.getBalance().compareTo(account.getAbsoluteLimit()) == -1)
             throw new ApiRequestException("Balance can not be less than absoluteLimit", HttpStatus.BAD_REQUEST);
 
-        //There should be a present user in the database
-        if (!userService.isUserPresent((int) account.getUser().getId()))
-            throw new ApiRequestException("User is not present in database", HttpStatus.FORBIDDEN);
+        //User can not be null
+        if (account.getUser()==null)
+            throw new ApiRequestException("User can not be null", HttpStatus.BAD_REQUEST);
         //Acount shouldn't be closed by default
         if (account.getStatus() == Account.StatusEnum.CLOSED)
             throw new ApiRequestException("Account must not be closed when it is created", HttpStatus.FORBIDDEN);

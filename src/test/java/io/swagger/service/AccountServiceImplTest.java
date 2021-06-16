@@ -1,5 +1,6 @@
 package io.swagger.service;
 
+import io.swagger.annotations.Api;
 import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.*;
 import io.swagger.repository.AccountRepository;
@@ -17,30 +18,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-@AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
+@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class AccountServiceImplTest {
 
+    @InjectMocks
+    private AccountServiceImpl accountServiceImpl;
 
     @Mock
     private AccountRepository accountRepo;
-    private AutoCloseable autoCloseable;
-
 
     @Autowired
-    @InjectMocks
-    private AccountServiceImpl accountServiceImpl;
-    private List<Account> accountList;
+    private UserServiceImpl userService;
 
+    @Autowired
+    private IbanGeneratorService ibanGenerator;
 
     private Account account;
 
@@ -56,7 +61,7 @@ class AccountServiceImplTest {
         mockUser.setId(1003);
 
         modifyAccountDTO= new ModifyAccountDTO(Account.TypeEnum.CURRENT);
-        this.account = new Account("iban", BigDecimal.valueOf(200), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000));
+        this.account = new Account(ibanGenerator.generateIban(), BigDecimal.valueOf(200), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000));
         this.postAccount= new AccountDTO(BigDecimal.valueOf(200),mockUser, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000), Account.TypeEnum.CURRENT);
     }
 
@@ -79,11 +84,12 @@ class AccountServiceImplTest {
 
     @Test
     void getAllAccounts() {
-        Account account1= new Account("iban1",postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
-        Account account2= new Account("iban2",postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
+        Account account1= new Account(ibanGenerator.generateIban(),postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
+        Account account2= new Account(ibanGenerator.generateIban(),postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
+        when(accountRepo.save(account1)).thenReturn(account1);
+        when(accountRepo.save(account2)).thenReturn(account2);
         accountServiceImpl.createAccount(account1);
         accountServiceImpl.createAccount(account2);
-
         List<Account>accounts1 = accountServiceImpl.getAllAccounts(2,0);
         verify(accountRepo.findAll());
 
@@ -103,28 +109,36 @@ class AccountServiceImplTest {
     void createdAccountShouldntHaveNullUser(){
         postAccount.setUser(null);
         Account account1= new Account("iban1",postAccount.getAbsoluteLimit(),postAccount.getUser(),postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
-        NullPointerException exception = assertThrows(NullPointerException.class,
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> accountServiceImpl.createAccount(account1));
-        Assertions.assertEquals(null, exception.getMessage());
+        Assertions.assertEquals("User can not be null", exception.getMessage());
 
     }
 
     @Test
-    void createAccountShouldNotReturnNull() {
+    void createAccountShouldNotHavePresentIbanInDatabase() {
 
-        Account account1= new Account("iban1",postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
+        Account account1= new Account(ibanGenerator.generateIban(),postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
+        Mockito.when(accountRepo.save(account1)).thenReturn(account1);
         accountServiceImpl.createAccount(account1);
+
+        Account account2= new Account(account1.getIBAN(),postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
+        Mockito.when(accountRepo.save(account2)).thenThrow(new ApiRequestException("Iban is already present in the database",HttpStatus.NOT_FOUND));
+
+        //Since the ibans are set and accounts are mocked, we know that this method is supposed to return the following exception.
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.createAccount(account2));
+        Assertions.assertEquals("Iban is already present in the database", exception.getMessage());
     }
 
     @Test
-    void isIbanPresent() {
-        accountServiceImpl.createAccount(this.account);
+    void isIbanPresentShouldNotReturnFalse() {
 
-        Mockito.when(accountRepo.findByIBAN(this.account.getIBAN())).thenReturn(this.account);
+        Account account= new Account(ibanGenerator.generateIban(),postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
+        accountServiceImpl.createAccount(account);
 
-        boolean result =accountServiceImpl.isIbanPresent(this.account.getIBAN());
-
-        assertTrue(result);
+        Mockito.when(accountRepo.findByIBAN(account.getIBAN())).thenReturn(account);
+        assertThat(accountServiceImpl.getAccountByIban(account.getIBAN())).isEqualTo(account);
     }
 
     @Test
