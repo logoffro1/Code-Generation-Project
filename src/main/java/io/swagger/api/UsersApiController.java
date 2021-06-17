@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,6 +45,7 @@ public class UsersApiController implements UsersApi {
 
     @org.springframework.beans.factory.annotation.Autowired
     public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+
         this.objectMapper = objectMapper;
         this.request = request;
 
@@ -85,26 +85,10 @@ public class UsersApiController implements UsersApi {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getUserById(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId) throws Exception {
-//
-//        try {
-//
-//            if(!LoggedInUser.isEmployee())
-//            {
-//                if (userId != LoggedInUser.getUserId())
-//                {
-//                    throw new ApiRequestException("You are not allowed to get this user details",HttpStatus.UNAUTHORIZED);
-//                }
-//            }
-//            User user = userService.getUserById(userId);
-//            return new ResponseEntity<User>(HttpStatus.FOUND).status(200).body(user);
-//
-//        } catch (Exception e ){
-//            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
-//        }
 
         if(!LoggedInUser.isEmployee())
         {
-            if (userId != LoggedInUser.getUserId())
+            if (! userId.equals(LoggedInUser.getUserId()))
             {
                 throw new ApiRequestException("You are not allowed to get this user details",HttpStatus.UNAUTHORIZED);
             }

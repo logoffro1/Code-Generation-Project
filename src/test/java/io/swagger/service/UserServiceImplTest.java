@@ -108,5 +108,4 @@ class UserServiceImplTest {
         assertEquals(modifyUserDTO,this.mockUser);
     }
 
-
 }
