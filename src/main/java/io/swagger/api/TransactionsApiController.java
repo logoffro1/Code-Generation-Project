@@ -66,18 +66,18 @@ public class TransactionsApiController implements TransactionsApi
 
     }
 
-    public ResponseEntity<TransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody Transaction transaction)
+    public ResponseEntity<Transaction> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody Transaction transaction)
     {
         try
         {
 
             transactionService.createTransaction(transaction);
 
-            return new ResponseEntity<Transaction>(HttpStatus.CREATED).status(201).body(transaction.getTransactionDTO());
+            return new ResponseEntity<Transaction>(HttpStatus.CREATED).status(201).body(transaction);
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
-            return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transaction.getTransactionDTO());
+            return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transaction );
         }
 
 
