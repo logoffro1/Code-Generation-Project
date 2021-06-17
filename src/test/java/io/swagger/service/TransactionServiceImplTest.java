@@ -60,7 +60,7 @@ class TransactionServiceImplTest
 
         Page<Transaction> transactionListPaged= new PageImpl<>(transactions);
         given(transactionRepository.findAll(PageRequest.of(0,5))).willReturn(transactionListPaged);
-        List<TransactionDTO> expected = transactionService.getAllTransactions(0, 5);
+        List<Transaction> expected = transactionService.getAllTransactions(0, 5);
 
 
         assertEquals(expected, transactions);
