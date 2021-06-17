@@ -45,7 +45,7 @@ class TransactionServiceImplTest
     @BeforeEach
     public void init()
     {
-        User mockUser = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.CUSTOMER);
+        User mockUser = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.ROLE_CUSTOMER);
         senderAccount = new Account("iban1", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
         Account receiverAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
         transaction = new Transaction(senderAccount, receiverAccount, 5000.00, "EUR");
@@ -60,7 +60,7 @@ class TransactionServiceImplTest
 
         Page<Transaction> transactionListPaged= new PageImpl<>(transactions);
         given(transactionRepository.findAll(PageRequest.of(0,5))).willReturn(transactionListPaged);
-        List<Transaction> expected = transactionService.getAllTransactions(0, 5);
+        List<TransactionDTO> expected = transactionService.getAllTransactions(0, 5);
 
 
         assertEquals(expected, transactions);

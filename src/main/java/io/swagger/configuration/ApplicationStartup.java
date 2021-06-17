@@ -32,7 +32,7 @@ public class ApplicationStartup implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        User user=new User("John","Doe","JohnDoe@gmail.com","johnnie123","213712983", User.RoleEnum.CUSTOMER);
+        User user=new User("John","Doe","JohnDoe@gmail.com","johnnie123","213712983", User.RoleEnum.ROLE_CUSTOMER);
 
         userService.createUser(user);
 
@@ -40,7 +40,7 @@ public class ApplicationStartup implements ApplicationRunner {
         accountService.createAccount(new Account(ibanService.generateIban(),BigDecimal.valueOf(2020),user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE,BigDecimal.valueOf(2020)));
         accountService.createAccount(new Account(ibanService.generateIban(),BigDecimal.valueOf(2020),user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE,BigDecimal.valueOf(2020)));
 
-        userService.createUser(new User("Williams","smith","willliamSmith@gmail.com","william123","213712983", User.RoleEnum.CUSTOMER));
+        userService.createUser(new User("Williams","smith","willliamSmith@gmail.com","william123","213712983", User.RoleEnum.ROLE_CUSTOMER));
 
     }
 }

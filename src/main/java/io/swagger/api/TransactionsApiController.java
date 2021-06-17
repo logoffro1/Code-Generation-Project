@@ -4,6 +4,7 @@ import io.swagger.model.Account;
 import io.swagger.model.ModifyTransactionDTO;
 import io.swagger.model.Transaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.model.TransactionDTO;
 import io.swagger.service.AccountServiceImpl;
 import io.swagger.service.TransactionServiceImpl;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,6 +21,7 @@ import org.springframework.web.server.NotAcceptableStatusException;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
@@ -45,13 +47,17 @@ public class TransactionsApiController implements TransactionsApi
         this.request = request;
     }
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<List<Transaction>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return", schema = @Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit)
+    public ResponseEntity<List<TransactionDTO>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return", schema = @Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit)
     {
         try
         {
-            return new ResponseEntity<List<Account>>(HttpStatus.ACCEPTED)
+            List<TransactionDTO> transactions = new ArrayList<>();
+            for(Transaction t : transactionService.getAllTransactions(offset, limit))
+                transactions.add(t.getTransactionDTO());
+
+            return new ResponseEntity<List<TransactionDTO>>(HttpStatus.ACCEPTED)
                     .status(200)
-                    .body(transactionService.getAllTransactions(offset, limit));
+                    .body(transactions);
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
@@ -60,18 +66,18 @@ public class TransactionsApiController implements TransactionsApi
 
     }
 
-    public ResponseEntity<Transaction> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody Transaction transaction)
+    public ResponseEntity<TransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody Transaction transaction)
     {
         try
         {
 
             transactionService.createTransaction(transaction);
 
-            return new ResponseEntity<Transaction>(HttpStatus.CREATED).status(201).body(transaction);
+            return new ResponseEntity<Transaction>(HttpStatus.CREATED).status(201).body(transaction.getTransactionDTO());
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
-            return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transaction);
+            return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transaction.getTransactionDTO());
         }
 
 
@@ -91,12 +97,12 @@ public class TransactionsApiController implements TransactionsApi
         }
     }
 
-    public ResponseEntity<Transaction> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId)
+    public ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId)
     {
         try
         {
             Transaction transaction = transactionService.getTransactionById(transactionId);
-            return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction);
+            return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction.getTransactionDTO());
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
@@ -106,14 +112,14 @@ public class TransactionsApiController implements TransactionsApi
 
     }
 
-    public ResponseEntity<Transaction> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody ModifyTransactionDTO newTransaction)
+    public ResponseEntity<TransactionDTO> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody ModifyTransactionDTO newTransaction)
     {
         try
         {
 
             transactionService.updateTransaction(transactionService.getTransactionById(transactionId), newTransaction);
             Transaction transaction = transactionService.getTransactionById(transactionId);
-            return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction);
+            return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction.getTransactionDTO());
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();

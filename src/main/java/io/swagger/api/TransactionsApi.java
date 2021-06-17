@@ -7,6 +7,7 @@ package io.swagger.api;
 
 import io.swagger.model.ModifyTransactionDTO;
 import io.swagger.model.Transaction;
+import io.swagger.model.TransactionDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -54,7 +55,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<Transaction>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit);
+    ResponseEntity<List<TransactionDTO>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit);
 
 
     @Operation(summary = "", description = "Create a transaction", security = {
@@ -73,7 +74,7 @@ public interface TransactionsApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Transaction> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body);
+    ResponseEntity<TransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body);
 
 
     @Operation(summary = "", description = "", security = {
@@ -108,7 +109,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "/{transactionId}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<Transaction> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
+    ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
 
 
     @Operation(summary = "", description = "", security = {
@@ -128,7 +129,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "/{transactionId}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Transaction> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody ModifyTransactionDTO body);
+    ResponseEntity<TransactionDTO> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody ModifyTransactionDTO body);
 
 }
 
