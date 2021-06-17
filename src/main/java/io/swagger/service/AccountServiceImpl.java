@@ -3,12 +3,15 @@ package io.swagger.service;
 import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.Account;
 import io.swagger.model.ModifyAccountDTO;
-import io.swagger.repository.AccountRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import io.swagger.repository.AccountRepository;
+
 
 import java.util.List;
 
@@ -40,7 +43,7 @@ public class AccountServiceImpl implements AccountService {
         return oldAccount;
     }
 
-    public List<Account> getAllAccounts(Integer limit, Integer offset) {
+    public Page<Account> getAllAccounts(Integer limit, Integer offset) {
 
         if (offset == null || offset < 0)
             throw new ApiRequestException("Offset can't be lower than 0 or Null.", HttpStatus.BAD_REQUEST);
@@ -50,7 +53,7 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiRequestException("Limit can't be lower or equal to 0 or Null", HttpStatus.BAD_REQUEST);
 
         Pageable pageable = PageRequest.of(offset, limit);
-        return accountRepository.findAll(pageable).getContent();
+        return  accountRepository.findAll(pageable);
     }
 
     public void createAccount(Account account) {

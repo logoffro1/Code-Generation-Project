@@ -1,6 +1,7 @@
 package io.swagger.repository;
 
 import io.swagger.model.Account;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
@@ -11,5 +12,5 @@ import java.util.List;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long>
 {
-  Account findByIBAN(String IBAN);
+    Account findByIBAN(String IBAN);
 }

@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -72,7 +74,8 @@ public class AccountApiControllerTest {
 
     @Test
     public void getAccountsShouldReturnAJsonArray() throws Exception {
-        given(accountService.getAllAccounts(1, 0)).willReturn(List.of(account));
+        Page<Account> accounts= new PageImpl<Account>(List.of(this.account));
+        given(accountService.getAllAccounts(1, 0)).willReturn(accounts);
         this.mvc.perform(
                 get("/accounts")).andExpect(
                 status().isOk());

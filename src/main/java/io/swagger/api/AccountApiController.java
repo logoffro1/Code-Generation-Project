@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -96,11 +97,11 @@ public class AccountApiController implements AccountApi {
     @RequestMapping(value = "",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    public ResponseEntity<List<Account>> getAccounts(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return", schema = @Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
+    public ResponseEntity<Page<Account>> getAccounts(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return", schema = @Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
         try
         {
-            List<Account> allAccounts = accountServiceImpl.getAllAccounts(limit,offset);
-            return new ResponseEntity<List<Account>>(HttpStatus.ACCEPTED).status(200).body(allAccounts);
+            Page<Account> allAccounts = accountServiceImpl.getAllAccounts(limit,offset);
+            return new ResponseEntity<Page<Account>>(HttpStatus.ACCEPTED).status(200).body(allAccounts);
         }catch (NotAcceptableStatusException exception){
             return new ResponseEntity<List<Account>>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(null);
         }

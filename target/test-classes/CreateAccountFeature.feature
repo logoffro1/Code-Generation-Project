@@ -4,3 +4,4 @@ Feature: Account Tests
     Given I am customer
     When I want to open a new account
     Then I should be able to open a new account
+

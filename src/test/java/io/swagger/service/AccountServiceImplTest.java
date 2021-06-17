@@ -1,10 +1,8 @@
 package io.swagger.service;
 
-import io.swagger.annotations.Api;
 import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.*;
 import io.swagger.repository.AccountRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,16 +13,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -74,7 +69,10 @@ class AccountServiceImplTest {
 
 
     @Test
-    void updateAccount() {
+    void updateAccountShouldChangeAccountType() {
+        if(this.modifyAccountDTO.getType()== Account.TypeEnum.CURRENT){
+
+        }
     }
 
     @Test
@@ -90,12 +88,12 @@ class AccountServiceImplTest {
         // paged data.
         Page<Account> accountListPaged= new PageImpl<Account>(accountList);
 
-        Pageable pageable = PageRequest.of(0, 2);
 
-        given(accountRepo.findAll(pageable)).willReturn(accountListPaged);
-        List<Account>accounts1 = accountServiceImpl.getAllAccounts(2,0);
+
+        given(accountRepo.findAll(PageRequest.of(0, 2))).willReturn(accountListPaged);
+        Page<Account>accounts1 = accountServiceImpl.getAllAccounts(2,0);
         assertEquals(accounts1,accountListPaged);
-        verify(accountRepo).findAll(pageable);
+        verify(accountRepo).findAll(PageRequest.of(0, 2));
 
     }
 
@@ -160,6 +158,21 @@ class AccountServiceImplTest {
     }
 
     @Test
-    void softDeleteAccount() {
+    void softDeleteAccountShouldChangeTheStatusOfAccount() {
+        //In case it was closed
+        this.account.setStatus(Account.StatusEnum.ACTIVE);
+        when(accountRepo.findByIBAN(this.account.getIBAN())).thenReturn(this.account);
+        accountServiceImpl.softDeleteAccount(this.account.getIBAN());
+        assertEquals(this.account.getStatus(), Account.StatusEnum.CLOSED);
+    }
+
+    @Test
+    void ifAccountClosedThrowAccountAlreadyClosedMessage() {
+        //In case it was closed
+        this.account.setStatus(Account.StatusEnum.CLOSED);
+        when(accountRepo.findByIBAN(this.account.getIBAN())).thenReturn(this.account);
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () ->  accountServiceImpl.softDeleteAccount(this.account.getIBAN()));
+        Assertions.assertEquals("Account is already closed", exception.getMessage());
     }
 }
