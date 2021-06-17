@@ -3,7 +3,6 @@ package io.swagger.service;
 import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.*;
 import io.swagger.repository.TransactionRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
@@ -37,46 +39,35 @@ class TransactionServiceImplTest
     private TransactionServiceImpl transactionService;
 
     private Transaction transaction;
-    private TransactionDTO transactionDTO;
-    private ModifyTransactionDTO modifyTransactionDTO;
-    private User mockUser;
     private Account senderAccount;
-    private Account receiverAccount;
 
 
     @BeforeEach
     public void init()
     {
-        mockUser = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.CUSTOMER);
+        User mockUser = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.CUSTOMER);
         senderAccount = new Account("iban1", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
-        receiverAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
+        Account receiverAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
         transaction = new Transaction(senderAccount, receiverAccount, 5000.00, "EUR");
-        transactionDTO = new TransactionDTO(senderAccount.getIBAN(), receiverAccount.getIBAN(), 5000.00, "EUR");
     }
 
-    @AfterEach
-    public void tearDown()
-    {
-      /*  mockUser = null;
-        transactionsList = null;*/
-    }
-/*
     @Test
-    void getAllTransactions() // NOT WORKING
+    void getAllTransactions()
     {
         List<Transaction> transactions = new ArrayList<>(List.of(transaction));
 
-        when(transactionRepository.save(transaction)).thenReturn(transaction);
+        lenient().when(transactionRepository.save(transaction)).thenReturn(transaction);
 
-        given(transactionRepository.findAll()).willReturn(transactions);
-        List<Transaction> expected = transactionService.getAllTransactions(0, 5); //returning null?
+        Page<Transaction> transactionListPaged= new PageImpl<>(transactions);
+        given(transactionRepository.findAll(PageRequest.of(0,5))).willReturn(transactionListPaged);
+        List<Transaction> expected = transactionService.getAllTransactions(0, 5);
 
 
         assertEquals(expected, transactions);
-    }*/
+    }
 
     @Test
-    void getTransactionById() //test for return as well
+    void getTransactionById()
     {
         lenient().when(transactionRepository.findById(transaction.getTransactionId())).thenReturn(java.util.Optional.ofNullable(transaction));
 
@@ -159,13 +150,20 @@ class TransactionServiceImplTest
     @Test
     void updateTransaction()
     {
+        ModifyTransactionDTO tmpTransaction = new ModifyTransactionDTO(3000.00);
+
         ApiRequestException exception = assertThrows(ApiRequestException.class,
-                () -> transactionService.updateTransaction(null, modifyTransactionDTO));
+                () -> transactionService.updateTransaction(null, tmpTransaction));
         Assertions.assertEquals("Old transaction cannot be NULL.", exception.getMessage());
 
         exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.updateTransaction(transaction, null));
         Assertions.assertEquals("New transaction cannot be NULL.", exception.getMessage());
+
+
+
+        transactionService.updateTransaction(transaction,tmpTransaction);
+        assertEquals((Double)3000.00,transaction.getAmount());
     }
 
 
