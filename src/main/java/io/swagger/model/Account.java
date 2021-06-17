@@ -1,11 +1,15 @@
 package io.swagger.model;
 
+import java.security.Timestamp;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.exceptions.ApiRequestException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -28,28 +32,33 @@ public class Account   {
   @JsonProperty("IBAN")
   private String IBAN = null;
 
+  @Column(precision=10, scale=2)
   @JsonProperty("absoluteLimit")
-  private Double absoluteLimit = null;
+  private BigDecimal absoluteLimit = null;
 
-  @JsonProperty("userId")
-  private Integer userId = null;
+  @ManyToOne(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
+  @JoinColumn(name = "userID")
+  private User user = null;
 
   public Account(){
 
   }
 
-  public Account(String IBAN,Double absoluteLimit, Integer userId, TypeEnum type, StatusEnum status, BigDecimal balance, String token) {
+  public Account(String IBAN,BigDecimal absoluteLimit, User user, TypeEnum type, StatusEnum status, BigDecimal balance) {
     this.absoluteLimit = absoluteLimit;
     this.IBAN = IBAN;
-    this.userId = userId;
+    this.user = user;
     this.type = type;
     this.status = status;
     this.balance = balance;
-    this.token = token;
   }
 
-  public long getAccountId() {
-    return accountId;
+  public BigDecimal getAbsoluteLimit() {
+    return absoluteLimit;
+  }
+
+  public void setAbsoluteLimit(BigDecimal absoluteLimit) {
+    this.absoluteLimit = absoluteLimit;
   }
 
   /**
@@ -63,7 +72,11 @@ public class Account   {
     private String value;
 
     TypeEnum(String value) {
-      this.value = value;
+      if(value=="current" || value=="savings")
+        this.value = value;
+      else{
+        throw new ApiRequestException("Please enter a valid Account Type (current/savings)", HttpStatus.BAD_REQUEST);
+      }
     }
 
     @Override
@@ -96,7 +109,12 @@ public class Account   {
     private String value;
 
     StatusEnum(String value) {
-      this.value = value;
+
+      if(value=="active" || value=="closed")
+        this.value = value;
+      else{
+        throw new ApiRequestException("Please enter a valid Account Status (active/closed)", HttpStatus.BAD_REQUEST);
+      }
     }
 
     @Override
@@ -118,11 +136,10 @@ public class Account   {
   @JsonProperty("status")
   private StatusEnum status = null;
 
+  @Column(precision=10, scale=2)
   @JsonProperty("balance")
   private BigDecimal balance = null;
 
-  @JsonProperty("token")
-  private String token = null;
 
   public Account IBAN(String IBAN) {
     this.IBAN = IBAN;
@@ -144,8 +161,8 @@ public class Account   {
     this.IBAN = IBAN;
   }
 
-  public Account userId(Integer userId) {
-    this.userId = userId;
+  public Account user(User user) {
+    this.user = user;
     return this;
   }
 
@@ -156,12 +173,12 @@ public class Account   {
   @Schema(required = true, description = "")
       @NotNull
 
-    public Integer getUserId() {
-    return userId;
+    public User getUser() {
+    return this.user;
   }
 
-  public void setUserId(Integer userId) {
-    this.userId = userId;
+  public void setUser(User user) {
+    this.user = user;
   }
 
   public Account type(TypeEnum type) {
@@ -222,27 +239,12 @@ public class Account   {
   }
 
   public void setBalance(BigDecimal balance) {
+    if(balance.compareTo(this.absoluteLimit)==-1)
+    throw new IllegalArgumentException("Balance can not be lower than absolute limit");
+
     this.balance = balance;
   }
 
-  public Account token(String token) {
-    this.token = token;
-    return this;
-  }
-
-  /**
-   * Get token
-   * @return token
-   **/
-  @Schema(description = "")
-  
-    public String getToken() {
-    return token;
-  }
-
-  public void setToken(String token) {
-    this.token = token;
-  }
 
 
   @Override
@@ -255,16 +257,15 @@ public class Account   {
     }
     Account account = (Account) o;
     return Objects.equals(this.IBAN, account.IBAN) &&
-        Objects.equals(this.userId, account.userId) &&
+        Objects.equals(this.user, account.user) &&
         Objects.equals(this.type, account.type) &&
         Objects.equals(this.status, account.status) &&
-        Objects.equals(this.balance, account.balance) &&
-        Objects.equals(this.token, account.token);
+        Objects.equals(this.balance, account.balance);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(IBAN, userId, type, status, balance, token);
+    return Objects.hash(IBAN, user, type, status, balance);
   }
 
   @Override
@@ -273,11 +274,10 @@ public class Account   {
     sb.append("class Account {\n");
     
     sb.append("    IBAN: ").append(toIndentedString(IBAN)).append("\n");
-    sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
+    sb.append("    userId: ").append(toIndentedString(user)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    balance: ").append(toIndentedString(balance)).append("\n");
-    sb.append("    token: ").append(toIndentedString(token)).append("\n");
     sb.append("}");
     return sb.toString();
   }

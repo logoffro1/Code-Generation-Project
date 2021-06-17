@@ -1,25 +1,18 @@
 package io.swagger.service;
 
-import com.sun.xml.bind.v2.model.core.ID;
 import io.swagger.model.Account;
-import io.swagger.repository.AccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import io.swagger.model.ModifyAccountDTO;
+import org.springframework.data.domain.Page;
 
-@Service
-public class AccountService  {
+import java.util.List;
 
-    @Autowired
-    private AccountRepository accountRepository;
+public interface AccountService {
 
-    public Account getAccountById(long id)
-    {
-       // return accountRepository != null ? accountRepository.findById(id).get() : null;
-        return accountRepository.findById(id).get();
-    }
-
-    public void createAccount(Account account){
-        accountRepository.save(account);
-    }
+     Account getAccountByIban(String iban);
+     Page<Account> getAllAccounts(Integer limit, Integer offset);
+    void createAccount(Account account);
+    boolean isIbanPresent(String iban);
+    Account softDeleteAccount(String iban);
+    Account updateAccount(Account oldAccount, ModifyAccountDTO newAccount);
 
 }

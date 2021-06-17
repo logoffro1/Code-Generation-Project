@@ -1,32 +1,21 @@
 package io.swagger.service;
 
-import com.sun.xml.bind.v2.model.core.ID;
+import io.swagger.model.ModifyTransactionDTO;
 import io.swagger.model.Transaction;
-import io.swagger.repository.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
-public class TransactionService
+public interface TransactionService
 {
+    List<Transaction> getAllTransactions(Integer offset,Integer limit);
 
-    @Autowired
-    private TransactionRepository transactionRepository;
+    Transaction getTransactionById(long id);
 
-    public List<Transaction> getAllTransactions()
-    {
-        return (List<Transaction>) transactionRepository.findAll();
-    }
+    void createTransaction(Transaction transaction);
 
-    public Transaction getTransactionById(int id)
-    {
-        return transactionRepository.findById(id).get();
-    }
+    void deleteTransactionById(long id);
 
-    public void createTransaction(Transaction transaction)
-    {
-        transactionRepository.save(transaction);
-    }
+    void deleteTransaction(Transaction transaction);
+    void updateTransaction(Transaction oldTransaction, ModifyTransactionDTO newTransaction);
+
 }
