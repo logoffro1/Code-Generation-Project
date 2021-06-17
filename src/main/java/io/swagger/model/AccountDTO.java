@@ -1,7 +1,6 @@
 package io.swagger.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.exceptions.ApiRequestException;
 import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 
