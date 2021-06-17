@@ -44,7 +44,7 @@ public class TransactionsApiController implements TransactionsApi
         this.objectMapper = objectMapper;
         this.request = request;
     }
-
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<List<Transaction>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return", schema = @Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit)
     {
         try
