@@ -13,6 +13,6 @@ public interface UserService {
     User createUser(User user);
     User getUserById(long id);
     void deleteUserById(long id);
-    void updateUser(User user,long id);
+    void updateUser(ModifyUserDTO user,long id);
     boolean isUserPresent(long id);
 }

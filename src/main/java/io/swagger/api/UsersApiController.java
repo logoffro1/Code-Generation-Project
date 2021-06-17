@@ -57,22 +57,17 @@ public class UsersApiController implements UsersApi {
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CreateUserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "User registered", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO userDTO)
     {
-        try {
             if(userDTO == null )
                 throw new NullPointerException("User can't be null");
 
             userService.createUser(convertFromCreateUserDtoToUser(userDTO));
             return new ResponseEntity<CreateUserDTO>(HttpStatus.CREATED).status(201).body(userDTO);
 
-        } catch(Exception e) {
-            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
-        }
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     @RequestMapping(value="",
-            method = RequestMethod.DELETE ,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+            method = RequestMethod.DELETE )
     public ResponseEntity<Void> deleteUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId) {
 
@@ -148,8 +143,8 @@ public class UsersApiController implements UsersApi {
 )) @PathVariable("userId") Long userId, @Valid @RequestBody ModifyUserDTO user) {
 
         try {
-            userService.updateUser(convertFromModifyUserDtoToUser(user),userId);
-            return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
+            userService.updateUser(user,userId);
+            return new ResponseEntity<Void>(HttpStatus.OK);
 
         } catch (Exception e){
 

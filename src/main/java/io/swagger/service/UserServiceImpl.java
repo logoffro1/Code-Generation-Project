@@ -2,6 +2,7 @@ package io.swagger.service;
 
 
 import io.swagger.exceptions.ApiRequestException;
+import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,8 @@ public class UserServiceImpl implements UserService{
     public User getUserById(long id)  {
         if(id < 1001)
             throw new ApiRequestException("Id less than 1001 doesn't exist.Try putting an id in the range of 1000",HttpStatus.BAD_REQUEST);
+        if(!userRepository.findById(id).isPresent())
+            throw new ApiRequestException("User with the specified Id was not found.", HttpStatus.BAD_REQUEST);
 
         return userRepository.findById(id).orElseThrow(() -> new ApiRequestException("User with the specified Id was not found",HttpStatus.NOT_FOUND));
     }
@@ -62,7 +65,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void updateUser(User modifyUser, long id) {
+    public void updateUser(ModifyUserDTO modifyUser, long id) {
 
         User user = getUserById(id);
 
@@ -76,8 +79,8 @@ public class UserServiceImpl implements UserService{
         if (modifyUser.getLastName() != null && !modifyUser.getLastName().isEmpty()) {
             user.setLastName(modifyUser.getLastName());
         }
-        if (modifyUser.getEmail() != null && !modifyUser.getEmail().isEmpty()) {
-            user.setEmail(modifyUser.getEmail());
+        if (modifyUser.getEmailAddress() != null && !modifyUser.getEmailAddress().isEmpty()) {
+            user.setEmail(modifyUser.getEmailAddress());
         }
         if (modifyUser.getPassword() != null && !modifyUser.getPassword().isEmpty()) {
             user.setPassword(modifyUser.getPassword());

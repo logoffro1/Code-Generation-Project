@@ -30,7 +30,7 @@ public class ModifyUserDTO {
     @JsonProperty("password")
     private String password;
 
-    public ModifyUserDTO(@NonNull String firstName, @NonNull String lastName, @NonNull String phoneNumber, @NonNull String emailAddress, @NonNull String password) {
+    public ModifyUserDTO(String firstName,  String lastName,  String phoneNumber,  String emailAddress,  String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
