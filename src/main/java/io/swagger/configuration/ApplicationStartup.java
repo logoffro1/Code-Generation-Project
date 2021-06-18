@@ -36,16 +36,17 @@ public class ApplicationStartup implements ApplicationRunner
     {
 
         User user = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.ROLE_CUSTOMER);
-
+        User bank = new User("Bank","NL","BankNl@gmail.com","BankPassword","+31 06 929281802",1000000.00,1000.00,User.RoleEnum.ROLE_EMPLOYEE);
         userService.createUser(user);
-
+        userService.createUser(bank);
 
         Account sender = new Account(ibanService.generateIban(), BigDecimal.valueOf(0), user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020));
         Account receiver = new Account(ibanService.generateIban(), BigDecimal.valueOf(0), user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020));
+        Account bankAccount= new Account("NL01INHO00000001",BigDecimal.valueOf(0),bank, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE,BigDecimal.valueOf(100000));
         accountService.createAccount(sender);
         accountService.createAccount(receiver);
-        accountService.createAccount(new Account(ibanService.generateIban(), BigDecimal.valueOf(2020), user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020)));
-        userService.createUser(new User("Williams", "smith", "willliamSmith@gmail.com", "william123", "213712983", User.RoleEnum.ROLE_CUSTOMER));
+        accountService.createAccount(bankAccount);
+        userService.createUser(new User("Williams", "smith", "willliamSmith@gmail.com", "william123", "213712983", User.RoleEnum.ROLE_EMPLOYEE));
         transactionService.createTransaction(new Transaction(sender,receiver,1000.00,"EUR"));
     }
 }

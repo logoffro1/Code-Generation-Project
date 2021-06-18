@@ -11,11 +11,11 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
-public class AccountDTO {
+public class CreateAccountDTO {
 
     private BigDecimal absoluteLimit;
 
-    private User user;
+    private Long userId;
 
 
     private Account.StatusEnum status;
@@ -25,12 +25,12 @@ public class AccountDTO {
     @Enumerated(EnumType.STRING)
     private Account.TypeEnum type;
 
-    public AccountDTO() {
+    public CreateAccountDTO() {
     }
 
-    public AccountDTO(BigDecimal absoluteLimit,User user, Account.StatusEnum status, BigDecimal balance, Account.TypeEnum type) {
+    public CreateAccountDTO(BigDecimal absoluteLimit, long userId, Account.StatusEnum status, BigDecimal balance, Account.TypeEnum type) {
         this.absoluteLimit = absoluteLimit;
-        this.user = user;
+        this.userId = userId;
         this.status = status;
         this.balance = balance;
         this.type = type;
@@ -44,12 +44,12 @@ public class AccountDTO {
         this.absoluteLimit = absoluteLimit;
     }
 
-    public User getUser() {
-        return user;
+    public long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public Account.StatusEnum getStatus() {

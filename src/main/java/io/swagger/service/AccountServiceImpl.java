@@ -4,8 +4,12 @@ import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.Account;
 import io.swagger.model.ModifyAccountDTO;
 
+import io.swagger.model.ResponseAccountDTO;
+import io.swagger.model.User;
+import io.swagger.util.LoggedInUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -13,6 +17,8 @@ import org.springframework.stereotype.Service;
 import io.swagger.repository.AccountRepository;
 
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -24,17 +30,29 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private UserServiceImpl userService;
 
+
     public Account getAccountByIban(String iban) {
         if (!isIbanPresent(iban))
             throw new ApiRequestException("Iban is not present, please input a valid iban", HttpStatus.NOT_FOUND);
+        Account account= accountRepository.findByIBAN(iban);
 
-        return accountRepository.findByIBAN(iban);
+        //If user is an employee (OR) A customer is trying to get his/her own account, return the account
+        if(LoggedInUser.isEmployee() || LoggedInUser.getUserId()==account.getUser().getId()){
+            return account;
+        }
+        else{
+            throw new ApiRequestException("Customers can not look for accounts that does not belong to them",HttpStatus.FORBIDDEN);
+        }
+
 
     }
 
     //Change this to only update account type for EMPLOYEE
     public Account updateAccount(Account oldAccount, ModifyAccountDTO newAccount) {
 
+        if(oldAccount.getIBAN().equals("NL01INHO00000001")){
+            throw new ApiRequestException("Bank's own account can not be updated by employees",HttpStatus.FORBIDDEN);
+        }
         if (!isIbanPresent(oldAccount.getIBAN()))
             throw new ApiRequestException("Iban is not found, please input the correct iban to modify the account", HttpStatus.NOT_FOUND);
 
@@ -97,6 +115,22 @@ public class AccountServiceImpl implements AccountService {
 
         return account;
 
+    }
+
+    public ResponseAccountDTO convertToResponseAccountDTO(Account account){
+
+        return new ResponseAccountDTO(account.getUser().getFirstName()+" "+account.getUser().getLastName(),account.getIBAN(),account.getStatus(),account.getType(),account.getBalance(),account.getAbsoluteLimit());
+
+    }
+
+    public Page<ResponseAccountDTO> convertPageToResponseAccountPage(Page<Account> accounts)
+    {
+        List<ResponseAccountDTO> listOfResponseAccountDtos= new ArrayList<>();
+        for (Account acc:accounts
+             ) {
+                listOfResponseAccountDtos.add(convertToResponseAccountDTO(acc));
+        }
+       return new PageImpl<>(listOfResponseAccountDtos);
     }
 
 

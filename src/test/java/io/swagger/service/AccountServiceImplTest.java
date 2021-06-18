@@ -17,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -28,8 +27,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -50,7 +48,7 @@ class AccountServiceImplTest {
 
     private Account account;
 
-    private AccountDTO postAccount;
+    private CreateAccountDTO postAccount;
 
     private ModifyAccountDTO modifyAccountDTO;
 
@@ -63,7 +61,7 @@ class AccountServiceImplTest {
 
         modifyAccountDTO= new ModifyAccountDTO(Account.TypeEnum.CURRENT);
         this.account = new Account(ibanGenerator.generateIban(), BigDecimal.valueOf(200), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000));
-        this.postAccount= new AccountDTO(BigDecimal.valueOf(200),mockUser, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000), Account.TypeEnum.CURRENT);
+        this.postAccount= new CreateAccountDTO(BigDecimal.valueOf(200),mockUser.getId(), Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000), Account.TypeEnum.CURRENT);
     }
 
 
@@ -71,7 +69,7 @@ class AccountServiceImplTest {
     @Test
     void updateAccountShouldChangeAccountType() {
         if(this.modifyAccountDTO.getType()== Account.TypeEnum.CURRENT){
-
+            //will work on it after a break
         }
     }
 
@@ -109,10 +107,10 @@ class AccountServiceImplTest {
     }
     @Test
     void createdAccountShouldntHaveNullUser(){
-        postAccount.setUser(null);
-        Account account1= new Account("iban1",postAccount.getAbsoluteLimit(),postAccount.getUser(),postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
+
+        Account createdAccount= new Account("iban1",postAccount.getAbsoluteLimit(),null,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
         ApiRequestException exception = assertThrows(ApiRequestException.class,
-                () -> accountServiceImpl.createAccount(account1));
+                () -> accountServiceImpl.createAccount(createdAccount));
         Assertions.assertEquals("User can not be null", exception.getMessage());
 
     }

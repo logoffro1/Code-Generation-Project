@@ -6,15 +6,14 @@
 package io.swagger.api;
 
 import io.swagger.model.Account;
-import io.swagger.model.AccountDTO;
+import io.swagger.model.CreateAccountDTO;
 import io.swagger.model.ModifyAccountDTO;
-import io.swagger.model.Transaction;
+import io.swagger.model.ResponseAccountDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -23,25 +22,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.CookieValue;
 
 import javax.validation.Valid;
-import javax.validation.constraints.*;
-import java.util.List;
-import java.util.Map;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
 @Validated
 public interface AccountApi {
 
     @Operation(summary = "Creates an account", description = "Creates an account for a normal user only the ID is needed", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts"})
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "success"),
         
@@ -51,7 +43,7 @@ public interface AccountApi {
     @RequestMapping(value = "",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be created", schema=@Schema()) @Valid @RequestBody AccountDTO body);
+    ResponseEntity<ResponseAccountDTO> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be created", schema=@Schema()) @Valid @RequestBody CreateAccountDTO body);
 
 
     @Operation(summary = "edit existed account", description = "get the account by id to edit the info of the account", security = {
@@ -61,7 +53,7 @@ public interface AccountApi {
     @RequestMapping(value = "/{iban}",
         consumes = { "application/json" }, 
         method = RequestMethod.PUT)
-    ResponseEntity<Account> editAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema=@Schema()) @Valid @RequestBody ModifyAccountDTO body);
+    ResponseEntity<ResponseAccountDTO> editAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the account you want to edit", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "description of the body of the account to be edited", schema=@Schema()) @Valid @RequestBody ModifyAccountDTO body);
 
 
     @Operation(summary = "get account by Iban", description = "get account by Iban", security = {
@@ -71,7 +63,7 @@ public interface AccountApi {
     @RequestMapping(value = "/{iban}",
             produces = { "application/json" },
             method = RequestMethod.GET)
-    ResponseEntity<Account> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the user who owns the account", required=true, schema=@Schema()) @PathVariable("iban") String iban);
+    ResponseEntity<ResponseAccountDTO> getAccountByIban(@Parameter(in = ParameterIn.PATH, description = "the id of the user who owns the account", required=true, schema=@Schema()) @PathVariable("iban") String iban);
 
 
 
@@ -86,7 +78,7 @@ public interface AccountApi {
     @RequestMapping(value = "",
             produces = { "application/json" },
             method = RequestMethod.GET)
-    ResponseEntity<Page<Account>> getAccounts(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit);
+    ResponseEntity<Page<ResponseAccountDTO>> getAccounts(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit);
 
     @Operation(summary = "", description = "", security = {
             @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
@@ -102,7 +94,7 @@ public interface AccountApi {
             @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
     @RequestMapping(value = "/{iban}",
             method = RequestMethod.DELETE)
-    ResponseEntity<Account> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("iban") String iban);
+    ResponseEntity<ResponseAccountDTO> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("iban") String iban);
 }
 
 
