@@ -1,6 +1,7 @@
 package io.swagger.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.service.AccountService;
 import org.threeten.bp.OffsetDateTime;
 
 public class TransactionDTO
@@ -33,6 +34,13 @@ public class TransactionDTO
         this.currencyType = currencyType;
     }
 
+    public Transaction getTransaction(AccountService accountService)
+    {
+        return new Transaction(accountService.getAccountByIban(senderIBAN)
+                , accountService.getAccountByIban(receiverIBAN)
+                , this.amount, this.currencyType);
+    }
+
     public OffsetDateTime getDateTimeCreated()
     {
         return dateTimeCreated;
@@ -50,8 +58,8 @@ public class TransactionDTO
 
     public void setAmount(Double amount)
     {
-        if(amount <= 0) throw new IllegalArgumentException("Amount cannot be less or equal to zero.");
-    this.amount = amount;
+        if (amount <= 0) throw new IllegalArgumentException("Amount cannot be less or equal to zero.");
+        this.amount = amount;
     }
 
     public String getCurrencyType()

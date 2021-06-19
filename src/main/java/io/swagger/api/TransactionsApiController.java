@@ -39,6 +39,9 @@ public class TransactionsApiController implements TransactionsApi
     @Autowired
     private TransactionServiceImpl transactionService;
 
+    @Autowired
+    private AccountServiceImpl accountService;
+
 
     @org.springframework.beans.factory.annotation.Autowired
     public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request)
@@ -66,21 +69,19 @@ public class TransactionsApiController implements TransactionsApi
 
     }
 
-    public ResponseEntity<Transaction> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody Transaction transaction)
+    public ResponseEntity<TransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody TransactionDTO transactionDTO)
     {
         try
         {
-
+Transaction transaction = transactionDTO.getTransaction(accountService);
             transactionService.createTransaction(transaction);
 
-            return new ResponseEntity<Transaction>(HttpStatus.CREATED).status(201).body(transaction);
+            return new ResponseEntity<TransactionDTO>(HttpStatus.CREATED).status(201).body(transactionDTO);
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
-            return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transaction );
+            return new ResponseEntity<TransactionDTO>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transactionDTO);
         }
-
-
     }
 
     public ResponseEntity<Transaction> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId)
@@ -108,8 +109,6 @@ public class TransactionsApiController implements TransactionsApi
             e.printStackTrace();
             return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-
-
     }
 
     public ResponseEntity<TransactionDTO> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody ModifyTransactionDTO newTransaction)
@@ -125,7 +124,6 @@ public class TransactionsApiController implements TransactionsApi
             e.printStackTrace();
             return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-
     }
 
 }
