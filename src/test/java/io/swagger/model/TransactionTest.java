@@ -24,7 +24,7 @@ class TransactionTest
         Account senderAccount = new Account("iban1", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
         Account receivingAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
 
-        this.transaction = new TransactionDTO(senderAccount.getIBAN(), receivingAccount.getIBAN(), 5000.00, "EUR");
+        this.transaction = new TransactionDTO(senderAccount.getUser().getId(),senderAccount.getIBAN(), receivingAccount.getIBAN(), 5000.00, "EUR");
     }
 
     @Test

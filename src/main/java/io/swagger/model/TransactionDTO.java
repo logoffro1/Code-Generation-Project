@@ -10,6 +10,9 @@ public class TransactionDTO
     @JsonProperty("dateTimeCreated")
     private OffsetDateTime dateTimeCreated = null;
 
+    @JsonProperty("senderUserID")
+    private long senderUserID;
+
     @JsonProperty("senderIBAN")
     private String senderIBAN = null;
 
@@ -26,8 +29,9 @@ public class TransactionDTO
     {
     }
 
-    public TransactionDTO(String senderIBAN, String receiverIBAN, Double amount, String currencyType)
+    public TransactionDTO(long senderUserID, String senderIBAN, String receiverIBAN, Double amount, String currencyType)
     {
+        this.senderUserID = senderUserID;
         this.senderIBAN = senderIBAN;
         this.receiverIBAN = receiverIBAN;
         this.amount = amount;
@@ -82,5 +86,11 @@ public class TransactionDTO
         return receiverIBAN;
     }
 
+    public long getUserID() {
+        return senderUserID;
+    }
 
+    public void setUserID(long senderUserID) {
+        this.senderUserID = senderUserID;
+    }
 }
