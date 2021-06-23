@@ -48,7 +48,7 @@ public class TransactionsApiControllerTest
     @BeforeEach
     public void init()
     {
-        User mockUser = new User("firstName", "lastName", "email", "password", "090078601", User.RoleEnum.EMPLOYEE);
+        User mockUser = new User("firstName", "lastName", "email", "password", "090078601", User.RoleEnum.ROLE_EMPLOYEE);
 
         modifyTransactionDTO = new ModifyTransactionDTO(3000.00);
         Account senderAccount = new Account("iban1", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));

@@ -64,7 +64,7 @@ public class AccountApiControllerTest {
 
     @BeforeEach
     public void init() {
-        User mockUser = new User("firstName","lastName","email","password","090078601", User.RoleEnum.EMPLOYEE);
+        User mockUser = new User("firstName","lastName","email","password","090078601", User.RoleEnum.ROLE_EMPLOYEE);
         mockUser.setId(1003);
 
         modifyAccountDTO= new ModifyAccountDTO(Account.TypeEnum.CURRENT);

@@ -19,7 +19,7 @@ class AccountTest {
 
     @BeforeEach
     public void init() {
-        User mockUser = new User("Egemin", "Cilierli", "egecilierli@gmail.com", "thisisnotapaassword", "+31 06 29297273", User.RoleEnum.CUSTOMER);
+        User mockUser = new User("Egemin", "Cilierli", "egecilierli@gmail.com", "thisisnotapaassword", "+31 06 29297273", User.RoleEnum.ROLE_CUSTOMER);
         this.account = new Account("NL02INHO00123456789", BigDecimal.valueOf(200), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000));
     }
 

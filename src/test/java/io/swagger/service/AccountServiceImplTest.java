@@ -58,7 +58,7 @@ class AccountServiceImplTest {
 
     @BeforeEach
      void initialize(){
-        mockUser = new User("firstName","lastName","email","password","090078601", User.RoleEnum.EMPLOYEE);
+        mockUser = new User("firstName","lastName","email","password","090078601", User.RoleEnum.ROLE_EMPLOYEE);
         mockUser.setId(1003);
 
         modifyAccountDTO= new ModifyAccountDTO(Account.TypeEnum.CURRENT);
