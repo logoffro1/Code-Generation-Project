@@ -69,7 +69,7 @@ public class Transaction
 
     public TransactionDTO getTransactionDTO()
     {
-        return new TransactionDTO(senderAccount.getIBAN(), receiverAccount.getIBAN(), this.amount, this.currencyType);
+        return new TransactionDTO(senderAccount.getUser().getId(),senderAccount.getIBAN(), receiverAccount.getIBAN(), this.amount, this.currencyType);
     }
 
     /**

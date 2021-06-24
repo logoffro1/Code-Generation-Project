@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.TransactionDTO;
 import io.swagger.service.AccountServiceImpl;
 import io.swagger.service.TransactionServiceImpl;
+import io.swagger.util.LoggedInUser;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.NotAcceptableStatusException;
@@ -27,8 +29,7 @@ import java.util.List;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
 @RestController
 @RequestMapping("/transactions")
-public class TransactionsApiController implements TransactionsApi
-{
+public class TransactionsApiController implements TransactionsApi {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionsApiController.class);
 
@@ -39,20 +40,24 @@ public class TransactionsApiController implements TransactionsApi
     @Autowired
     private TransactionServiceImpl transactionService;
 
+    @Autowired
+    private AccountServiceImpl accountService;
+
 
     @org.springframework.beans.factory.annotation.Autowired
-    public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request)
-    {
+    public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
         this.objectMapper = objectMapper;
         this.request = request;
     }
+
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ResponseEntity<List<TransactionDTO>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return", schema = @Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit)
-    {
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<List<TransactionDTO>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return", schema = @Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
         try
         {
             List<TransactionDTO> transactions = new ArrayList<>();
-            for(Transaction t : transactionService.getAllTransactions(offset, limit))
+            for (Transaction t : transactionService.getAllTransactions(offset, limit))
                 transactions.add(t.getTransactionDTO());
 
             return new ResponseEntity<List<TransactionDTO>>(HttpStatus.ACCEPTED)
@@ -61,30 +66,28 @@ public class TransactionsApiController implements TransactionsApi
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
-            return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
     }
 
-    public ResponseEntity<Transaction> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody Transaction transaction)
-    {
+    @PreAuthorize("hasAnyRole('EMPLOYEE','CUSTOMER')")
+    public ResponseEntity<TransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody TransactionDTO transactionDTO) {
         try
         {
-
+            Transaction transaction = transactionDTO.getTransaction(accountService);
             transactionService.createTransaction(transaction);
 
-            return new ResponseEntity<Transaction>(HttpStatus.CREATED).status(201).body(transaction);
+            return new ResponseEntity<TransactionDTO>(HttpStatus.CREATED).status(201).body(transactionDTO);
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
-            return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transaction );
+            return new ResponseEntity<TransactionDTO>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transactionDTO);
         }
-
-
     }
 
-    public ResponseEntity<Transaction> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId)
-    {
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<Transaction> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId) {
         try
         {
             Transaction transaction = transactionService.getTransactionById(transactionId);
@@ -93,39 +96,38 @@ public class TransactionsApiController implements TransactionsApi
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
-            return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    public ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId)
-    {
+    @PreAuthorize("hasAnyRole('EMPLOYEE','CUSTOMER')")
+    public ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId) {
         try
         {
+            if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionId))
+                throw new IllegalArgumentException("You cannot access this transaction.");
+
             Transaction transaction = transactionService.getTransactionById(transactionId);
             return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction.getTransactionDTO());
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
-            return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-
-
     }
 
-    public ResponseEntity<TransactionDTO> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody ModifyTransactionDTO newTransaction)
-    {
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<TransactionDTO> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody ModifyTransactionDTO newTransaction) {
         try
         {
-
             transactionService.updateTransaction(transactionService.getTransactionById(transactionId), newTransaction);
             Transaction transaction = transactionService.getTransactionById(transactionId);
             return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction.getTransactionDTO());
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
-            return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-
     }
 
 }
