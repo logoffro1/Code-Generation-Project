@@ -91,8 +91,6 @@ public class AccountServiceImpl implements AccountService {
         //This would never happen but it's here in case of future code changes in iban generator
         if (isIbanPresent(account.getIBAN()))
             throw new ApiRequestException("Iban is already present in the database", HttpStatus.NOT_FOUND);
-
-
         accountRepository.save(account);
 
     }
@@ -104,6 +102,9 @@ public class AccountServiceImpl implements AccountService {
 
     public Account softDeleteAccount(String iban) {
 
+        if(iban.equals("NL01INHO00000001")){
+            throw new ApiRequestException("Bank's own account can not be updated by employees",HttpStatus.FORBIDDEN);
+        }
         Account account = getAccountByIban(iban);
 
         if(account.getStatus()==Account.StatusEnum.CLOSED)
