@@ -186,6 +186,9 @@ public static RoleEnum fromValue(String text) {
 
   public void setId(Integer id)
   {
+     if(id <= 0)
+       throw new IllegalArgumentException("Id should not be below zero");
+
     this.id = id;
   }
 
