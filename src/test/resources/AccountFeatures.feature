@@ -32,3 +32,17 @@ Feature: Account Tests
         When I try to get all accounts with the limit of 100 and offset of 0
         Then I receive the first 100 accounts from database
 
+
+      Scenario: User tries to get an account that doesn't exist in the database by iban
+        Given  I am User
+        When I try to get an account by iban with an iban that does not exist in the database
+        Then I get "ApiRequestException"
+        Then I get Exception message "Iban is not found, please input the correct iban to modify the account"
+
+
+      Scenario:
+
+
+
+
+

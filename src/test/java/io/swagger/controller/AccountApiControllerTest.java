@@ -57,7 +57,7 @@ public class AccountApiControllerTest {
     private ObjectMapper mapper = new ObjectMapper();
 
     @MockBean
-   private User mockUser;
+    private User mockUser;
 
 
     @BeforeEach
@@ -70,7 +70,6 @@ public class AccountApiControllerTest {
         this.postAccount= new CreateAccountDTO(BigDecimal.valueOf(20000),mockUser.getId(), Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000), Account.TypeEnum.CURRENT);
     }
 
-    // FOR COSMIN: You add this line for authorization bro if you dont use it, tests fail. -Egehan
 
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test

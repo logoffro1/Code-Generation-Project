@@ -61,7 +61,7 @@ class AccountServiceImplTest {
 
     @BeforeEach
      void initialize(){
-        mockUser = new User("firstName","lastName","email","password","090078601", User.RoleEnum.ROLE_EMPLOYEE);
+        mockUser = new User("firstName","lastName","email","password","090078601", User.RoleEnum.ROLE_CUSTOMER);
         mockUser.setId(1003);
 
         modifyAccountDTO= new ModifyAccountDTO(Account.TypeEnum.CURRENT);
@@ -69,12 +69,32 @@ class AccountServiceImplTest {
         this.postAccount= new CreateAccountDTO(BigDecimal.valueOf(200),mockUser.getId(), Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000), Account.TypeEnum.CURRENT);
     }
 
+    @Test
+    void getAccountByIbanReturnsExceptionIfUserIsNotSame() {
+        //Mock authorization
+        AuthorizedUser user = new AuthorizedUser(mockUser);
+        Authentication authentication= mock(Authentication.class);
+        SecurityContext securityContext= mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
+
+        //Change user id to be inconsistent to create error
+        User emptyUser = new User();
+        emptyUser.setId(101);
+
+        this.account.setUser(emptyUser);
+        when(accountRepo.findByIBAN(this.account.getIBAN())).thenReturn(this.account);
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.getAccountByIban(this.account.getIBAN()));
+        Assertions.assertEquals("Customers can not look for accounts that does not belong to them", exception.getMessage());
+    }
 
 
     @Test
     void updateAccountShouldChangeAccountType() {
         if(this.modifyAccountDTO.getType()== Account.TypeEnum.CURRENT){
-            //will work on it after a break
+
         }
     }
 
