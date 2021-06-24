@@ -57,6 +57,7 @@ public class TransactionsApiControllerTest
         transaction = new Transaction(senderAccount, receiverAccount, 1000.00, "EUR");
 
     }
+    @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
     void getTransactionsShouldReturnAJsonArray() throws Exception
     {

@@ -3,6 +3,7 @@ package io.swagger.service;
 import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.*;
 import io.swagger.repository.AccountRepository;
+import io.swagger.util.LoggedInUser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
@@ -114,9 +119,32 @@ class AccountServiceImplTest {
         Assertions.assertEquals("User can not be null", exception.getMessage());
 
     }
+    //By bank account I refer to the banks actual account. eg. ING's initial account.
+    @Test
+    void bankAccountCanNotBeUpdated(){
+        this.account.setIBAN("NL01INHO00000001");
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.updateAccount(this.account,new ModifyAccountDTO(Account.TypeEnum.CURRENT)));
+        Assertions.assertEquals("Bank's own account can not be updated by employees", exception.getMessage());
+    }
+
+    //By bank account I refer to the banks actual account. eg. ING's initial account.
+    @Test
+    void bankAccountCantBeClosed(){
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.softDeleteAccount("NL01INHO00000001"));
+        Assertions.assertEquals("Bank's own account can not be updated by employees", exception.getMessage());
+    }
 
     @Test
     void getAccountByIbanShouldReturnTheRightAccount() {
+
+        AuthorizedUser user = new AuthorizedUser(mockUser);
+        Authentication authentication= mock(Authentication.class);
+        SecurityContext securityContext= mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
         //We mock the data to see if everything is working right.
         when(accountRepo.findByIBAN(this.account.getIBAN())).thenReturn(this.account);
         Account returnedAccount = accountServiceImpl.getAccountByIban(this.account.getIBAN());
@@ -145,8 +173,16 @@ class AccountServiceImplTest {
         Assertions.assertEquals("Iban is already present in the database", exception.getMessage());
     }
 
+
     @Test
     void isIbanPresentShouldNotReturnFalse() {
+        //Mocking Authorization
+        AuthorizedUser user = new AuthorizedUser(mockUser);
+        Authentication authentication= mock(Authentication.class);
+        SecurityContext securityContext= mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
 
         Account account= new Account(ibanGenerator.generateIban(),postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
         accountServiceImpl.createAccount(account);
@@ -155,8 +191,16 @@ class AccountServiceImplTest {
         assertThat(accountServiceImpl.getAccountByIban(account.getIBAN())).isEqualTo(account);
     }
 
+
     @Test
     void softDeleteAccountShouldChangeTheStatusOfAccount() {
+        //Mocking Authorization
+        AuthorizedUser user = new AuthorizedUser(mockUser);
+        Authentication authentication= mock(Authentication.class);
+        SecurityContext securityContext= mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
         //In case it was closed
         this.account.setStatus(Account.StatusEnum.ACTIVE);
         when(accountRepo.findByIBAN(this.account.getIBAN())).thenReturn(this.account);
@@ -164,8 +208,18 @@ class AccountServiceImplTest {
         assertEquals(this.account.getStatus(), Account.StatusEnum.CLOSED);
     }
 
+
     @Test
     void ifAccountClosedThrowAccountAlreadyClosedMessage() {
+
+        //Mocking Authorization
+        AuthorizedUser user = new AuthorizedUser(mockUser);
+        Authentication authentication= mock(Authentication.class);
+        SecurityContext securityContext= mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
+
         //In case it was closed
         this.account.setStatus(Account.StatusEnum.CLOSED);
         when(accountRepo.findByIBAN(this.account.getIBAN())).thenReturn(this.account);
