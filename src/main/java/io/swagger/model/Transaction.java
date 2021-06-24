@@ -32,11 +32,11 @@ public class Transaction
     @JsonProperty("dateTimeCreated")
     private OffsetDateTime dateTimeCreated = null;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "senderIBAN")
     private Account senderAccount = null;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "receiverIBAN")
     private Account receiverAccount = null;
 
@@ -59,6 +59,7 @@ public class Transaction
         this.receiverAccount = receiverAccount;
         this.amount = amount;
         this.currencyType = currencyType;
+        this.dateTimeCreated = OffsetDateTime.now();
     }
 
     public Transaction transactionId(Integer transactionId)
@@ -69,7 +70,7 @@ public class Transaction
 
     public TransactionDTO getTransactionDTO()
     {
-        return new TransactionDTO(senderAccount.getUser().getId(),senderAccount.getIBAN(), receiverAccount.getIBAN(), this.amount, this.currencyType);
+        return new TransactionDTO(transactionId,dateTimeCreated,senderAccount.getUser().getId(),senderAccount.getIBAN(), receiverAccount.getIBAN(), this.amount, this.currencyType);
     }
 
     /**

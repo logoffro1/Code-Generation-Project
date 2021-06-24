@@ -16,14 +16,12 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Service
-public class TransactionServiceImpl implements TransactionService
-{
+public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private TransactionRepository transactionRepository;
 
-    public List<Transaction> getAllTransactions(Integer offset, Integer limit)
-    {
+    public List<Transaction> getAllTransactions(Integer offset, Integer limit) {
         if (offset == null || offset < 0)
             throw new ApiRequestException("Offset can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
 
@@ -35,16 +33,14 @@ public class TransactionServiceImpl implements TransactionService
         return transactionRepository.findAll(pageable).getContent();
     }
 
-    public Transaction getTransactionById(long id)
-    {
+    public Transaction getTransactionById(long id) {
         if (!transactionRepository.findById(id).isPresent())
             throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
 
         return transactionRepository.findById(id).get();
     }
 
-    public void createTransaction(Transaction transaction)
-    {
+    public void createTransaction(Transaction transaction) {
         User senderUser = transaction.getSenderAccount().getUser(); //store sender
         User receiverUser = transaction.getReceiverAccount().getUser(); //store receiver
         if (senderUser == null)
@@ -88,8 +84,7 @@ public class TransactionServiceImpl implements TransactionService
     }
 
     @Override
-    public void deleteTransactionById(long id)
-    {
+    public void deleteTransactionById(long id) {
 
         if (!transactionRepository.findById(id).isPresent())
             throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
@@ -101,8 +96,7 @@ public class TransactionServiceImpl implements TransactionService
     }
 
     @Override
-    public void deleteTransaction(Transaction transaction)
-    {
+    public void deleteTransaction(Transaction transaction) {
         if (transaction == null)
             throw new ApiRequestException("Transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
 
@@ -112,25 +106,24 @@ public class TransactionServiceImpl implements TransactionService
     }
 
     @Override
-    public void updateTransaction(Transaction oldTransaction, ModifyTransactionDTO newTransaction)
-    {
+    public void updateTransaction(Transaction oldTransaction, ModifyTransactionDTO newTransaction) {
+        throw new ApiRequestException("ACCESS DENIED!", HttpStatus.BAD_REQUEST);
 
-        if (oldTransaction == null)
+      /*  if (oldTransaction == null)
             throw new ApiRequestException("Old transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
         if (newTransaction == null)
             throw new ApiRequestException("New transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
 
 
         oldTransaction.setAmount(newTransaction.getAmount());
-        transactionRepository.save(oldTransaction);
+        transactionRepository.save(oldTransaction);*/
     }
 
-    private void sendMoney(Account senderAccount, Account receiverAccount, Double amount)
-    {
-        //subtract money from the sender and save
+    private void sendMoney(Account senderAccount, Account receiverAccount, Double amount) {
+      /*  //subtract money from the sender and save
         senderAccount.setBalance(senderAccount.getBalance().subtract(BigDecimal.valueOf(amount)));
 
         //add money to the receiver and save
-        receiverAccount.setBalance(receiverAccount.getBalance().add(BigDecimal.valueOf(amount)));
+        receiverAccount.setBalance(receiverAccount.getBalance().add(BigDecimal.valueOf(amount)));*/
     }
 }

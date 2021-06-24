@@ -5,6 +5,7 @@
  */
 package io.swagger.api;
 
+import io.swagger.model.CreateTransactionDTO;
 import io.swagger.model.ModifyTransactionDTO;
 import io.swagger.model.Transaction;
 import io.swagger.model.TransactionDTO;
@@ -74,7 +75,7 @@ public interface TransactionsApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<TransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody TransactionDTO body);
+    ResponseEntity<CreateTransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody CreateTransactionDTO body);
 
 
     @Operation(summary = "", description = "", security = {
@@ -91,7 +92,7 @@ public interface TransactionsApi {
         @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
     @RequestMapping(value = "/{transactionId}",
         method = RequestMethod.DELETE)
-    ResponseEntity<Transaction> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
+    ResponseEntity<TransactionDTO> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
 
 
     @Operation(summary = "", description = "", security = {
@@ -109,7 +110,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "/{transactionId}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
+    ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Long transactionId);
 
 
     @Operation(summary = "", description = "", security = {
