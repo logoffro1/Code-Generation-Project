@@ -1,10 +1,7 @@
 package io.swagger.api;
 
-import io.swagger.model.Account;
-import io.swagger.model.ModifyTransactionDTO;
-import io.swagger.model.Transaction;
+import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.model.TransactionDTO;
 import io.swagger.service.AccountServiceImpl;
 import io.swagger.service.TransactionServiceImpl;
 import io.swagger.util.LoggedInUser;
@@ -72,39 +69,41 @@ public class TransactionsApiController implements TransactionsApi {
     }
 
     @PreAuthorize("hasAnyRole('EMPLOYEE','CUSTOMER')")
-    public ResponseEntity<TransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody TransactionDTO transactionDTO) {
+    public ResponseEntity<CreateTransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody CreateTransactionDTO transactionDTO) {
         try
         {
-            Transaction transaction = transactionDTO.getTransaction(accountService);
+            Transaction transaction = new Transaction(accountService.getAccountByIban(transactionDTO.getSenderIBAN()),
+                    accountService.getAccountByIban(transactionDTO.getReceiverIBAN()), transactionDTO.getAmount(), transactionDTO.getCurrencyType());
             transactionService.createTransaction(transaction);
 
-            return new ResponseEntity<TransactionDTO>(HttpStatus.CREATED).status(201).body(transactionDTO);
+            return new ResponseEntity<CreateTransactionDTO>(HttpStatus.CREATED).status(201).body(transactionDTO);
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
-            return new ResponseEntity<TransactionDTO>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transactionDTO);
+            return new ResponseEntity<CreateTransactionDTO>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transactionDTO);
         }
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<Transaction> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId) {
+    public ResponseEntity<TransactionDTO> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId) {
         try
         {
             Transaction transaction = transactionService.getTransactionById(transactionId);
             transactionService.deleteTransactionById(transactionId);
-            return new ResponseEntity<Account>(HttpStatus.ACCEPTED).status(200).body(transaction);
+            return new ResponseEntity<TransactionDTO>(HttpStatus.ACCEPTED).status(200).body(transaction.getTransactionDTO());
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
-            return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return new ResponseEntity<TransactionDTO>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @PreAuthorize("hasAnyRole('EMPLOYEE','CUSTOMER')")
-    public ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId) {
+    public ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Long transactionId) {
         try
         {
-            if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionId))
+           // System.out.println(String.format("LOGGED: %s \n %LOGGED ID: %d, "));
+            if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionService.getTransactionById(transactionId).getTransactionDTO().getSenderUserID()))
                 throw new IllegalArgumentException("You cannot access this transaction.");
 
             Transaction transaction = transactionService.getTransactionById(transactionId);

@@ -37,6 +37,8 @@ public class ApplicationStartup implements ApplicationRunner
 
         User user = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.ROLE_CUSTOMER);
         User bank = new User("Bank","NL","BankNl@gmail.com","BankPassword","+31 06 929281802",1000000.00,1000.00,User.RoleEnum.ROLE_EMPLOYEE);
+
+
         userService.createUser(user);
         userService.createUser(bank);
 
