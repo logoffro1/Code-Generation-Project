@@ -1,41 +1,46 @@
-Feature: Users
+Feature: Testing Users
 
-  Scenario: Get All Users (For employee)
+  Scenario: Retrieving all Users return http status ok
     Given the user is an employee
-    When visiting the getUsers endpoint
-    And the http verb is GET
-    And the offset and limit are set
-    Then the employee should be able to retrieve list of all users
+    When retrieving all users
+    Then show http status 200
 
-  Scenario: Create a User
+  Scenario: Creating a user returns http status created
     Given the user is an employee
-    When visiting the createUser endpoint
-    And user is given in the request body
-    Then user should be created
+    When creating a new user
+    Then show http status 201
 
-  Scenario: Get User by ID (For employee)
+  Scenario: Retrieving a user with Id returns
     Given the user is an employee
-    When visiting the getUserById endpoint
-    And the user id is given in the url
-    Then the employee should be able to get the user with the specified id
+    When retrieving a user with id 1
+    Then show http status 200
 
-  Scenario: Update User (For employee)
+  Scenario: Updating a user returns http status ok
     Given the user is an employee
-    When visiting the updateUser endpoint
-    And the user id is given in the url
-    And the updated information is given in the request body
-    Then the user should be updated in the database
+    When updating a user with id 1
+    Then show http status 200
 
-  Scenario: Delete User (For employee)
+  Scenario: Deleting a user returns http status ok
     Given the user is an employee
-    When visiting the deleteUser endpoint
-    And the user id is given in the url
-    Then the user should be deleted from the database
+    When deleting a user with id 1
+    Then show http status 200
 
-  Scenario: Update User (For customer)
+  Scenario: Deleting a user as customer returns http status forbidden
     Given the user is a customer
-    When visiting the updateUser endpoint
-    And the user id is given in the url
-    And the user information belongs to the user that is logged in
-    And the updated information is given in the request body
-    Then the user should be updated in the database
+    When deleting a user with id 1
+    Then show http status 403
+
+  Scenario: Updating a user as customer returns http status forbidden
+    Given the user is a customer
+    When updating a user with id 1
+    Then show http status 403
+
+  Scenario: Creating a user as customer returns http status forbidden
+    Given the user is a customer
+    When creating a user with id 1
+    Then show http status 403
+
+  Scenario: Retrieving all Users as customer return http status forbidden
+    Given the user is a customer
+    When retrieving all users
+    Then show http status 403
