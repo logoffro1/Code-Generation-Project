@@ -46,14 +46,8 @@ class UserServiceImplTest {
     public void setUp() {
 
         userList = new ArrayList<>();
-        mockUser = new User("John",
-                            "Doe",
-                            "JohnDoe@gmail.com",
-                            "johnnie123",
-                            "213712983",
-                            User.RoleEnum.ROLE_CUSTOMER);
+        mockUser = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.ROLE_CUSTOMER);
         mockUser.setId(1002);
-
         userList.add(mockUser);
     }
 
@@ -84,20 +78,17 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getUserById()
-   {
+    void getUserById() {
+
         when(userRepository.findById(this.mockUser.getId())).thenReturn(java.util.Optional.ofNullable(this.mockUser));
         User returnedUser = userServiceImpl.getUserById(this.mockUser.getId());
         assertEquals(returnedUser,this.mockUser);
-
-//       ApiRequestException exception = assertThrows(ApiRequestException.class,
-//                () -> userServiceImpl.getUserById(1003));
-//        Assertions.assertEquals("User with the specified Id was not found", exception.getMessage());
     }
 
+    //doesn't work
     @Test
-    void updateUser()
-    {
+    void updateUser() {
+
         modifyUserDTO = new ModifyUserDTO("William",
                                            "Smith",
                                             "090078601",
@@ -106,6 +97,51 @@ class UserServiceImplTest {
 
         userServiceImpl.updateUser(modifyUserDTO,this.mockUser.getId());
         assertEquals(modifyUserDTO,this.mockUser);
+    }
+
+    @Test
+    void gettingUserByIdThrowsExceptionIfUserDoesnotExist(){
+
+        Exception exception = assertThrows(ApiRequestException.class,
+                () -> userServiceImpl.getUserById(1005L));
+        Assertions.assertEquals("User with the specified Id was not found", exception.getMessage());
+
+    }
+
+    @Test
+    void gettingUserByIdThrowsExceptionIfIdIsNotInTheRangeOf1000(){
+
+        Exception exception = assertThrows(ApiRequestException.class,
+                () -> userServiceImpl.getUserById(1L));
+        Assertions.assertEquals("Id less than 1001 doesn't exist.Try putting an id in the range of 1000", exception.getMessage());
+
+    }
+
+    //doesn't work
+    @Test
+    void creatingUserWithTheSameEmailThrowsException(){
+
+        User mockUser2 = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.ROLE_CUSTOMER);
+
+        Exception exception = assertThrows(ApiRequestException.class,
+                () -> userServiceImpl.createUser(mockUser2));
+        Assertions.assertEquals("This email is already in use.", exception.getMessage());
+    }
+
+    @Test
+    void getUsersThrowsExceptionIfOffsetIsNull(){
+
+        Exception exception = assertThrows(ApiRequestException.class,
+                () -> userServiceImpl.getUsers(5,null));
+        Assertions.assertEquals("Offset can't be lower than 0 or NULL.", exception.getMessage());
+    }
+
+    @Test
+    void getUsersThrowsExceptionIfLimitIsNull(){
+
+        Exception exception = assertThrows(ApiRequestException.class,
+                () -> userServiceImpl.getUsers(null,0));
+        Assertions.assertEquals("Limit can't be lower than 0 or NULL.", exception.getMessage());
     }
 
 }

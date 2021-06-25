@@ -43,6 +43,14 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User createUser(User user) {
+
+        List<User> users = getAllUsers();
+        for (User u : users) {
+            if(u.getEmail().equals(user.getEmail())){
+                throw new ApiRequestException("This email is already in use.",HttpStatus.BAD_REQUEST);
+            }
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -51,8 +59,6 @@ public class UserServiceImpl implements UserService{
     public User getUserById(long id)  {
         if(id < 1001)
             throw new ApiRequestException("Id less than 1001 doesn't exist.Try putting an id in the range of 1000",HttpStatus.BAD_REQUEST);
-        if(!userRepository.findById(id).isPresent())
-            throw new ApiRequestException("User with the specified Id was not found.", HttpStatus.BAD_REQUEST);
 
         return userRepository.findById(id).orElseThrow(() -> new ApiRequestException("User with the specified Id was not found",HttpStatus.NOT_FOUND));
     }

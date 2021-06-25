@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
 
@@ -27,6 +28,7 @@ import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ContextConfiguration(classes = {UserService.class})
 public class UsersApiControllerTest {
 
     @Autowired
@@ -49,14 +51,14 @@ public class UsersApiControllerTest {
 
     @BeforeEach
     public void init(){
-         user = new User("firstName","lastName","email@gmail.com","password","090078601", User.RoleEnum.ROLE_EMPLOYEE);
-         user.setId(1003);
+        user = new User("firstName","lastName","email@gmail.com","password","090078601", User.RoleEnum.ROLE_EMPLOYEE);
+        user.setId(1003);
     }
 
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
     public void getUsersShouldReturnJsonArray() throws Exception{
-       given(userService.getAllUsers()).willReturn(List.of(user));
+        given(userService.getAllUsers()).willReturn(List.of(user));
         this.mvc.perform(
                 get("/users"))
                 .andExpect(
@@ -68,8 +70,8 @@ public class UsersApiControllerTest {
     public void createUserShouldReturnCreated() throws Exception{
 
         this.mvc.perform(post("/users")
-         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-         .content(mapper.writeValueAsString(user)))
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(user)))
                 .andExpect(status().isCreated());
     }
 
