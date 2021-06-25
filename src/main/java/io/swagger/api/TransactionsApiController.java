@@ -4,7 +4,6 @@ import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.service.AccountServiceImpl;
 import io.swagger.service.TransactionServiceImpl;
-import io.swagger.util.LoggedInUser;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -72,8 +71,9 @@ public class TransactionsApiController implements TransactionsApi {
     public ResponseEntity<CreateTransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody CreateTransactionDTO transactionDTO) {
         try
         {
-            Transaction transaction = new Transaction(accountService.getAccountByIban(transactionDTO.getSenderIBAN()),
-                    accountService.getAccountByIban(transactionDTO.getReceiverIBAN()), transactionDTO.getAmount(), transactionDTO.getCurrencyType());
+
+            Transaction transaction = new Transaction(accountService.getAccountByIbanForTransactions(transactionDTO.getSenderIBAN()),
+                    accountService.getAccountByIbanForTransactions(transactionDTO.getReceiverIBAN()), transactionDTO.getAmount(), transactionDTO.getCurrencyType());
             transactionService.createTransaction(transaction);
 
             return new ResponseEntity<CreateTransactionDTO>(HttpStatus.CREATED).status(201).body(transactionDTO);
@@ -102,24 +102,6 @@ public class TransactionsApiController implements TransactionsApi {
     public ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Long transactionId) {
         try
         {
-           // System.out.println(String.format("LOGGED: %s \n %LOGGED ID: %d, "));
-            if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionService.getTransactionById(transactionId).getTransactionDTO().getSenderUserID()))
-                throw new IllegalArgumentException("You cannot access this transaction.");
-
-            Transaction transaction = transactionService.getTransactionById(transactionId);
-            return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction.getTransactionDTO());
-        } catch (NotAcceptableStatusException e)
-        {
-            e.printStackTrace();
-            return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-
-    @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<TransactionDTO> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody ModifyTransactionDTO newTransaction) {
-        try
-        {
-            transactionService.updateTransaction(transactionService.getTransactionById(transactionId), newTransaction);
             Transaction transaction = transactionService.getTransactionById(transactionId);
             return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction.getTransactionDTO());
         } catch (NotAcceptableStatusException e)

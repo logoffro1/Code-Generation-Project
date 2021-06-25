@@ -6,6 +6,7 @@ import io.swagger.model.ModifyTransactionDTO;
 import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.repository.TransactionRepository;
+import io.swagger.util.LoggedInUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,9 @@ public class TransactionServiceImpl implements TransactionService {
     public Transaction getTransactionById(long id) {
         if (!transactionRepository.findById(id).isPresent())
             throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
+
+        if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionRepository.findById(id).get().getTransactionDTO().getSenderUserID()))
+            throw new ApiRequestException("You cannot access this transaction.",HttpStatus.BAD_REQUEST);
 
         return transactionRepository.findById(id).get();
     }
@@ -88,14 +92,14 @@ public class TransactionServiceImpl implements TransactionService {
 
         if (!transactionRepository.findById(id).isPresent())
             throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
-        Transaction transaction = getTransactionById(id);
+        Transaction transaction = transactionRepository.findById(id).get();
 
         //send the money  back
         sendMoney(transaction.getReceiverAccount(), transaction.getSenderAccount(), transaction.getAmount());
         transactionRepository.deleteById(id);
     }
 
-    @Override
+/*    @Override
     public void deleteTransaction(Transaction transaction) {
         if (transaction == null)
             throw new ApiRequestException("Transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
@@ -103,27 +107,27 @@ public class TransactionServiceImpl implements TransactionService {
         //send the money back
         sendMoney(transaction.getReceiverAccount(), transaction.getSenderAccount(), transaction.getAmount());
         transactionRepository.delete(transaction);
-    }
+    }*/
 
-    @Override
+/*    @Override
     public void updateTransaction(Transaction oldTransaction, ModifyTransactionDTO newTransaction) {
         throw new ApiRequestException("ACCESS DENIED!", HttpStatus.BAD_REQUEST);
 
-      /*  if (oldTransaction == null)
+      *//*  if (oldTransaction == null)
             throw new ApiRequestException("Old transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
         if (newTransaction == null)
             throw new ApiRequestException("New transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
 
 
         oldTransaction.setAmount(newTransaction.getAmount());
-        transactionRepository.save(oldTransaction);*/
-    }
+        transactionRepository.save(oldTransaction);*//*
+    }*/
 
     private void sendMoney(Account senderAccount, Account receiverAccount, Double amount) {
-      /*  //subtract money from the sender and save
+        //subtract money from the sender and save
         senderAccount.setBalance(senderAccount.getBalance().subtract(BigDecimal.valueOf(amount)));
 
         //add money to the receiver and save
-        receiverAccount.setBalance(receiverAccount.getBalance().add(BigDecimal.valueOf(amount)));*/
+        receiverAccount.setBalance(receiverAccount.getBalance().add(BigDecimal.valueOf(amount)));
     }
 }

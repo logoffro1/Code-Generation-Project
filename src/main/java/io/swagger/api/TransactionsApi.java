@@ -112,25 +112,5 @@ public interface TransactionsApi {
         method = RequestMethod.GET)
     ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Long transactionId);
 
-
-    @Operation(summary = "", description = "", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Transaction modified."),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden, you do not have access rights"),
-        
-        @ApiResponse(responseCode = "404", description = "Not found"),
-        
-        @ApiResponse(responseCode = "409", description = "Conflict"),
-        
-        @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
-    @RequestMapping(value = "/{transactionId}",
-        consumes = { "application/json" }, 
-        method = RequestMethod.PUT)
-    ResponseEntity<TransactionDTO> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody ModifyTransactionDTO body);
-
 }
 

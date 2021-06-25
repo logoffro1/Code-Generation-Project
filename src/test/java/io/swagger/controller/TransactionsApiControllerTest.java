@@ -2,71 +2,106 @@ package io.swagger.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.*;
-import io.swagger.service.TransactionService;
+import io.swagger.repository.TransactionRepository;
+import io.swagger.service.AccountServiceImpl;
+import io.swagger.service.IbanGeneratorService;
+import io.swagger.service.TransactionServiceImpl;
+import io.swagger.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.hamcrest.Matchers.*;
-import java.math.BigDecimal;
-import java.util.List;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
+import java.math.BigDecimal;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-@ContextConfiguration(classes = {TransactionService.class})
 @SpringBootTest
 @AutoConfigureMockMvc
-public class TransactionsApiControllerTest
-{
+class TransactionsApiControllerTest {
+
     @Autowired
     private MockMvc mvc;
 
+    @Autowired
+    private TransactionServiceImpl transactionService;
+
+    @Autowired
+    private UserServiceImpl userService;
+
+    @Autowired
+    private AccountServiceImpl accountService;
+
     @MockBean
-    private TransactionService transactionService;
+    private User mockUser;
+
+    @Autowired
+    private IbanGeneratorService ibanGenerator;
+
+    private Account senderAccount;
+    private Account receiverAccount;
+
 
     private Transaction transaction;
-
-    @MockBean
-    private TransactionDTO transactionDTO;
-
-    @MockBean
-    private ModifyTransactionDTO modifyTransactionDTO;
-
 
     private ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
-    public void init()
-    {
-        User mockUser = new User("firstName", "lastName", "email", "password", "090078601", User.RoleEnum.ROLE_EMPLOYEE);
+    public void init() {
+        User user = new User("Bank", "NL", "BankNl@gmail.com", "BankPassword", "+31 06 929281802", 1000000.00, 1000.00, User.RoleEnum.ROLE_EMPLOYEE);
+        user.setId(1003);
+        userService.createUser(user);
+        this.senderAccount = new Account(ibanGenerator.generateIban(), BigDecimal.valueOf(0), user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000));
+        this.receiverAccount = new Account(ibanGenerator.generateIban(), BigDecimal.valueOf(0), user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000));
 
-        modifyTransactionDTO = new ModifyTransactionDTO(3000.00);
-        Account senderAccount = new Account("iban1", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
-        Account receiverAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
-        transaction = new Transaction(senderAccount, receiverAccount, 1000.00, "EUR");
+        accountService.createAccount(senderAccount);
+        accountService.createAccount(receiverAccount);
+
+        this.transaction = new Transaction(senderAccount, receiverAccount, 1.00, "EUR");
 
     }
+
+    @Test
+    void getAllTransactions() {
+    }
+
+    @Test
+    void createTransaction() {
+    }
+
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
-    void getTransactionsShouldReturnAJsonArray() throws Exception
-    {
-        given(transactionService.getAllTransactions(0, 5)).willReturn(List.of(transaction));
-        this.mvc.perform(
-                get("/transactions")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(
-                        status().isOk()).andExpect(jsonPath("$",hasSize(1)))
-                .andExpect(jsonPath("$[0].amount",is(transaction.getAmount())));
+    void deleteTransactionByid() throws Exception {
+
+        when(mockUser.getTransactionLimit()).thenReturn(10000.00);
+        when(mockUser.getDayLimit()).thenReturn(10000.00);
+        transactionService.createTransaction(this.transaction);
+
+        this.mvc.perform(delete("/transactions/" + this.transaction.getTransactionId())).andExpect(status().isOk());
+    }
+
+    @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
+    @Test
+    void getTransactionById() throws Exception {
+
+       /* when(mockUser.getTransactionLimit()).thenReturn(10000.00);
+        when(mockUser.getDayLimit()).thenReturn(10000.00);*/
+
+        transactionService.createTransaction(transaction);
+
+        this.mvc.perform((get("/transactions/" + transaction.getTransactionId()))
+        ).andExpect(status().isOk());
     }
 }
