@@ -43,9 +43,15 @@ public class AccountServiceImpl implements AccountService {
         else{
             throw new ApiRequestException("Customers can not look for accounts that does not belong to them",HttpStatus.FORBIDDEN);
         }
-
-
     }
+
+    //Transaction methods should be able to get accounts via ibans because of the sender and receiver account fields. This method is required for transaction posting.
+    public Account getAccountByIbanForTransactions(String iban){
+        if (!isIbanPresent(iban))
+            throw new ApiRequestException("Iban is not present, please input a valid iban", HttpStatus.NOT_FOUND);
+        return accountRepository.findByIBAN(iban);
+    }
+
 
     //Change this to only update account type for EMPLOYEE
     public Account updateAccount(Account oldAccount, ModifyAccountDTO newAccount) {

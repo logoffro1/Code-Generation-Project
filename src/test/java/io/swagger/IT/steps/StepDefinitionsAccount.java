@@ -1,41 +1,43 @@
 package io.swagger.IT.steps;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.swagger.model.Login;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class StepDefinitionsAccount {
+    private String baseUrl = "http://localhost:8080/api/swagger-ui/#/Accounts";
+    private String token;
 
-    @Given("I am customer")
-    public void i_am_customer() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
-    }
-    @When("I want to open a new account")
-    public void i_want_to_open_a_new_account() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
-    }
-    @Then("I should be able to open a new account")
-    public void i_should_be_able_to_open_a_new_account() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
-    }
+    public void loginWithRightCredentials(String email, String password) throws URISyntaxException, JsonProcessingException, JSONException {
+        HttpHeaders headers = new HttpHeaders();
+        TestRestTemplate template = new TestRestTemplate();
 
-    @Given("Im User")
-    public void imUser() {
-    }
+        ObjectMapper mapper = new ObjectMapper();
+        Login login = new Login();
+        login.setEmail(email);
+        login.setPassword(password);
 
-    @When("I want to get my balance to see")
-    public void iWantToGetMyBalanceToSee() {
-    }
+        URI uri = new URI("http://localhost:8080/api/login");
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-    @Then("I should be able to see my balance")
-    public void iShouldBeAbleToSeeMyBalance() {
-    }
+        HttpEntity<String> entity = new HttpEntity<>(mapper.writeValueAsString(login), headers);
+        ResponseEntity<String> responseEntity = template.postForEntity(uri, entity, String.class);
+        JSONObject jsonObject = new JSONObject(responseEntity.getBody());
 
-    @Given("I am Employee")
-    public void iAmEmployee() {
+        token = jsonObject.getString("webtoken");
     }
 
 

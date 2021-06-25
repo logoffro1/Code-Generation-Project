@@ -46,8 +46,10 @@ Feature: Account Tests
         Then I get "ApiRequesException"
         Then I get Exception message "Bank's own account can not be updated by employees"
 
+#        successfull scenarios
+      Scenario:  Employee updates the account by changing the type from current to savings
+        Given I am Employee
 
-      Scenario:  Employee wants to
 
 
 
