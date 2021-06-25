@@ -7,6 +7,7 @@
 package io.swagger.api;
 
 import io.swagger.model.InlineResponse200;
+import io.swagger.model.TokenDTO;
 import io.swagger.model.UserLogin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,6 +41,6 @@ public interface LoginApi {
             produces = { "application/json" },
             consumes = { "application/json" },
             method = RequestMethod.POST)
-    ResponseEntity<String> login(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody UserLogin body);
+    ResponseEntity<TokenDTO> login(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody UserLogin body);
 
 }
