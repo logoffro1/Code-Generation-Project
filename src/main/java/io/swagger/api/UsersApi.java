@@ -42,7 +42,7 @@ public interface UsersApi {
     @Operation(summary = "Creates a new user", description = "Creates a new user, if the logged in user is an employee, and returns the userId", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "User" })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "User registered", content = @Content(schema = @Schema(implementation = User.class))),
+        @ApiResponse(responseCode = "200", description = "User registered", content = @Content(schema = @Schema(implementation = CreateUserDTO.class))),
         
         @ApiResponse(responseCode = "400", description = "Invalid input"),
         

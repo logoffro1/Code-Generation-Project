@@ -3,14 +3,6 @@ package io.swagger.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.NonNull;
-import org.springframework.data.annotation.Id;
-
-import javax.management.relation.Role;
-import javax.persistence.ElementCollection;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import java.util.Collection;
 
 @Data
 public class ModifyUserDTO {

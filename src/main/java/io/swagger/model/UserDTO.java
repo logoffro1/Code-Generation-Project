@@ -3,11 +3,9 @@ package io.swagger.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NonNull;
 
-import javax.management.relation.Role;
 import javax.persistence.ElementCollection;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
 

@@ -6,7 +6,6 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.util.LoggedInUser;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.security.core.GrantedAuthority;
 import org.threeten.bp.OffsetDateTime;
@@ -102,67 +101,40 @@ public class User {
    */
   public enum RoleEnum implements GrantedAuthority
   {
-    ROLE_EMPLOYEE("employee"),
+      ROLE_EMPLOYEE("employee"),
 
-    ROLE_CUSTOMER("customer");
+      ROLE_CUSTOMER("customer");
 
-    private String value;
+      private String value;
 
-    RoleEnum(String value)
-    {
-      this.value = value;
-    }
-//
-//    @Override
-//    @JsonValue
-//    public String toString()
-//    {
-//      return String.valueOf(value);
-//    }
-//
-//    @JsonCreator
-//    public static RoleEnum fromValue(String text)
-//    {
-//      for (RoleEnum b : RoleEnum.values())
-//      {
-//        if (String.valueOf(b.value).equals(text))
-//        {
-//          return b;
-//        }
-//      }
-//      return null;
-//    }
-//
-//    @Override
-//    public String getAuthority() {
-//      return name();
-//      }
-@JsonCreator
-public static RoleEnum fromValue(String text) {
-  if (String.valueOf(RoleEnum.ROLE_CUSTOMER.value.toUpperCase(Locale.ROOT)).equals(text.toUpperCase(Locale.ROOT))) {
-    return RoleEnum.ROLE_CUSTOMER;
+      RoleEnum(String value)
+      {
+        this.value = value;
+      }
+
+      @JsonCreator
+      public static RoleEnum fromValue(String text) {
+          if (String.valueOf(RoleEnum.ROLE_CUSTOMER.value.toUpperCase(Locale.ROOT)).equals(text.toUpperCase(Locale.ROOT))) {
+            return RoleEnum.ROLE_CUSTOMER;
+          }
+          if (String.valueOf(RoleEnum.ROLE_EMPLOYEE.value.toUpperCase(Locale.ROOT)).equals(text.toUpperCase(Locale.ROOT))) {
+            return RoleEnum.ROLE_EMPLOYEE;
+          }
+
+          return null;
+      }
+
+      @Override
+      @JsonValue
+      public String toString() {
+          return String.valueOf(value);
+      }
+
+      @Override
+      public String getAuthority() {
+          return name();
+      }
   }
-  if (String.valueOf(RoleEnum.ROLE_EMPLOYEE.value.toUpperCase(Locale.ROOT)).equals(text.toUpperCase(Locale.ROOT))) {
-    return RoleEnum.ROLE_EMPLOYEE;
-  }
-
-  return null;
-}
-
-
-
-    @Override
-  @JsonValue
-  public String toString() {
-    return String.valueOf(value);
-  }
-
-  @Override
-  public String getAuthority() {
-    return name();
-  }
-
-}
 
   @JsonProperty("role")
   private RoleEnum role = null;
@@ -178,7 +150,7 @@ public static RoleEnum fromValue(String text) {
    *
    * @return id
    **/
-  @Schema(required = false)
+  //@Schema(required = false)
   public long getId()
   {
     return id;
@@ -344,8 +316,8 @@ public static RoleEnum fromValue(String text) {
 
   public User creationDate(OffsetDateTime creationDate)
   {
-    this.creationDate = creationDate;
-    return this;
+      this.creationDate = creationDate;
+      return this;
   }
 
   /**
@@ -390,7 +362,6 @@ public static RoleEnum fromValue(String text) {
   {
     this.role = role;
   }
-
 
   @Override
   public boolean equals(java.lang.Object o)

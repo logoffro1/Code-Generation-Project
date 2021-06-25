@@ -33,9 +33,11 @@ import static org.mockito.Mockito.*;
 class UserServiceImplTest {
 
     @Mock
+    @Autowired
     private UserRepository userRepository;
 
     @InjectMocks
+    @Autowired
     private UserServiceImpl userServiceImpl;
 
     private List<User> userList;
@@ -47,6 +49,7 @@ class UserServiceImplTest {
 
         userList = new ArrayList<>();
         mockUser = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.ROLE_CUSTOMER);
+        userServiceImpl.createUser(mockUser);
         mockUser.setId(1002);
         userList.add(mockUser);
     }

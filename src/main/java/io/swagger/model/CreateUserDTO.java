@@ -37,9 +37,10 @@ public class CreateUserDTO {
     @JsonProperty("role")
     private User.RoleEnum role;
 
-    public CreateUserDTO(@NonNull String firstName, @NonNull String lastName, @NonNull String phoneNumber, @NonNull String emailAddress, @NonNull User.RoleEnum role) {
+    public CreateUserDTO(@NonNull String firstName, @NonNull String lastName, @NonNull String phoneNumber, @NonNull String emailAddress,String password, @NonNull User.RoleEnum role) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.password = password;
         this.phoneNumber = phoneNumber;
         this.emailAddress = emailAddress;
         this.role = role;
