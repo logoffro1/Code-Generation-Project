@@ -32,11 +32,12 @@ public class Transaction
     @JsonProperty("dateTimeCreated")
     private OffsetDateTime dateTimeCreated = null;
 
-    @ManyToOne
+    //I added cascade types check if it breaks anything. I couldnt see anything that is broken so far.
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "senderIBAN")
     private Account senderAccount = null;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "receiverIBAN")
     private Account receiverAccount = null;
 

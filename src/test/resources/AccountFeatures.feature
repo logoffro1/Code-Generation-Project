@@ -40,7 +40,14 @@ Feature: Account Tests
         Then I get Exception message "Iban is not found, please input the correct iban to modify the account"
 
 
-      Scenario:
+      Scenario: Employee tries to update the bank account and gets rejected
+        Given I am Employee
+        When I try to update Banks account to change type from current to savings
+        Then I get "ApiRequesException"
+        Then I get Exception message "Bank's own account can not be updated by employees"
+
+
+      Scenario:  Employee wants to
 
 
 

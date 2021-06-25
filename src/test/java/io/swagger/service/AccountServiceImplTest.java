@@ -70,6 +70,24 @@ class AccountServiceImplTest {
     }
 
     @Test
+    void getAccountByIbanReturnsIbanNotPresentExceptionMessage() {
+        this.account.setIBAN("NLNOTAVALIDIBAN00");
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.getAccountByIban(this.account.getIBAN()));
+        Assertions.assertEquals("Iban is not present, please input a valid iban", exception.getMessage());
+    }
+
+    @Test
+    void createAccountWithInvalidIbanReturnsIbanNotPresentExceptionMessage() {
+        this.account.setIBAN("NLNOTAVALIDIBAN00000");
+
+        when(accountRepo.findByIBAN(this.account.getIBAN())).thenThrow(new ApiRequestException("Iban is not present, please input a valid iban",HttpStatus.NOT_FOUND));
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.createAccount(this.account));
+        Assertions.assertEquals("Iban is not present, please input a valid iban", exception.getMessage());
+    }
+
+    @Test
     void getAccountByIbanReturnsExceptionIfUserIsNotSame() {
         //Mock authorization
         AuthorizedUser user = new AuthorizedUser(mockUser);
@@ -90,10 +108,25 @@ class AccountServiceImplTest {
         Assertions.assertEquals("Customers can not look for accounts that does not belong to them", exception.getMessage());
     }
 
+    @Test
+    void convertDTOReturnsResponseAccountDTOObject(){
+        ResponseAccountDTO responseAccountDTO= new ResponseAccountDTO(
+                account.getUser().getFirstName()+" "+account.getUser().getLastName(),
+                account.getIBAN(),
+                account.getStatus(),
+                account.getType(),
+                account.getBalance(),
+                account.getAbsoluteLimit());
+
+        ResponseAccountDTO result= accountServiceImpl.convertToResponseAccountDTO(this.account);
+        assertThat(result).isEqualToComparingFieldByField(responseAccountDTO);
+    }
+
 
     @Test
     void updateAccountShouldChangeAccountType() {
         if(this.modifyAccountDTO.getType()== Account.TypeEnum.CURRENT){
+            this.account.setType(Account.TypeEnum.SAVINGS);
 
         }
     }
@@ -191,6 +224,15 @@ class AccountServiceImplTest {
         ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> accountServiceImpl.createAccount(account2));
         Assertions.assertEquals("Iban is already present in the database", exception.getMessage());
+    }
+
+    @Test
+    void createClosedAccountShouldThrowApiRequestException(){
+        this.account.setStatus(Account.StatusEnum.CLOSED);
+
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.createAccount(this.account));
+        Assertions.assertEquals("Account must not be closed when it is created", exception.getMessage());
     }
 
 
