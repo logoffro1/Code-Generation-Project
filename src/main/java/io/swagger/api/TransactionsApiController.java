@@ -80,6 +80,7 @@ public class TransactionsApiController implements TransactionsApi {
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
+
             return new ResponseEntity<CreateTransactionDTO>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transactionDTO);
         }
     }

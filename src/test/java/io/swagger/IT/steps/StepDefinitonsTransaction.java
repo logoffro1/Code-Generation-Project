@@ -12,6 +12,7 @@ import io.swagger.service.TransactionServiceImpl;
 import io.swagger.service.UserService;
 import org.json.JSONException;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.util.Arrays;
 
 
 public class StepDefinitonsTransaction {
@@ -70,9 +72,11 @@ public class StepDefinitonsTransaction {
 
     @When("I enter id {int} to get transaction")
     public void iEnterIdToGetTransaction(int id) throws URISyntaxException {
-        URI uri = new URI(baseUrl + "/"+id);
+
+        URI uri = new URI(baseUrl + "/" + id);
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
+
         entity = new HttpEntity<>(headers);
         responseEntity = template.exchange(uri, HttpMethod.GET, entity, String.class);
     }
@@ -84,7 +88,7 @@ public class StepDefinitonsTransaction {
 
     @Given("I am an user")
     public void iAmAnUser() throws JsonProcessingException, JSONException, URISyntaxException {
-            //it's irrelevant if user is customer or employee
+        //it's irrelevant if user is customer or employee
         validateLogin("JohnDoe@gmail.com", "johnnie123");
     }
 
@@ -95,7 +99,7 @@ public class StepDefinitonsTransaction {
 
     @When("I enter id {int} to delete transaction")
     public void iEnterIdToDeleteTransaction(int id) throws URISyntaxException {
-        URI uri = new URI(baseUrl + "/"+id);
+        URI uri = new URI(baseUrl + "/" + id);
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
         entity = new HttpEntity<>(headers);
@@ -103,13 +107,13 @@ public class StepDefinitonsTransaction {
     }
 
     @When("I want to create a transaction with senderIBAN {string} and receiverIBAN {string} and amount {double} and currencyType {string}")
-    public void iWantToCreateATransactionWithSenderIBANAndReceiverIBANAndAmountAndCurrencyType(String senderIBAN, String receiverIBAN, double amount, String currencyType) throws URISyntaxException {
+    public void iWantToCreateATransactionWithSenderIBANAndReceiverIBANAndAmountAndCurrencyType(String senderIBAN, String receiverIBAN, double amount, String currencyType) throws URISyntaxException, JsonProcessingException {
 
-        CreateTransactionDTO createTransactionDTO = new CreateTransactionDTO(senderIBAN,receiverIBAN,amount,currencyType);
+        CreateTransactionDTO createTransactionDTO = new CreateTransactionDTO(senderIBAN, receiverIBAN, amount, currencyType);
         URI uri = new URI(baseUrl);
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
-        entity = new HttpEntity<>(headers);
-        responseEntity = template.exchange(uri, HttpMethod.DELETE, entity, String.class);
+        entity = new HttpEntity<>(mapper.writeValueAsString(createTransactionDTO), headers);
+        responseEntity = template.postForEntity(uri, entity, String.class);
     }
 }

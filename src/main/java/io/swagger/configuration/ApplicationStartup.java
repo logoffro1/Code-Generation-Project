@@ -50,12 +50,24 @@ public class ApplicationStartup implements ApplicationRunner {
 
 
         User customer = new User("Williams", "smith", "willliamSmith@gmail.com", "william123", "213712983", User.RoleEnum.ROLE_CUSTOMER);
+
         userService.createUser(customer);
-        Account sender2 = new Account("NL03INHO0778852694", BigDecimal.valueOf(0), customer, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020));
-        Account receiver2 = new Account("NL04INHO0836583995", BigDecimal.valueOf(0), customer, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2020));
+        customer.setTransactionLimit(4000.00);
+        customer.setDayLimit(3000.00);
+        Account sender2 = new Account("NL03INHO0778852694", BigDecimal.valueOf(0), customer, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
+        Account receiver2 = new Account("NL04INHO0836583995", BigDecimal.valueOf(0), customer, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
+        Account closedAccount = new Account("NL04INHO0836583997", BigDecimal.valueOf(0), user, Account.TypeEnum.SAVINGS, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
+
         accountService.createAccount(sender2);
         accountService.createAccount(receiver2);
-        transactionService.createTransaction(new Transaction(sender, receiver, 1000.00, "EUR"));
-        transactionService.createTransaction(new Transaction(sender2, receiver2, 1000.00, "EUR"));
+        accountService.createAccount(closedAccount);
+        closedAccount.setStatus(Account.StatusEnum.CLOSED);
+
+        Transaction transaction1 = new Transaction(sender, receiver, 1000.00, "EUR");
+        transactionService.createTransaction(transaction1);
+
+        Transaction transaction2 = new Transaction(sender2, receiver2, 1000.00, "EUR");
+        transactionService.createTransaction(transaction2);
+
     }
 }
