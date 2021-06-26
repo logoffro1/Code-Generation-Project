@@ -35,7 +35,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public Transaction getTransactionById(long id) {
-        if (transactionRepository.findById(id).isPresent())
+        if (!transactionRepository.findById(id).isPresent())
             throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
 
         if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionRepository.findById(id).get().getTransactionDTO().getSenderUserID()))
