@@ -70,11 +70,10 @@ public class AccountServiceImpl implements AccountService {
     public Page<Account> getAllAccounts(Integer limit, Integer offset) {
 
         if (offset == null || offset < 0)
-            throw new ApiRequestException("Offset can't be lower than 0 or Null.", HttpStatus.BAD_REQUEST);
+            offset = 0; //default 0
 
-        // !!!!!!!!!! <=?
-        if (limit == null || limit <= 0)
-            throw new ApiRequestException("Limit can't be lower or equal to 0 or Null", HttpStatus.BAD_REQUEST);
+        if (limit == null || limit < 0)
+            limit = 15; //default limit
 
         Pageable pageable = PageRequest.of(offset, limit);
         return  accountRepository.findAll(pageable);
