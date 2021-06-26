@@ -41,9 +41,7 @@ public class StepDefinitionsAccount {
 
         entity = new HttpEntity<>(mapper.writeValueAsString(login),headers);
         responseEntity = template.postForEntity(uri,entity,String.class);
-
-        JSONObject jsonObject = new JSONObject(responseEntity.getBody());
-        token = jsonObject.getString("Token");
+        token = responseEntity.getBody().substring(7);
     }
 
     public void loginWithCredentials(String email,String password)throws URISyntaxException, JsonProcessingException{
