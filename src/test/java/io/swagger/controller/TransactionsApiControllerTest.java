@@ -99,8 +99,7 @@ public class TransactionsApiControllerTest
     @WithMockUser(username = "employee", roles = { "EMPLOYEE", "CUSTOMER" })
     @Test
     public void getTransactionsByIdShouldReturnOk() throws Exception {
-
-        this.mvc.perform(get("/transactions/1").contentType(MediaType.APPLICATION_JSON)
+        this.mvc.perform(get("/transactions/4").contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -108,7 +107,7 @@ public class TransactionsApiControllerTest
     @Test
     @WithMockUser(username = "employee", roles = { "EMPLOYEE" })
     public void deleteTransactionById() throws Exception {
-        this.mvc.perform(delete("/transactions/1").contentType(MediaType.APPLICATION_JSON)
+        this.mvc.perform(delete("/transactions/4").contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(204));
     }
