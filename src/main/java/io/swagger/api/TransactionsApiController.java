@@ -89,9 +89,9 @@ public class TransactionsApiController implements TransactionsApi {
     public ResponseEntity<TransactionDTO> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId) {
         try
         {
-            Transaction transaction = transactionService.getTransactionById(transactionId);
+           //Transaction transaction = transactionService.getTransactionById(transactionId);
             transactionService.deleteTransactionById(transactionId);
-            return new ResponseEntity<TransactionDTO>(HttpStatus.ACCEPTED).status(200).body(transaction.getTransactionDTO());
+            return new ResponseEntity<TransactionDTO>(HttpStatus.ACCEPTED).status(200).body(null);
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();

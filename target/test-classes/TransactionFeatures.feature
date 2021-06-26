@@ -9,7 +9,7 @@ Feature: Transaction test
     #successful
   Scenario: Employee wants to get transaction by id
     Given I am an employee
-    When I enter id 7 to get transaction
+    When I enter id 8 to get transaction
     Then Show http status 200
 
     #successful
