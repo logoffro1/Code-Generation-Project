@@ -2,7 +2,9 @@ package io.swagger.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.User;
+import io.swagger.repository.UserRepository;
 import io.swagger.service.UserService;
+import io.swagger.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +25,21 @@ import java.util.List;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
-@ContextConfiguration(classes = {UserService.class,MockMvc.class})
+@AutoConfigureMockMvc
 public class UsersApiControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
     @MockBean
-    private UserService userService;
+    @Autowired
+    private UserServiceImpl userService;
 
+    @MockBean
+    @Autowired
+    private UserRepository userRepo;
+
+    @MockBean
     private User user;
 
     ObjectMapper mapper = new ObjectMapper();
@@ -46,7 +53,6 @@ public class UsersApiControllerTest {
     @WithMockUser
     @Test
     public void getUsersShouldReturnJsonArray() throws Exception{
-        given(userService.getAllUsers()).willReturn(List.of(user));
         this.mvc.perform(
                 get("/users"))
                 .andExpect(
@@ -86,7 +92,6 @@ public class UsersApiControllerTest {
     @Test
     void CanDeleteUser() throws Exception {
 
-        userService.createUser(this.user);
         this.mvc.perform(
                 delete("/users/"+this.user.getId()))
                 .andExpect(status().isOk());
@@ -107,7 +112,7 @@ public class UsersApiControllerTest {
     //doesn't work
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
-    public void CreateUserShouldNotBeNull() throws Exception{
+    public void CreateUserShouldBeNull() throws Exception{
 
         assertThrows(NullPointerException.class,
                 ()-> this.mvc.perform(

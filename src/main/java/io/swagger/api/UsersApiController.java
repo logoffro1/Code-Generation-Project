@@ -60,13 +60,14 @@ public class UsersApiController implements UsersApi {
             method = RequestMethod.POST ,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CreateUserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "User registered", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO userDTO)
-    {
-
-            if(userDTO == null )
-                throw new NullPointerException("User can't be null");
-
+{
+        try {
             userService.createUser(convertFromCreateUserDtoToUser(userDTO));
             return new ResponseEntity<CreateUserDTO>(HttpStatus.CREATED).status(201).body(userDTO);
+
+        } catch (Exception e) {
+            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
+        }
 
     }
 

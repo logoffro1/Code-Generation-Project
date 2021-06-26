@@ -53,6 +53,9 @@ public class UserServiceImpl implements UserService{
     @Override
     public User createUser(User user) {
 
+        if(user.equals(null))
+            throw new ApiRequestException("User can't be null",HttpStatus.BAD_REQUEST);
+
         List<User> users = getAllUsers();
         for (User u : users) {
             if(u.getEmail().equals(user.getEmail())){
