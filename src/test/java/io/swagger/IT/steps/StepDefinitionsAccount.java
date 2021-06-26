@@ -114,8 +114,8 @@ public class StepDefinitionsAccount {
 
     }
     @When("I enter my Iban {string} to get my account")
-    public void iEnterMyIbanToGetMyAccount(String accountId) throws URISyntaxException {
-        URI uri = new URI(accountUrl + "/"+accountId);
+    public void iEnterMyIbanToGetMyAccount(String iban) throws URISyntaxException {
+        URI uri = new URI(accountUrl + "/"+iban);
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
         entity = new HttpEntity<>(headers);
