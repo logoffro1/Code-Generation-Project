@@ -115,18 +115,5 @@ public class TransactionsApiController implements TransactionsApi {
         }
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<TransactionDTO> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody ModifyTransactionDTO newTransaction) {
-        try
-        {
-            transactionService.updateTransaction(transactionService.getTransactionById(transactionId), newTransaction);
-            Transaction transaction = transactionService.getTransactionById(transactionId);
-            return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction.getTransactionDTO());
-        } catch (NotAcceptableStatusException e)
-        {
-            e.printStackTrace();
-            return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
 
 }

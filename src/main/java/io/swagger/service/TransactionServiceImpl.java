@@ -24,10 +24,10 @@ public class TransactionServiceImpl implements TransactionService {
 
     public List<Transaction> getAllTransactions(Integer offset, Integer limit) {
         if (offset == null || offset < 0)
-            throw new ApiRequestException("Offset can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
+            offset = 0; //default 0
 
         if (limit == null || limit < 0)
-            throw new ApiRequestException("Limit can't be lower than 1 or NULL.", HttpStatus.BAD_REQUEST);
+            limit = 15; //default limit
 
 
         Pageable pageable = PageRequest.of(offset, limit);
@@ -39,7 +39,7 @@ public class TransactionServiceImpl implements TransactionService {
             throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
 
         if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionRepository.findById(id).get().getTransactionDTO().getSenderUserID()))
-            throw new ApiRequestException("You cannot access this transaction.",HttpStatus.BAD_REQUEST);
+            throw new ApiRequestException("You cannot access this transaction.", HttpStatus.BAD_REQUEST);
 
         return transactionRepository.findById(id).get();
     }
@@ -78,7 +78,7 @@ public class TransactionServiceImpl implements TransactionService {
         if (transaction.getSenderAccount().getType() == Account.TypeEnum.SAVINGS
                 || transaction.getReceiverAccount().getType() == Account.TypeEnum.SAVINGS)
             if (senderUser != receiverUser)
-                throw new ApiRequestException("Invalid request", HttpStatus.BAD_REQUEST);
+                throw new ApiRequestException("Invalid request!", HttpStatus.BAD_REQUEST);
 
 
         //transfer money
