@@ -31,17 +31,16 @@ public class StepDefinitonsTransaction {
     private RestTemplate template = new RestTemplate();
     private String token;
     private HttpEntity<String> entity;
-
+    ObjectMapper mapper = new ObjectMapper();
     private String httpResponseCode;
 
-    @Autowired
-    private TransactionServiceImpl transactionService;
-    public StepDefinitonsTransaction(){
+
+    public StepDefinitonsTransaction() {
     }
 
     public void validateLogin(String email, String password) throws URISyntaxException, JsonProcessingException, JSONException {
 
-        ObjectMapper mapper = new ObjectMapper();
+
         UserLogin login = new UserLogin(email, password);
 
         URI uri = new URI(loginUrl);
@@ -64,12 +63,11 @@ public class StepDefinitonsTransaction {
         headers.setBearerAuth(token);
         entity = new HttpEntity<>(headers);
         responseEntity = template.exchange(uri, HttpMethod.GET, entity, String.class);
-        System.out.println(responseEntity.getBody());
     }
 
     @Then("I will see all the transactions")
     public void iWillSeeAllTheTransactions() {
-
+        Assert.assertEquals("200 OK", responseEntity.getStatusCode().toString());
     }
 
     @And("Transaction exists")
