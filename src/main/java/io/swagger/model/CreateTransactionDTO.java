@@ -16,6 +16,13 @@ public class CreateTransactionDTO {
     @JsonProperty("currencyType")
     private String currencyType = null;
 
+    public CreateTransactionDTO(String senderIBAN, String receiverIBAN, Double amount, String currencyType) {
+        this.senderIBAN = senderIBAN;
+        this.receiverIBAN = receiverIBAN;
+        this.amount = amount;
+        this.currencyType = currencyType;
+    }
+
     public String getSenderIBAN() {
         return senderIBAN;
     }

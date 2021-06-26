@@ -7,7 +7,9 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.swagger.model.*;
+import io.swagger.service.AccountService;
 import io.swagger.service.TransactionServiceImpl;
+import io.swagger.service.UserService;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,108 +67,49 @@ public class StepDefinitonsTransaction {
         responseEntity = template.exchange(uri, HttpMethod.GET, entity, String.class);
     }
 
-    @Then("I will see all the transactions")
-    public void iWillSeeAllTheTransactions() {
-        Assert.assertEquals("200 OK", responseEntity.getStatusCode().toString());
-    }
 
-    @When("I want to get transaction by id")
-    public void iWantToGetTransactionById() throws URISyntaxException {
-        URI uri = new URI(baseUrl + "/4");
+    @When("I enter id {int} to get transaction")
+    public void iEnterIdToGetTransaction(int id) throws URISyntaxException {
+        URI uri = new URI(baseUrl + "/"+id);
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
         entity = new HttpEntity<>(headers);
         responseEntity = template.exchange(uri, HttpMethod.GET, entity, String.class);
     }
 
-    @Then("I will get transaction by id")
-    public void iWillGetTransactionById() {
-        Assert.assertEquals("200 OK", responseEntity.getStatusCode().toString());
+    @Then("Show http status {int}")
+    public void showHttpStatus(int httpCode) {
+        Assert.assertEquals(httpCode, responseEntity.getStatusCodeValue());
     }
 
     @Given("I am an user")
     public void iAmAnUser() throws JsonProcessingException, JSONException, URISyntaxException {
-        //here it's irrelevant if user is customer or employee
+            //it's irrelevant if user is customer or employee
         validateLogin("JohnDoe@gmail.com", "johnnie123");
-    }
-
-    @When("I want to get transaction by invalid id")
-    public void iWantToGetTransactionByInvalidId() throws URISyntaxException {
-        URI uri = new URI(baseUrl + "/3000");
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token);
-        entity = new HttpEntity<>(headers);
-        responseEntity = template.exchange(uri, HttpMethod.GET, entity, String.class);
-    }
-
-    @Then("I will get {string} exception")
-    public void iWillGetTransactionWithTheSpecifiedIDNotFoundException() {
-        Assert.assertEquals("200 OK", responseEntity.getStatusCode().toString());
     }
 
     @Given("I am a customer")
     public void iAmACustomer() throws JsonProcessingException, JSONException, URISyntaxException {
         validateLogin("willliamSmith@gmail.com", "william123");
-        // validateLogin("JohnDoe@gmail.com", "johnnie123");
     }
 
-    @When("I want to get transaction by wrong id")
-    public void iWantToGetTransactionByWrongId() {
+    @When("I enter id {int} to delete transaction")
+    public void iEnterIdToDeleteTransaction(int id) throws URISyntaxException {
+        URI uri = new URI(baseUrl + "/"+id);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+        entity = new HttpEntity<>(headers);
+        responseEntity = template.exchange(uri, HttpMethod.DELETE, entity, String.class);
     }
 
-    @When("I want to delete a transaction by id")
-    public void iWantToDeleteATransactionById() {
-    }
+    @When("I want to create a transaction with senderIBAN {string} and receiverIBAN {string} and amount {double} and currencyType {string}")
+    public void iWantToCreateATransactionWithSenderIBANAndReceiverIBANAndAmountAndCurrencyType(String senderIBAN, String receiverIBAN, double amount, String currencyType) throws URISyntaxException {
 
-    @Then("I will delete transaction by id")
-    public void iWillDeleteTransactionById() {
-    }
-
-    @When("I want to delete a transaction by invalid id")
-    public void iWantToDeleteATransactionByInvalidId() {
-    }
-
-    @Then("I will get a {string} exception")
-    public void iWillGetAException(String arg0) {
-    }
-
-    @When("I want to create a transaction")
-    public void iWantToCreateATransaction() {
-    }
-
-    @Then("I will create a new transaction")
-    public void iWillCreateANewTransaction() {
-    }
-
-    @When("I want to create a transaction and sender user is null")
-    public void iWantToCreateATransactionAndSenderUserIsNull() {
-    }
-
-    @When("I want to create a transaction and receiver user is null")
-    public void iWantToCreateATransactionAndReceiverUserIsNull() {
-    }
-
-    @When("I want to create a transaction and transaction amount is invalid")
-    public void iWantToCreateATransactionAndTransactionAmountIsInvalid() {
-    }
-
-    @When("I want to create a transaction and transaction amount is higher than user transaction limit")
-    public void iWantToCreateATransactionAndTransactionAmountIsHigherThanUserTransactionLimit() {
-    }
-
-    @When("I want to create a transaction and the user's daily limit is exceeded")
-    public void iWantToCreateATransactionAndTheUserSDailyLimitIsExceeded() {
-    }
-
-    @When("I want to create a transaction and the transaction amount is bigger than account balance")
-    public void iWantToCreateATransactionAndTheTransactionAmountIsBiggerThanAccountBalance() {
-    }
-
-    @When("I want to create a transaction and sender account is closed")
-    public void iWantToCreateATransactionAndSenderAccountIsClosed() {
-    }
-
-    @When("I want to create a transaction and accounts are of different types")
-    public void iWantToCreateATransactionAndAccountsAreOfDifferentTypes() {
+        CreateTransactionDTO createTransactionDTO = new CreateTransactionDTO(senderIBAN,receiverIBAN,amount,currencyType);
+        URI uri = new URI(baseUrl);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+        entity = new HttpEntity<>(headers);
+        responseEntity = template.exchange(uri, HttpMethod.DELETE, entity, String.class);
     }
 }
