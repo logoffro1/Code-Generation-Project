@@ -2,8 +2,11 @@ package io.swagger.service;
 
 
 import io.swagger.exceptions.ApiRequestException;
+import io.swagger.model.Account;
 import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
+import io.swagger.repository.AccountRepository;
+import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +22,12 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -50,7 +59,6 @@ public class UserServiceImpl implements UserService{
                 throw new ApiRequestException("This email is already in use.",HttpStatus.BAD_REQUEST);
             }
         }
-
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -66,8 +74,22 @@ public class UserServiceImpl implements UserService{
     @Override
     public void deleteUserById(long id) {
 
-        //TO DO: delete the transactions and account too
-        userRepository.deleteById(id);
+//        accountRepository.findAll().forEach(account -> {
+//            if (account.getUser().getId() == id) {
+//                accountRepository.deleteById(Long.parseLong(account.getIBAN()));
+//            }
+//        });
+
+        User user = getUserById(id);
+
+        if(user.getStatus() == User.StatusEnum.INACTIVE)
+            throw new ApiRequestException("User is inactive",HttpStatus.BAD_REQUEST);
+
+        //Putting user to inactive state instead of deleting all the records
+        user.setStatus(User.StatusEnum.INACTIVE);
+        userRepository.save(user);
+
+        //userRepository.deleteById(id);
     }
 
     @Override
@@ -78,15 +100,16 @@ public class UserServiceImpl implements UserService{
         if (modifyUser.equals(user)){
             throw new ApiRequestException("Nothing was updated",HttpStatus.NOT_MODIFIED);
         }
+        if(!modifyUser.getEmailAddress().equals(user.getEmail()))
+        {
+            throw new ApiRequestException("Email cannot be modified",HttpStatus.BAD_REQUEST);
+        }
 
         if (modifyUser.getFirstName() != null && !modifyUser.getFirstName().isEmpty()) {
             user.setFirstName(modifyUser.getFirstName());
         }
         if (modifyUser.getLastName() != null && !modifyUser.getLastName().isEmpty()) {
             user.setLastName(modifyUser.getLastName());
-        }
-        if (modifyUser.getEmailAddress() != null && !modifyUser.getEmailAddress().isEmpty()) {
-            user.setEmail(modifyUser.getEmailAddress());
         }
         if (modifyUser.getPassword() != null && !modifyUser.getPassword().isEmpty()) {
             user.setPassword(modifyUser.getPassword());

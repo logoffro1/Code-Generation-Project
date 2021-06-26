@@ -6,7 +6,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.exceptions.ApiRequestException;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
@@ -36,7 +38,7 @@ public class User {
   @JsonProperty("lastName")
   private String lastName = null;
 
-  @JsonProperty("Email")
+  @JsonProperty("email")
   private String email = null;
 
   @JsonProperty("password")
@@ -134,6 +136,39 @@ public class User {
       public String getAuthority() {
           return name();
       }
+  }
+
+  /**
+   * Gets or Sets status
+   */
+  public enum StatusEnum {
+    ACTIVE("active"),
+
+    INACTIVE("inactive");
+
+    private String value;
+
+    StatusEnum(String value)
+    {
+      this.value = value;
+    }
+
+  }
+
+  @JsonProperty("status")
+  private User.StatusEnum status = null;
+
+  public User status(User.StatusEnum status) {
+    this.status = status;
+    return this;
+  }
+
+  public StatusEnum getStatus() {
+    return status;
+  }
+
+  public void setStatus(StatusEnum status) {
+    this.status = status;
   }
 
   @JsonProperty("role")

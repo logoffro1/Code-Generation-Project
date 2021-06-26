@@ -3,6 +3,7 @@ package io.swagger.api;
 import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.service.AccountService;
 import io.swagger.service.UserService;
 import io.swagger.util.LoggedInUser;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,6 +38,9 @@ public class UsersApiController implements UsersApi {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private AccountService accountService;
+
     private static final Logger log = LoggerFactory.getLogger(UsersApiController.class);
 
     private final ObjectMapper objectMapper;
@@ -57,6 +61,7 @@ public class UsersApiController implements UsersApi {
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CreateUserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "User registered", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO userDTO)
     {
+
             if(userDTO == null )
                 throw new NullPointerException("User can't be null");
 
@@ -66,7 +71,7 @@ public class UsersApiController implements UsersApi {
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    @RequestMapping(value="",
+    @RequestMapping(value="/{userId}",
             method = RequestMethod.DELETE )
     public ResponseEntity<Void> deleteUser(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId) {

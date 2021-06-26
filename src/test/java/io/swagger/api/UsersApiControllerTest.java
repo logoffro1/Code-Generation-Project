@@ -1,10 +1,7 @@
 package io.swagger.api;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
-import io.swagger.repository.UserRepository;
 import io.swagger.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,29 +18,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
-@AutoConfigureMockMvc
-@ContextConfiguration(classes = {UserService.class})
+@AutoConfigureMockMvc(addFilters = false)
+@ContextConfiguration(classes = {UserService.class,MockMvc.class})
 public class UsersApiControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
     @MockBean
-    @Autowired
     private UserService userService;
-
-    @MockBean
-    @Autowired
-    private UserRepository userRepository;
-
-    @MockBean
-    private ModifyUserDTO modifyUserDTO;
 
     private User user;
 
@@ -55,7 +43,7 @@ public class UsersApiControllerTest {
         user.setId(1003);
     }
 
-    @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
+    @WithMockUser
     @Test
     public void getUsersShouldReturnJsonArray() throws Exception{
         given(userService.getAllUsers()).willReturn(List.of(user));
@@ -128,5 +116,4 @@ public class UsersApiControllerTest {
                                 .content(mapper.writeValueAsString(null)))
         );
     }
-
 }
