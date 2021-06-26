@@ -9,8 +9,10 @@ import io.cucumber.java.en.When;
 import io.swagger.model.*;
 import org.json.JSONException;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -89,8 +91,8 @@ public class StepDefinitionsAccount {
     }
 
     @Then("I get ApiRequestException with Exception message {string}")
-    public void iGetApiRequestExceptionWithExceptionMessage(String arg0) {
-        System.out.println(responseEntity.getHeaders());
+    public void iGetApiRequestExceptionWithExceptionMessage(String exceptionMessage) {
+        Assertions.assertEquals(responseEntity.getBody().split("\",")[0].substring(12),exceptionMessage);
     }
     @Then("I see my balance {int}")
     public void iSeeMyBalance(int balance) {
@@ -115,11 +117,13 @@ public class StepDefinitionsAccount {
     }
     @When("I enter my Iban {string} to get my account")
     public void iEnterMyIbanToGetMyAccount(String iban) throws URISyntaxException {
-        URI uri = new URI(accountUrl + "/"+iban);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token);
-        entity = new HttpEntity<>(headers);
-        responseEntity = template.exchange(uri, HttpMethod.GET, entity, String.class);
+           URI uri = new URI(accountUrl + "/"+iban);
+           headers.setContentType(MediaType.APPLICATION_JSON);
+           headers.setBearerAuth(token);
+           entity = new HttpEntity<>(headers);
+           System.out.println(iban);
+           responseEntity = template.exchange(uri, HttpMethod.GET, entity, String.class);
+           System.out.println(responseEntity);
     }
 
     @When("Updating account with the iban {string}  to  {string}")
