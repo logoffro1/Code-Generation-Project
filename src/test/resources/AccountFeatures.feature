@@ -1,44 +1,47 @@
 Feature: Account Tests
 
+
+    #    Done and done and done and done son
   Scenario:  Employee updates the account by changing the type from current to savings
     Given I am Employee
-    When Updating account From TypeEnum.CURRENT to  TypeEnum.SAVINGS
+    When Updating account with the iban "NL03INHO0778852693" From TypeEnum.CURRENT to  TypeEnum.SAVINGS
     Then Display Http Status 200
 
+    #    Done and done and done and done son
   Scenario: Employee Soft Deletes the account
     Given I am Employee
-    When Soft Deletes the account by entering iban "NL02INHO0859674253"
+    When Soft Deletes the account by entering iban "NL03INHO0778852693"
     Then Display Http Status 200
 
-#    Done and done and done and done son
+    #    Done and done and done and done son
   Scenario:  Employee wants to get all accounts
     Given I am Employee
     When I want to get all acounts
     Then Display Http Status 200
 
-
+   #    Done and done and done and done son
   Scenario: Employee creates a saving account for a customer
     Given I am Employee
-    When I want to create a new account for Customer
-    Then Display Http Status 200
+    When I want to create a new account for Customer with user id of 1001 a balance of 2000 with an absolute limit of 200 with an enum of  "Account.TypeEnum.CURRENT" and with a status of "Account.StatusEnum.ACTIVE"
+    Then Display Http Status 201
 
 
   Scenario:  Customer wants to see account balance
     Given I am Customer
-    When  I enter my Iban "NL03INHO0778852693" to get my account to see my balance (Using get account by iban endpoint)
+    When  I enter my Iban "NL03INHO0778852693" to get my account
     Then  I see my balance 2500
     Then  Display Http Status 200
 
 
   Scenario: Customer tries to get an account by IBAN
     Given I am Customer
-    When I try to get my account by Iban "NL03INHO0778852693"
+    When I enter my Iban"NL03INHO0778852693" to get my account
     Then Display Http Status 200
 
 
   Scenario: Employee tries to create an account with a balance lower than absolutelimit.
     Given I am Employee
-    When I try to create account with a balance of 250 lower than absolutelimit 1000
+    When  I want to create a new account for Customer with user id of 1001 a balance of 12 with an absolute limit of 200 with an enum of  "Account.TypeEnum.CURRENT" and with a status of "Account.StatusEnum.ACTIVE"
     Then I get ApiRequestException with Exception message "Balance can not be lower than absolute limit"
     Then Display Http Status 403
 
@@ -56,7 +59,7 @@ Feature: Account Tests
 
   Scenario: Employee tries to create an account with a null user
     Given I am Employee
-    When I try to create an account with a null user
+    When  I want to create a new account for Customer with user id of 0 a balance of 2000 with an absolute limit of 200 with an enum of  "Account.TypeEnum.CURRENT" and with a status of "Account.StatusEnum.ACTIVE"
     Then I get ApiRequestException with Exception message "User can not be null.
     Then Display Http Status 400
 
@@ -67,18 +70,11 @@ Feature: Account Tests
     Then Display Http Status 403
 
 
-  Scenario: Employee Wants the update account that belongs to the actual bank
+  Scenario: Employee Wants to delete account that belongs to the actual bank
     Given I am Employee
     When Soft Deletes the account by entering iban "NL01INHO00000001"
     Then Display Http Status 403
     Then Display ApiRequestException "Bank's own account can not be updated by employees"
-
-  Scenario: Employee Wants the soft delete account that belongs to the actual bank
-    Given I am Employee
-    When Soft Deletes the account by entering iban "NL01INHO00000001"
-    Then Display Http Status 403
-    Then Display ApiRequestException "Bank's own account can not be updated by employees"
-
 
   Scenario: Customer tries to get his/her account by IBAN but enters an iban that belongs to another customer
     Given  I am Customer

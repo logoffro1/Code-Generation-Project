@@ -6,16 +6,14 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.swagger.model.Account;
-import io.swagger.model.Login;
-import io.swagger.model.ModifyAccountDTO;
-import io.swagger.model.UserLogin;
+import io.swagger.model.*;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -49,18 +47,6 @@ public class StepDefinitionsAccount {
 //        loginWithCredentials("JohnDoe@gmail.com","johnnie123");
     }
 
-    @When("Updating account From TypeEnum.CURRENT to  TypeEnum.SAVINGS")
-    public void updatingAccountFromTypeEnumCURRENTToTypeEnumSAVINGS() throws URISyntaxException {
-        URI uriForUpdate = new URI(this.accountUrl + "/NL04INHO0836583990");
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(this.token);
-        ModifyAccountDTO accountDTO = new ModifyAccountDTO(Account.TypeEnum.SAVINGS);
-        HttpEntity<ModifyAccountDTO> entity = new HttpEntity<>(headers);
-        responseEntity = template.exchange(uriForUpdate, HttpMethod.PUT, entity, String.class);
-        httpResponseCode = responseEntity.getStatusCode().toString();
-    }
-
-
     @Given("I am Customer")
     public void iAmCustomer() throws URISyntaxException, JsonProcessingException, JSONException {
         //"JohnDoe@gmail.com", "johnnie123"
@@ -90,19 +76,30 @@ public class StepDefinitionsAccount {
     }
 
     @When("Soft Deletes the account by entering iban {string}")
-    public void softDeletesTheAccountByEnteringIban(String arg0) {
+    public void softDeletesTheAccountByEnteringIban(String accountId) throws URISyntaxException {
+        String deleteAccountUrl = accountUrl + "/" + accountId;
+        TestRestTemplate transactionTemplate = new TestRestTemplate();
+        URI uri = new URI(deleteAccountUrl);
+        HttpHeaders httpHeaders = new HttpHeaders();
+
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.add("Authorization", "Bearer " + token);
+        HttpEntity<String> entity = new HttpEntity<String>("", httpHeaders);
+
+        responseEntity = transactionTemplate.exchange(uri, HttpMethod.DELETE, entity, String.class);
     }
 
     @When("I want to create a new account for Customer")
-    public void iWantToCreateANewAccountForCustomer() {
+    public void iWantToCreateANewAccountForCustomer() throws URISyntaxException, JsonProcessingException {
+
     }
 
     @When("I enter my Iban {string} to get my account to see my balance \\(Using get account by iban endpoint)")
-    public void iEnterMyIbanToGetMyAccountToSeeMyBalanceUsingGetAccountByIbanEndpoint(String arg0) {
+    public void iEnterMyIbanToGetMyAccountToSeeMyBalanceUsingGetAccountByIbanEndpoint(String iban) {
     }
 
     @Then("I see my balance {int}")
-    public void iSeeMyBalance(int arg0) {
+    public void iSeeMyBalance(int balance) {
     }
 
     @When("I try to get my account by Iban {string}")
@@ -159,6 +156,45 @@ public class StepDefinitionsAccount {
 
     @Then("I get ApiRequesException with Exceptionmessage {string}")
     public void iGetApiRequesExceptionWithExceptionmessage(String arg0) {
+    }
+
+    @When("Updating account with the iban {string} From TypeEnum.CURRENT to  TypeEnum.SAVINGS")
+    public void updatingAccountWithTheIbanFromTypeEnumCURRENTToTypeEnumSAVINGS(String iban) throws URISyntaxException, JsonProcessingException {
+        TestRestTemplate transactionTemplate = new TestRestTemplate();
+        URI uri = new URI(accountUrl + "/" + iban);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.add("Authorization", "Bearer " + token);
+
+        ObjectMapper mapper = new ObjectMapper();
+        ModifyAccountDTO accountDTO = new ModifyAccountDTO(Account.TypeEnum.SAVINGS);
+        HttpEntity<String> entity = new HttpEntity<>(mapper.writeValueAsString(accountDTO), httpHeaders);
+
+        responseEntity = transactionTemplate.exchange(uri, HttpMethod.PUT, entity, String.class);
+    }
+
+    @When("I want to create a new account for Customer with a balance of {int} with an absolute limit of {int} with an enum of  {string} and with a status of {string}")
+    public void iWantToCreateANewAccountForCustomerWithABalanceOfWithAnAbsoluteLimitOfWithAnEnumOfAndWithAStatusOf(int balance, int absoluteLimit, String typeEnum, String statusEnum) throws URISyntaxException, JsonProcessingException {
+
+
+    }
+
+    @When("I want to create a new account for Customer with user id of {int} a balance of {int} with an absolute limit of {int} with an enum of  {string} and with a status of {string}")
+    public void iWantToCreateANewAccountForCustomerWithUserIdOfABalanceOfWithAnAbsoluteLimitOfWithAnEnumOfAndWithAStatusOf(int userId, int balance, int absoluteLimit, String typeEnum, String statusEnum) throws URISyntaxException, JsonProcessingException {
+        TestRestTemplate accountTemplate = new TestRestTemplate();
+        URI uri = new URI(accountUrl);
+        HttpHeaders httpHeaders = new HttpHeaders();
+
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.add("Authorization", "Bearer " + token);
+
+        CreateAccountDTO createAccountDTO= new CreateAccountDTO(BigDecimal.valueOf(balance),userId,Account.StatusEnum.valueOf(statusEnum),BigDecimal.valueOf(absoluteLimit), Account.TypeEnum.valueOf(typeEnum));
+        ObjectMapper mapper = new ObjectMapper();
+        HttpEntity<String> entity = new HttpEntity<>(mapper.writeValueAsString(createAccountDTO), httpHeaders);
+
+        responseEntity = accountTemplate.postForEntity(uri, entity, String.class);
+
     }
 }
 
