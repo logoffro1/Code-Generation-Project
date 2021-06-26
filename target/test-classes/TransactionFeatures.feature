@@ -12,6 +12,12 @@ Feature: Transaction test
     When I enter id 7 to get transaction
     Then Show http status 200
 
+  Scenario: User wants to get transaction by invalid id
+    Given I am an user
+    When I enter id 100 to get transaction
+    Then I get exception with exception message "Transaction with the specified ID not found."
+    Then Show http status 400
+
     #successful
   Scenario: Customer wants to get transaction by id
     Given I am a customer
