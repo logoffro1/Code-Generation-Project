@@ -2,12 +2,11 @@ package io.swagger.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.*;
-import io.swagger.service.AccountService;
-import io.swagger.service.TransactionService;
-import io.swagger.service.TransactionServiceImpl;
-import io.swagger.service.UserService;
+import io.swagger.repository.TransactionRepository;
+import io.swagger.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,17 +17,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.*;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@ContextConfiguration(classes = {TransactionService.class})
 @SpringBootTest
 @AutoConfigureMockMvc
 public class TransactionsApiControllerTest
@@ -36,14 +34,24 @@ public class TransactionsApiControllerTest
     @Autowired
     private MockMvc mvc;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @MockBean
+    @Autowired
     private TransactionServiceImpl transactionService;
 
     @MockBean
-    private UserService userService;
+    @Autowired
+    private UserServiceImpl userService;
 
     @MockBean
-    private AccountService accountService;
+    @Autowired
+    private TransactionRepository transactionRepo;
+
+    @MockBean
+    @Autowired
+    private AccountServiceImpl accountService;
 
     private Transaction transaction;
 
@@ -51,7 +59,7 @@ public class TransactionsApiControllerTest
     private TransactionDTO transactionDTO;
 
 
-    @MockBean
+
     private User mockUser;
 
     private ObjectMapper mapper = new ObjectMapper();
@@ -70,13 +78,11 @@ public class TransactionsApiControllerTest
     @Test
     void getTransactionsShouldReturnAJsonArray() throws Exception
     {
-        given(transactionService.getAllTransactions(0, 5)).willReturn(List.of(transaction));
         this.mvc.perform(
                 get("/transactions")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(
-                        status().isOk()).andExpect(jsonPath("$",hasSize(1)))
-                .andExpect(jsonPath("$[0].amount",is(transaction.getAmount())));
+                        status().isOk());
     }
 
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
@@ -88,4 +94,24 @@ public class TransactionsApiControllerTest
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(this.transactionDTO))).andExpect((status().isCreated()));
     }
+
+
+    @WithMockUser(username = "employee", roles = { "EMPLOYEE", "CUSTOMER" })
+    @Test
+    public void getTransactionsByIdShouldReturnOk() throws Exception {
+
+        this.mvc.perform(get("/transactions/1").contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "employee", roles = { "EMPLOYEE" })
+    public void deleteTransactionById() throws Exception {
+        this.mvc.perform(delete("/transactions/1").contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(204));
+    }
+
+
 }
