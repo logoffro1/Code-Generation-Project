@@ -173,13 +173,7 @@ public class StepDefinitionsAccount {
 
         responseEntity = transactionTemplate.exchange(uri, HttpMethod.PUT, entity, String.class);
     }
-
-    @When("I want to create a new account for Customer with a balance of {int} with an absolute limit of {int} with an enum of  {string} and with a status of {string}")
-    public void iWantToCreateANewAccountForCustomerWithABalanceOfWithAnAbsoluteLimitOfWithAnEnumOfAndWithAStatusOf(int balance, int absoluteLimit, String typeEnum, String statusEnum) throws URISyntaxException, JsonProcessingException {
-
-
-    }
-
+    
     @When("I want to create a new account for Customer with user id of {int} a balance of {int} with an absolute limit of {int} with an enum of  {string} and with a status of {string}")
     public void iWantToCreateANewAccountForCustomerWithUserIdOfABalanceOfWithAnAbsoluteLimitOfWithAnEnumOfAndWithAStatusOf(int userId, int balance, int absoluteLimit, String typeEnum, String statusEnum) throws URISyntaxException, JsonProcessingException {
         TestRestTemplate accountTemplate = new TestRestTemplate();
@@ -195,6 +189,14 @@ public class StepDefinitionsAccount {
 
         responseEntity = accountTemplate.postForEntity(uri, entity, String.class);
 
+    }
+
+    @When("I enter my Iban {string} to get my account")
+    public void iEnterMyIbanToGetMyAccount(String arg0) {
+    }
+
+    @When("Updating account with the iban {string}  to  {string}")
+    public void updatingAccountWithTheIbanTo(String arg0, String arg1) {
     }
 }
 

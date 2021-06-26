@@ -4,7 +4,7 @@ Feature: Account Tests
     #    Done and done and done and done son
   Scenario:  Employee updates the account by changing the type from current to savings
     Given I am Employee
-    When Updating account with the iban "NL03INHO0778852693" From TypeEnum.CURRENT to  TypeEnum.SAVINGS
+    When Updating account with the iban "NL03INHO0778852693"  to  "TypeEnum.SAVINGS"
     Then Display Http Status 200
 
     #    Done and done and done and done son
@@ -65,7 +65,7 @@ Feature: Account Tests
 
   Scenario:  Employee tries to create an account with a closed status
     Given I am Employee
-    When I try to create an account with a null user
+    When  I want to create a new account for Customer with user id of 0 a balance of 2000 with an absolute limit of 200 with an enum of  "Account.TypeEnum.CURRENT" and with a status of "Account.StatusEnum.CLOSED"
     Then I get ApiRequestException with Exception message "Account must not be closed when it is created"
     Then Display Http Status 403
 
