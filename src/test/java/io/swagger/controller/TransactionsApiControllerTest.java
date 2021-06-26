@@ -2,7 +2,10 @@ package io.swagger.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.*;
+import io.swagger.service.AccountService;
 import io.swagger.service.TransactionService;
+import io.swagger.service.TransactionServiceImpl;
+import io.swagger.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import java.util.List;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,25 +37,30 @@ public class TransactionsApiControllerTest
     private MockMvc mvc;
 
     @MockBean
-    private TransactionService transactionService;
+    private TransactionServiceImpl transactionService;
+
+    @MockBean
+    private UserService userService;
+
+    @MockBean
+    private AccountService accountService;
 
     private Transaction transaction;
 
     @MockBean
     private TransactionDTO transactionDTO;
 
-    @MockBean
-    private ModifyTransactionDTO modifyTransactionDTO;
 
+    @MockBean
+    private User mockUser;
 
     private ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
     public void init()
     {
-        User mockUser = new User("firstName", "lastName", "email", "password", "090078601", User.RoleEnum.ROLE_EMPLOYEE);
+        mockUser = new User("firstName", "lastName", "email", "password", "090078601", User.RoleEnum.ROLE_EMPLOYEE);
 
-        modifyTransactionDTO = new ModifyTransactionDTO(3000.00);
         Account senderAccount = new Account("iban1", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
         Account receiverAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
         transaction = new Transaction(senderAccount, receiverAccount, 1000.00, "EUR");
@@ -68,5 +77,15 @@ public class TransactionsApiControllerTest
                 .andExpect(
                         status().isOk()).andExpect(jsonPath("$",hasSize(1)))
                 .andExpect(jsonPath("$[0].amount",is(transaction.getAmount())));
+    }
+
+    @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
+    @Test
+    public void whenCreateTransactionsShouldReturnCreated() throws Exception{
+        TransactionDTO transactionDTO= new TransactionDTO(transaction.getTransactionId(),transaction.getDateTimeCreated(),transaction.getSenderAccount().getUser().getId(),transaction.getSenderAccount().getIBAN(),transaction.getReceiverAccount().getIBAN(),transaction.getAmount(),transaction.getCurrencyType()) ;
+
+        this.mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(this.transactionDTO))).andExpect((status().isCreated()));
     }
 }

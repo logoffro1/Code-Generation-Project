@@ -38,6 +38,7 @@ public class AccountApiControllerTest {
     @MockBean
     private AccountServiceImpl accountService;
 
+    //My tests fail if i delete this
     @MockBean
     private UserServiceImpl userService;
 
@@ -50,7 +51,6 @@ public class AccountApiControllerTest {
     private CreateAccountDTO postAccount;
 
     @MockBean
-
     private ModifyAccountDTO modifyAccountDTO;
 
 

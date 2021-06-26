@@ -72,8 +72,8 @@ public class TransactionsApiController implements TransactionsApi {
     public ResponseEntity<CreateTransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody CreateTransactionDTO transactionDTO) {
         try
         {
-            Transaction transaction = new Transaction(accountService.getAccountByIban(transactionDTO.getSenderIBAN()),
-                    accountService.getAccountByIban(transactionDTO.getReceiverIBAN()), transactionDTO.getAmount(), transactionDTO.getCurrencyType());
+            Transaction transaction = new Transaction(accountService.getAccountByIbanForTransactions(transactionDTO.getSenderIBAN()),
+                    accountService.getAccountByIbanForTransactions(transactionDTO.getReceiverIBAN()), transactionDTO.getAmount(), transactionDTO.getCurrencyType());
             transactionService.createTransaction(transaction);
 
             return new ResponseEntity<CreateTransactionDTO>(HttpStatus.CREATED).status(201).body(transactionDTO);
