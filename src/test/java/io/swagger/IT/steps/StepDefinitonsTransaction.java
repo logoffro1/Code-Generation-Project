@@ -6,8 +6,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.swagger.model.Login;
-import io.swagger.model.UserLogin;
+import io.swagger.model.*;
 import io.swagger.service.TransactionServiceImpl;
 import org.json.JSONException;
 import org.junit.Assert;
@@ -16,6 +15,7 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -31,17 +31,16 @@ public class StepDefinitonsTransaction {
     private RestTemplate template = new RestTemplate();
     private String token;
     private HttpEntity<String> entity;
-
+    ObjectMapper mapper = new ObjectMapper();
     private String httpResponseCode;
 
-    @Autowired
-    private TransactionServiceImpl transactionService;
-    public StepDefinitonsTransaction(){
+
+    public StepDefinitonsTransaction() {
     }
 
     public void validateLogin(String email, String password) throws URISyntaxException, JsonProcessingException, JSONException {
 
-        ObjectMapper mapper = new ObjectMapper();
+
         UserLogin login = new UserLogin(email, password);
 
         URI uri = new URI(loginUrl);
@@ -64,48 +63,55 @@ public class StepDefinitonsTransaction {
         headers.setBearerAuth(token);
         entity = new HttpEntity<>(headers);
         responseEntity = template.exchange(uri, HttpMethod.GET, entity, String.class);
-        System.out.println(responseEntity.getBody());
     }
 
     @Then("I will see all the transactions")
     public void iWillSeeAllTheTransactions() {
-
-    }
-
-    @And("Transaction exists")
-    public void transactionExists() {
+        Assert.assertEquals("200 OK", responseEntity.getStatusCode().toString());
     }
 
     @When("I want to get transaction by id")
-    public void iWantToGetTransactionById() {
+    public void iWantToGetTransactionById() throws URISyntaxException {
+        URI uri = new URI(baseUrl + "/4");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+        entity = new HttpEntity<>(headers);
+        responseEntity = template.exchange(uri, HttpMethod.GET, entity, String.class);
     }
 
     @Then("I will get transaction by id")
     public void iWillGetTransactionById() {
+        Assert.assertEquals("200 OK", responseEntity.getStatusCode().toString());
     }
 
     @Given("I am an user")
-    public void iAmAnUser() {
+    public void iAmAnUser() throws JsonProcessingException, JSONException, URISyntaxException {
+        //here it's irrelevant if user is customer or employee
+        validateLogin("JohnDoe@gmail.com", "johnnie123");
     }
 
-    @And("Transaction does not exist")
-    public void transactionDoesNotExist() {
+    @When("I want to get transaction by invalid id")
+    public void iWantToGetTransactionByInvalidId() throws URISyntaxException {
+        URI uri = new URI(baseUrl + "/3000");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+        entity = new HttpEntity<>(headers);
+        responseEntity = template.exchange(uri, HttpMethod.GET, entity, String.class);
     }
 
     @Then("I will get {string} exception")
-    public void iWillGetException(String arg0) {
+    public void iWillGetTransactionWithTheSpecifiedIDNotFoundException() {
+        Assert.assertEquals("200 OK", responseEntity.getStatusCode().toString());
     }
 
     @Given("I am a customer")
-    public void iAmACustomer() {
+    public void iAmACustomer() throws JsonProcessingException, JSONException, URISyntaxException {
+        validateLogin("willliamSmith@gmail.com", "william123");
+        // validateLogin("JohnDoe@gmail.com", "johnnie123");
     }
 
-    @And("Transaction belongs to customer")
-    public void transactionBelongsToCustomer() {
-    }
-
-    @And("Transaction belongs to other customer")
-    public void transactionBelongsToOtherCustomer() {
+    @When("I want to get transaction by wrong id")
+    public void iWantToGetTransactionByWrongId() {
     }
 
     @When("I want to delete a transaction by id")
@@ -116,16 +122,12 @@ public class StepDefinitonsTransaction {
     public void iWillDeleteTransactionById() {
     }
 
-    @And("Transaction ID is invalid")
-    public void transactionIDIsInvalid() {
+    @When("I want to delete a transaction by invalid id")
+    public void iWantToDeleteATransactionByInvalidId() {
     }
 
     @Then("I will get a {string} exception")
     public void iWillGetAException(String arg0) {
-    }
-
-    @Given("I am a user")
-    public void iAmAUser() {
     }
 
     @When("I want to create a transaction")
@@ -136,35 +138,35 @@ public class StepDefinitonsTransaction {
     public void iWillCreateANewTransaction() {
     }
 
-    @And("Sender user is null")
-    public void senderUserIsNull() {
+    @When("I want to create a transaction and sender user is null")
+    public void iWantToCreateATransactionAndSenderUserIsNull() {
     }
 
-    @And("Receiver user is null")
-    public void receiverUserIsNull() {
+    @When("I want to create a transaction and receiver user is null")
+    public void iWantToCreateATransactionAndReceiverUserIsNull() {
     }
 
-    @And("Transaction amount is bigger than transaction amount limit")
-    public void transactionAmountIsBiggerThanTransactionAmountLimit() {
+    @When("I want to create a transaction and transaction amount is invalid")
+    public void iWantToCreateATransactionAndTransactionAmountIsInvalid() {
     }
 
-    @And("Transaction amount is higher than the user's transaction limit")
-    public void transactionAmountIsHigherThanTheUserSTransactionLimit() {
+    @When("I want to create a transaction and transaction amount is higher than user transaction limit")
+    public void iWantToCreateATransactionAndTransactionAmountIsHigherThanUserTransactionLimit() {
     }
 
-    @And("The user has exceeded it's daily limit")
-    public void theUserHasExceededItSDailyLimit() {
+    @When("I want to create a transaction and the user's daily limit is exceeded")
+    public void iWantToCreateATransactionAndTheUserSDailyLimitIsExceeded() {
     }
 
-    @And("The transaction amount is bigger than the account's balance")
-    public void theTransactionAmountIsBiggerThanTheAccountSBalance() {
+    @When("I want to create a transaction and the transaction amount is bigger than account balance")
+    public void iWantToCreateATransactionAndTheTransactionAmountIsBiggerThanAccountBalance() {
     }
 
-    @And("The sending account is closed")
-    public void theSendingAccountIsClosed() {
+    @When("I want to create a transaction and sender account is closed")
+    public void iWantToCreateATransactionAndSenderAccountIsClosed() {
     }
 
-    @And("User wants to send money to another user that does not have the same account TYPE")
-    public void userWantsToSendMoneyToAnotherUserThatDoesNotHaveTheSameAccountTYPE() {
+    @When("I want to create a transaction and accounts are of different types")
+    public void iWantToCreateATransactionAndAccountsAreOfDifferentTypes() {
     }
 }
