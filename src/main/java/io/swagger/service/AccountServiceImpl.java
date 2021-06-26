@@ -32,8 +32,10 @@ public class AccountServiceImpl implements AccountService {
 
 
     public Account getAccountByIban(String iban) {
+
         if (!isIbanPresent(iban))
             throw new ApiRequestException("Iban is not present, please input a valid iban", HttpStatus.NOT_FOUND);
+
         Account account= accountRepository.findByIBAN(iban);
 
         //If user is an employee (OR) A customer is trying to get his/her own account, return the account
@@ -101,7 +103,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     public boolean isIbanPresent(String iban) {
-        return (accountRepository.findByIBAN(iban) != null);
+
+        return (accountRepository.findByIBAN(iban)!= null);
     }
 
 
