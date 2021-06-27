@@ -1,9 +1,0 @@
--------------------------------------------------------------------------------
-Test set: io.swagger.model.dtos.ResponseAccountDtoTest
--------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 7.179 s <<< FAILURE! - in io.swagger.model.dtos.ResponseAccountDtoTest
-accountHasCorrectType  Time elapsed: 0 s  <<< ERROR!
-java.lang.IllegalStateException: Failed to load ApplicationContext
-Caused by: java.lang.IllegalStateException: Failed to execute ApplicationRunner
-Caused by: io.swagger.exceptions.ApiRequestException: This email is already in use.
-

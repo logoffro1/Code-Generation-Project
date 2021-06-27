@@ -1,9 +1,0 @@
--------------------------------------------------------------------------------
-Test set: io.swagger.model.TransactionTest
--------------------------------------------------------------------------------
-Tests run: 14, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 7.273 s <<< FAILURE! - in io.swagger.model.TransactionTest
-dateTimeCreated  Time elapsed: 0 s  <<< ERROR!
-java.lang.IllegalStateException: Failed to load ApplicationContext
-Caused by: java.lang.IllegalStateException: Failed to execute ApplicationRunner
-Caused by: io.swagger.exceptions.ApiRequestException: This email is already in use.
-

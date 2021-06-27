@@ -1,9 +1,0 @@
--------------------------------------------------------------------------------
-Test set: io.swagger.controller.LoginApiControllerTest
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 7.626 s <<< FAILURE! - in io.swagger.controller.LoginApiControllerTest
-loginTestReturnsOk  Time elapsed: 0.001 s  <<< ERROR!
-java.lang.IllegalStateException: Failed to load ApplicationContext
-Caused by: java.lang.IllegalStateException: Failed to execute ApplicationRunner
-Caused by: io.swagger.exceptions.ApiRequestException: This email is already in use.
-
