@@ -127,26 +127,12 @@ class UserServiceImplTest {
 
         User mockUser2 = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.ROLE_CUSTOMER);
 
+        when(userServiceImpl.getAllUsers()).thenReturn(List.of(mockUser));
         Exception exception = assertThrows(ApiRequestException.class,
                 () -> userServiceImpl.createUser(mockUser2));
         Assertions.assertEquals("This email is already in use.", exception.getMessage());
     }
 
-    @Test
-    void getUsersThrowsExceptionIfOffsetIsNull(){
-
-        Exception exception = assertThrows(ApiRequestException.class,
-                () -> userServiceImpl.getUsers(5,null));
-        Assertions.assertEquals("Offset can't be lower than 0 or NULL.", exception.getMessage());
-    }
-
-    @Test
-    void getUsersThrowsExceptionIfLimitIsNull(){
-
-        Exception exception = assertThrows(ApiRequestException.class,
-                () -> userServiceImpl.getUsers(null,0));
-        Assertions.assertEquals("Limit can't be lower than 0 or NULL.", exception.getMessage());
-    }
 
     @Test
     public void CreateUserShouldNotBeNull() throws Exception{

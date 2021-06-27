@@ -100,7 +100,7 @@ public class StepDefinitionsUser {
     public void updatingAUserWithId(String id) throws URISyntaxException, JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
 
-        ModifyUserDTO user = new ModifyUserDTO("John","Doe","34567567","JohnDoe@gmail.com","whatever");
+        ModifyUserDTO user = new ModifyUserDTO("John","Doe","34567567","whatever");
         URI uri = new URI(baseUrl + "/"+ id);
 
         headers.setContentType(MediaType.APPLICATION_JSON);

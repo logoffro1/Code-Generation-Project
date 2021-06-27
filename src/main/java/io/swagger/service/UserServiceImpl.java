@@ -75,7 +75,8 @@ public class UserServiceImpl implements UserService{
     @Override
     public User getUserById(long id)  {
 
-        if(!LoggedInUser.isEmployee())
+
+        if(!LoggedInUser.userIsNull() && !LoggedInUser.isEmployee())
         {
             if (!LoggedInUser.getUserId().equals(id))
             {
