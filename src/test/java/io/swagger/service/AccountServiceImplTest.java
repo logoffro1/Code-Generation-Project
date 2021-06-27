@@ -71,6 +71,8 @@ class AccountServiceImplTest {
 
     @Test
     void getAccountByIbanReturnsIbanNotPresentExceptionMessage() {
+        //Changing the iban to something that wouldnt work
+
         this.account.setIBAN("NLNOTAVALIDIBAN00");
         ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> accountServiceImpl.getAccountByIban(this.account.getIBAN()));
@@ -79,6 +81,8 @@ class AccountServiceImplTest {
 
     @Test
     void createAccountWithInvalidIbanReturnsIbanNotPresentExceptionMessage() {
+        //Changing the iban to something that wouldnt work
+
         this.account.setIBAN("NLNOTAVALIDIBAN00000");
 
         when(accountRepo.findByIBAN(this.account.getIBAN())).thenThrow(new ApiRequestException("Iban is not present, please input a valid iban",HttpStatus.NOT_FOUND));

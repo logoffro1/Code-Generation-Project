@@ -48,7 +48,7 @@ public class AccountApiController implements AccountApi {
         this.request = request;
     }
 
-    //Done and working
+    //POST endpoint
     @RequestMapping(value = "",
             consumes = {"application/json"},
             method = RequestMethod.POST)
@@ -65,6 +65,7 @@ public class AccountApiController implements AccountApi {
         }
     }
 
+//    PUT by iban endpoint
     @RequestMapping(value = "/{iban}",
             consumes = {"application/json"},
             method = RequestMethod.PUT)
@@ -82,6 +83,7 @@ public class AccountApiController implements AccountApi {
 
     }
 
+//    GET by iban endpoint
     @RequestMapping(value = "/{iban}",
             produces = {"application/json"},
             method = RequestMethod.GET)
@@ -96,8 +98,7 @@ public class AccountApiController implements AccountApi {
 
     }
 
-
-    //Done and working
+//GET endpoint for all Accounts
     @RequestMapping(value = "",
             produces = {"application/json"},
             method = RequestMethod.GET)
@@ -112,6 +113,8 @@ public class AccountApiController implements AccountApi {
         }
 
     }
+
+    //DELETE by iban endpoint
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     public  ResponseEntity<ResponseAccountDTO> deleteAccount(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("iban") String iban){

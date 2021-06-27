@@ -24,6 +24,7 @@ public class StepDefinitionsLogin {
     private String token;
     private HttpEntity<String> entity;
 
+    //For login post
     @When("User tries to enter {string} as email and {string} as password")
     public void userTriesToEnterAsEmailAndAsPassword(String email, String password) throws JsonProcessingException, URISyntaxException {
         ObjectMapper mapper = new ObjectMapper();
@@ -37,6 +38,7 @@ public class StepDefinitionsLogin {
         token = responseEntity.getBody().substring(7);
     }
 
+    //For comparing http status
     @Then("Http Status {int} is displayed")
     public void httpStatusIsDisplayed(int code) {
         {

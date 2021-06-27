@@ -1,24 +1,23 @@
-package io.swagger.model;
+package io.swagger.model.dtos;
 
-import io.swagger.api.NotFoundException;
-import org.hibernate.annotations.NotFound;
+import io.swagger.model.Account;
+import io.swagger.model.CreateAccountDTO;
+import io.swagger.model.IbanGenerator;
+import io.swagger.model.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.*;
-@SpringBootTest
-class AccountTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class CreateAccountDtoTest {
 
     @MockBean
-    private Account account;
+    private CreateAccountDTO account;
 
     @MockBean
     private User user;
@@ -30,7 +29,7 @@ class AccountTest {
     @BeforeEach
     public void init() {
         this.user = new User("Egemin", "Cilierli", "egecilierli@gmail.com", "thisisnotapaassword", "+31 06 29297273", User.RoleEnum.ROLE_CUSTOMER);
-        this.account = new Account(this.ibanGenerator.generateIban(), BigDecimal.valueOf(200), this.user, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000));
+        this.account = new CreateAccountDTO( BigDecimal.valueOf(200), this.user.getId(), Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000), Account.TypeEnum.CURRENT);
     }
 
     //This class is only testing the get and set methods, nothing specific
@@ -39,14 +38,6 @@ class AccountTest {
         Assertions.assertNotNull(account);
     }
 
-    //This had to be checked in the setter so I wrote this test to make sure.
-    @Test
-    public void balanceMustBeLargerThanAbsoluteLimit() {
-        Exception exception = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> this.account.setBalance(
-                        account.getAbsoluteLimit().subtract(BigDecimal.valueOf(20)))
-        );
-    }
 
     @Test
     public void accountHasCorrectStatus(){
@@ -60,7 +51,7 @@ class AccountTest {
 
     @Test
     public void accountHasCorrectUser(){
-        assertEquals(account.getUser(),this.user);
+        assertEquals(account.getUserId(),this.user.getId());
     }
 
     @Test
@@ -71,15 +62,6 @@ class AccountTest {
     @Test
     public void accountHasCorrectAbsoluteLimit(){
         assertEquals(this.account.getAbsoluteLimit(),BigDecimal.valueOf(200));
-    }
-
-    @Test
-    public void ifBalanceMustBeLargerThanAbsoluteLimit() {
-        Exception exception = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> this.account.setBalance(
-                        account.getAbsoluteLimit().subtract(BigDecimal.valueOf(20)))
-        );
-        Assertions.assertEquals("Balance can not be lower than absolute limit",exception.getMessage());
     }
 
 

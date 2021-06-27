@@ -59,71 +59,58 @@ public class AccountApiControllerTest {
     @MockBean
     private User mockUser;
 
-
+//Instantiating some objects for testing
     @BeforeEach
     public void init() {
         User mockUser = new User("firstName","lastName","email","password","090078601", User.RoleEnum.ROLE_EMPLOYEE);
         mockUser.setId(1003);
-
         modifyAccountDTO= new ModifyAccountDTO(Account.TypeEnum.CURRENT);
         this.account = new Account(ibanGenerator.generateIban(), BigDecimal.valueOf(20000), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000));
         this.postAccount= new CreateAccountDTO(BigDecimal.valueOf(20000),mockUser.getId(), Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000), Account.TypeEnum.CURRENT);
     }
 
+    //Get Account endpoint
 
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
     public void getAccountsShouldReturnAJsonArray() throws Exception {
-        Page<Account> accounts= new PageImpl<Account>(List.of(this.account));
-        given(accountService.getAllAccounts(1, 0)).willReturn(accounts);
         this.mvc.perform(
                 get("/accounts")).andExpect(
                 status().isOk());
     }
 
+    //Create Account Endpoint
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
     public void whenCreateAccountShouldReturnCreated() throws Exception{
-        this.postAccount.setUserId(this.mockUser.getId());
         this.mvc.perform(post("/accounts")
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
         .content(mapper.writeValueAsString(this.postAccount))).andExpect((status().isCreated()));
     }
 
+    //Get account by iban
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
-   public void getAccountByIban() throws Exception {
+   public void getAccountByIbanShouldReturnOk() throws Exception {
 
         mvc.perform((get("/accounts/" + account.getIBAN()))
         ).andExpect(status().isOk());
     }
 
-    @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
-    @Test
-    public void callingAllAccountsShouldReturnOK() throws Exception {
-    /*
-    Removed the servlet context /api for testing
-     */
-        this.mvc.perform(get("/accounts"))
-                .andExpect(status().isOk());
-    }
 
+    //PUT account that uses iban
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
     public void updateAccountShouldReturnOk() throws Exception
     {
-        //You can delete these accountservice
-        ObjectMapper mapper = new ObjectMapper();
-        accountService.createAccount(this.account);
         this.mvc.perform(put("/accounts/"+this.account.getIBAN()).contentType(MediaType.APPLICATION_JSON_VALUE).content(mapper.writeValueAsString(this.modifyAccountDTO))).andExpect(status().isOk());
     }
 
+    //Delete account that uses iban
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
     public void deleteAccountShouldReturnOk() throws Exception
     {
-        //You can delete these accountservices.
-        accountService.createAccount(this.account);
         this.mvc.perform(delete("/accounts/"+this.account.getIBAN())).andExpect(status().isOk());
     }
 
