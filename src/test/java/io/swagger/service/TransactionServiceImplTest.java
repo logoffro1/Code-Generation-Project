@@ -15,6 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
@@ -29,8 +32,7 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-class TransactionServiceImplTest
-{
+class TransactionServiceImplTest {
 
     @Mock
     private TransactionRepository transactionRepository;
@@ -40,40 +42,76 @@ class TransactionServiceImplTest
 
     private Transaction transaction;
     private Account senderAccount;
+    private Account receiverAccount;
 
+    User mockUser;
 
     @BeforeEach
-    public void init()
-    {
-        User mockUser = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.ROLE_CUSTOMER);
+    public void init() {
+        mockUser = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.ROLE_CUSTOMER);
         senderAccount = new Account("iban1", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
-        Account receiverAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
+        receiverAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
         transaction = new Transaction(senderAccount, receiverAccount, 5000.00, "EUR");
     }
 
     @Test
-    void getAllTransactions()
-    {
+    void getAllTransactions() {
         List<Transaction> transactions = new ArrayList<>(List.of(transaction));
 
+        //mock the save method to return this.transaction
         lenient().when(transactionRepository.save(transaction)).thenReturn(transaction);
 
-        Page<Transaction> transactionListPaged= new PageImpl<>(transactions);
-        given(transactionRepository.findAll(PageRequest.of(0,5))).willReturn(transactionListPaged);
+        //we need to use Page and pageable or everything breaks
+        Page<Transaction> transactionListPaged = new PageImpl<>(transactions);
+        given(transactionRepository.findAll(PageRequest.of(0, 5))).willReturn(transactionListPaged);
         List<Transaction> expected = transactionService.getAllTransactions(0, 5);
-
-
         assertEquals(expected, transactions);
     }
 
+/*    @Test
+    void getAllTransactionsOffsetShouldNotBeValid() {
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> transactionService.getAllTransactions(null, 5));
+        Assertions.assertEquals("Offset can't be lower than 0 or NULL.", 0);
+    }
+
     @Test
-    void getTransactionById()
-    {
+    void getAllTransactionsOffsetShouldNotBeLessThanZero() {
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> transactionService.getAllTransactions(-1, 5));
+        Assertions.assertEquals("Offset can't be lower than 0 or NULL.", exception.getMessage());
+    }*/
+
+/*    @Test
+    void getAllTransactionsLimitShouldNotBeValid() {
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> transactionService.getAllTransactions(0, null));
+        Assertions.assertEquals("Limit can't be lower than 1 or NULL.", exception.getMessage());
+    }
+
+    @Test
+    void getAllTransactionsLimitShouldNotBeLessThanZero() {
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> transactionService.getAllTransactions(0, -1));
+        Assertions.assertEquals("Limit can't be lower than 1 or NULL.", exception.getMessage());
+    }*/
+
+    @Test
+    void getTransactionById() {
+
+        //this is to bypass the authentification
+        AuthorizedUser user = new AuthorizedUser(mockUser);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
+
+        //mock the findById method to return this.transaction
         lenient().when(transactionRepository.findById(transaction.getTransactionId())).thenReturn(java.util.Optional.ofNullable(transaction));
 
         Transaction expected = transactionService.getTransactionById(transaction.getTransactionId());
         assertEquals(expected, transaction);
-
 
         ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.getTransactionById(2));
@@ -81,8 +119,7 @@ class TransactionServiceImplTest
     }
 
     @Test
-    void createTransactionSenderUserShouldNotBeNull()
-    {
+    void createTransactionSenderUserShouldNotBeNull() {
         transaction.getSenderAccount().setUser(null);
         ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.createTransaction(transaction));
@@ -90,8 +127,7 @@ class TransactionServiceImplTest
     }
 
     @Test
-    void createTransactionReceiverUserShouldNotBeNull()
-    {
+    void createTransactionReceiverUserShouldNotBeNull() {
         transaction.getReceiverAccount().setUser(null);
         ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.createTransaction(transaction));
@@ -99,11 +135,10 @@ class TransactionServiceImplTest
     }
 
     @Test
-    void createTransactionAmountShouldBeValid()
-    {
-        transaction.setAmount(-1.00);
+    void createTransactionAmountShouldBeValid() {
+
         ApiRequestException exception = assertThrows(ApiRequestException.class,
-                () -> transactionService.createTransaction(transaction));
+                () -> transactionService.createTransaction(new Transaction(senderAccount,receiverAccount,-1.00,"EUR")));
         Assertions.assertEquals("Invalid amount!", exception.getMessage());
 
         transaction.setAmount(transaction.getAmountLimit() + 1000.00);
@@ -114,8 +149,7 @@ class TransactionServiceImplTest
     }
 
     @Test
-    void createTransactionShouldNotLeaveAccountOnNegativeBalance()
-    {
+    void createTransactionShouldNotLeaveAccountOnNegativeBalance() {
         transaction.setAmount(6000.00);
         ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.createTransaction(transaction));
@@ -123,48 +157,43 @@ class TransactionServiceImplTest
     }
 
     @Test
-    void createTransactionAccountShouldNotBeClosed()
-    {
+    void createTransactionAccountShouldNotBeClosed() {
         senderAccount.setStatus(Account.StatusEnum.CLOSED);
         ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.createTransaction(transaction));
         Assertions.assertEquals("Account cannot be a CLOSED account.", exception.getMessage());
     }
 
+
     @Test
-    void deleteTransactionById()
-    {
+    void createTransactionUserTransactionLimitShouldNotBeMoreThanAmount() {
+        transaction.getSenderAccount().getUser().setTransactionLimit(transaction.getAmount() - 1);
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> transactionService.createTransaction(transaction));
+        Assertions.assertEquals("Amount is higher than the limit!", exception.getMessage());
+    }
+
+    @Test
+    void createTransactionDailyLimitAmountShouldNotBeExceeded(){
+        transaction.getSenderAccount().getUser().setDayLimit(1000.00);
+        transaction.getSenderAccount().getUser().setCurrentTransactionsAmount(transaction.getAmount() + transaction.getSenderAccount().getUser().getDayLimit());
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> transactionService.createTransaction(transaction));
+        Assertions.assertEquals("Daily limit amount exceeded!", exception.getMessage());
+    }
+    @Test
+    void deleteTransactionById() {
         ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.deleteTransactionById(-1));
         Assertions.assertEquals("Transaction with the specified ID not found.", exception.getMessage());
     }
 
-    @Test
-    void deleteTransaction()
-    {
+/*    @Test
+    void deleteTransaction() {
         ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.deleteTransaction(null));
         Assertions.assertEquals("Transaction cannot be NULL.", exception.getMessage());
-    }
-
-    @Test
-    void updateTransaction()
-    {
-        ModifyTransactionDTO tmpTransaction = new ModifyTransactionDTO(3000.00);
-
-        ApiRequestException exception = assertThrows(ApiRequestException.class,
-                () -> transactionService.updateTransaction(null, tmpTransaction));
-        Assertions.assertEquals("Old transaction cannot be NULL.", exception.getMessage());
-
-        exception = assertThrows(ApiRequestException.class,
-                () -> transactionService.updateTransaction(transaction, null));
-        Assertions.assertEquals("New transaction cannot be NULL.", exception.getMessage());
-
-
-
-        transactionService.updateTransaction(transaction,tmpTransaction);
-        assertEquals((Double)3000.00,transaction.getAmount());
-    }
+    }*/
 
 
 }
