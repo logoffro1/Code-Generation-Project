@@ -9,6 +9,7 @@ import io.swagger.model.*;
 import io.swagger.model.dtos.CreateAccountDTO;
 import io.swagger.model.dtos.ModifyAccountDTO;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -42,7 +43,8 @@ public class StepDefinitionsAccount {
 
         entity = new HttpEntity<>(mapper.writeValueAsString(login), headers);
         responseEntity = template.postForEntity(uri, entity, String.class);
-        token = responseEntity.getBody().substring(7);
+        JSONObject jsonObject = new JSONObject(responseEntity.getBody());
+        token = jsonObject.getString("Token");
     }
 
     //Logging in as an employee
