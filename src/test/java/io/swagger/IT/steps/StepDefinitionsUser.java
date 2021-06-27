@@ -6,6 +6,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.CreateUserDTO;
 import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,6 +30,7 @@ public class StepDefinitionsUser {
     UserService userService;
 
     private String token;
+    private ObjectMapper mapper = new ObjectMapper();
     private HttpHeaders headers = new HttpHeaders();
     private RestTemplate template = new RestTemplate();
     private String baseUrl = "http://localhost:8080/api/users";
@@ -42,12 +45,11 @@ public class StepDefinitionsUser {
     @When("retrieving all users")
     public void retrievingAllUsers() throws URISyntaxException {
         URI uri = new URI(baseUrl);
-        HttpHeaders headers = new HttpHeaders();
 
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Authorization","Bearer " + token);
 
-        entity = new HttpEntity<>("",headers);
+        entity = new HttpEntity<>(headers);
         responseEntity = template.exchange(uri, HttpMethod.GET,entity,String.class);
     }
 
@@ -58,9 +60,6 @@ public class StepDefinitionsUser {
 
     @When("creating a new user")
     public void creatingANewUser() throws URISyntaxException, JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        HttpHeaders headers = new HttpHeaders();
-
         CreateUserDTO user = new CreateUserDTO("John","Doe","213712983","JohnDoe123@gmail.com","whatever",User.RoleEnum.ROLE_EMPLOYEE);
         URI uri = new URI(baseUrl);
 
@@ -74,8 +73,7 @@ public class StepDefinitionsUser {
 
     @When("retrieving a user with id {string}")
     public void retrievingAUserWithId(String id) throws URISyntaxException {
-        URI uri = new URI(baseUrl + "/{id}");
-        HttpHeaders headers = new HttpHeaders();
+        URI uri = new URI(baseUrl + "/" + id);
 
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Authorization","Bearer " + token);
@@ -84,14 +82,8 @@ public class StepDefinitionsUser {
         responseEntity = template.exchange(uri, HttpMethod.GET,entity,String.class);
     }
 
-    @When("creating a user with id {int}")
-    public void creatingAUserWithId(int arg0) {
-    }
 
     public void validateLogin(String email, String password) throws URISyntaxException, JsonProcessingException, JSONException {
-
-        ObjectMapper mapper = new ObjectMapper();
-        HttpHeaders headers = new HttpHeaders();
 
         UserLogin login = new UserLogin(email,password);
 
@@ -121,7 +113,7 @@ public class StepDefinitionsUser {
         headers.add("Authorization","Bearer " + token);
 
         HttpEntity<String> entity = new HttpEntity<>(mapper.writeValueAsString(user), headers);
-        responseEntity = template.postForEntity(uri,entity,String.class);
+        responseEntity = template.exchange(uri,HttpMethod.PUT,entity,String.class);
     }
 
     @Then("the phone number should be {string}")
@@ -133,8 +125,6 @@ public class StepDefinitionsUser {
 
     @Given("the user provides {string} and {string}")
     public void theUserProvidesAnd(String email, String password) throws URISyntaxException, JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        HttpHeaders headers = new HttpHeaders();
 
         UserLogin login = new UserLogin(email,password);
 
@@ -179,28 +169,32 @@ public class StepDefinitionsUser {
 
     @When("creating a null user")
     public void creatingANullUser() throws URISyntaxException, JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
 
+        TestRestTemplate userTemplate = new TestRestTemplate();
+        ObjectMapper mapper = new ObjectMapper();
         URI uri = new URI(baseUrl);
 
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Authorization","Bearer " + token);
 
         HttpEntity<String> entity = new HttpEntity<>(mapper.writeValueAsString(null), headers);
-        responseEntity = template.postForEntity(uri,entity,String.class);
-    }
-
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
-
-
-    @Then("throw exception")
-    public void throwException() throws JSONException {
-        expectedEx.expect(NullPointerException.class);
-        //expectedEx.expectMessage("the message");
-        userService.createUser(null);
-
+        responseEntity = userTemplate.postForEntity(uri,entity,String.class);
     }
 
 
+    @When("creating a user with existing email")
+    public void creatingAUserWithExistingEmail() throws URISyntaxException, JsonProcessingException {
+
+        TestRestTemplate userTemplate = new TestRestTemplate();
+
+        //creating the same user again
+        CreateUserDTO user = new CreateUserDTO("John","Doe","213712983","JohnDoe123@gmail.com","whatever",User.RoleEnum.ROLE_EMPLOYEE);
+        URI uri = new URI(baseUrl);
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Authorization","Bearer " + token);
+
+        HttpEntity<String> entity = new HttpEntity<>(mapper.writeValueAsString(user), headers);
+        responseEntity = userTemplate.postForEntity(uri,entity,String.class);
+    }
 }

@@ -2,11 +2,12 @@ package io.swagger.service;
 
 import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
-import io.swagger.model.UserDTO;
 
 import java.util.List;
-import java.util.Optional;
 
+/**
+ * User Service Interface class
+ */
 public interface UserService {
     List<User> getUsers(Integer limit,Integer offset);
     List<User> getAllUsers();

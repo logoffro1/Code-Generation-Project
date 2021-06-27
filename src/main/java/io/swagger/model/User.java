@@ -6,9 +6,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.exceptions.ApiRequestException;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +16,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * User
+ * User Model Class
  */
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
@@ -70,21 +68,8 @@ public class User {
     this.password = password;
     this.phoneNumber = phoneNumber;
     this.creationDate = OffsetDateTime.now();
+    this.status = StatusEnum.ACTIVE;
     this.role = role;
-  }
-
-  public User(String firstName, String lastName, String email, String password, String phoneNumber, Double dayLimit, Double transactionLimit, RoleEnum role)
-  {
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.email = email;
-    this.password = password;
-    this.phoneNumber = phoneNumber;
-    this.dayLimit = dayLimit;
-    this.transactionLimit = transactionLimit;
-    this.role = role;
-    this.creationDate = OffsetDateTime.now();
-
   }
 
   public User(String firstName, String lastName, String emailAddress, String password, String phoneNumber) {
@@ -93,6 +78,7 @@ public class User {
     this.email = email;
     this.password = password;
     this.phoneNumber = phoneNumber;
+    this.status = StatusEnum.ACTIVE;
     this.dayLimit = dayLimit;
     this.transactionLimit = transactionLimit;
     this.creationDate = OffsetDateTime.now();
@@ -185,7 +171,6 @@ public class User {
    *
    * @return id
    **/
-  //@Schema(required = false)
   public long getId()
   {
     return id;
@@ -212,7 +197,6 @@ public class User {
    **/
   @Schema(example = "john", required = true, description = "")
   @NotNull
-
   public String getFirstName()
   {
     return firstName;

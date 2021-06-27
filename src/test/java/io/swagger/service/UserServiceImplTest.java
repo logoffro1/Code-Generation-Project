@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -26,6 +27,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -147,4 +149,12 @@ class UserServiceImplTest {
         Assertions.assertEquals("Limit can't be lower than 0 or NULL.", exception.getMessage());
     }
 
+    @Test
+    public void CreateUserShouldNotBeNull() throws Exception{
+
+        User user = null;
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                ()-> userServiceImpl.createUser(null));
+        Assertions.assertEquals("User can't be null", exception.getMessage());
+    }
 }

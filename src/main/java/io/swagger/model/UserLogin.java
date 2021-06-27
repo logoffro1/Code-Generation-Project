@@ -5,6 +5,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Login class for user
+ * Takes in email address and password for login
+ */
 @Data
 public class UserLogin   {
 

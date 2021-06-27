@@ -1,7 +1,9 @@
 package io.swagger.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.EnumType;
@@ -9,6 +11,10 @@ import javax.persistence.Enumerated;
 import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
 
+/**
+ * DTO class for creating user
+ */
+@Getter@Setter
 public class UserDTO {
 
     @JsonProperty("firstName")

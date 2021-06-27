@@ -6,6 +6,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
 
+/**
+ * Custom class to check which user is logged in
+ * needed for authorization of methods
+ */
 public class LoggedInUser extends User{
 
     private static AuthorizedUser user ;
@@ -26,14 +30,6 @@ public class LoggedInUser extends User{
             roles.add(User.RoleEnum.valueOf(auth.getAuthority()));
         });
         return roles;
-    }
-
-    public static String getUserName() {
-        return user.getUsername();
-    }
-
-    public static String getUserEmail() {
-        return user.getEmail();
     }
 
     public static Long getUserId() {

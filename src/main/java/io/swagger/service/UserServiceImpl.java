@@ -1,13 +1,12 @@
 package io.swagger.service;
 
-
 import io.swagger.exceptions.ApiRequestException;
-import io.swagger.model.Account;
 import io.swagger.model.ModifyUserDTO;
 import io.swagger.model.User;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
+import io.swagger.util.LoggedInUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +16,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * User Service Implementation class
+ * Implements the interface User Service
+ */
 @Service
 public class UserServiceImpl implements UserService{
 
@@ -53,9 +56,11 @@ public class UserServiceImpl implements UserService{
     @Override
     public User createUser(User user) {
 
-        if(user.equals(null))
+        // null user shouldn't be created
+        if(user == null)
             throw new ApiRequestException("User can't be null",HttpStatus.BAD_REQUEST);
 
+        // A user with same email address shouldn't be created because it's used as a username(two users can't have the same username)
         List<User> users = getAllUsers();
         for (User u : users) {
             if(u.getEmail().equals(user.getEmail())){
@@ -68,6 +73,14 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getUserById(long id)  {
+
+        if(!LoggedInUser.isEmployee())
+        {
+            if (!LoggedInUser.getUserId().equals(id))
+            {
+                throw new ApiRequestException("You are not allowed to get this user details",HttpStatus.UNAUTHORIZED);
+            }
+        }
         if(id < 1001)
             throw new ApiRequestException("Id less than 1001 doesn't exist.Try putting an id in the range of 1000",HttpStatus.BAD_REQUEST);
 
@@ -77,22 +90,14 @@ public class UserServiceImpl implements UserService{
     @Override
     public void deleteUserById(long id) {
 
-//        accountRepository.findAll().forEach(account -> {
-//            if (account.getUser().getId() == id) {
-//                accountRepository.deleteById(Long.parseLong(account.getIBAN()));
-//            }
-//        });
-
         User user = getUserById(id);
 
         if(user.getStatus() == User.StatusEnum.INACTIVE)
             throw new ApiRequestException("User is inactive",HttpStatus.BAD_REQUEST);
 
-        //Putting user to inactive state instead of deleting all the records
+        //Putting user to inactive state instead of deleting all the records(including its accounts and the transactions made)
         user.setStatus(User.StatusEnum.INACTIVE);
         userRepository.save(user);
-
-        //userRepository.deleteById(id);
     }
 
     @Override
@@ -103,6 +108,8 @@ public class UserServiceImpl implements UserService{
         if (modifyUser.equals(user)){
             throw new ApiRequestException("Nothing was updated",HttpStatus.NOT_MODIFIED);
         }
+
+        //user shoulnot be able to modify the email address because its used as a username
         if(!modifyUser.getEmailAddress().equals(user.getEmail()))
         {
             throw new ApiRequestException("Email cannot be modified",HttpStatus.BAD_REQUEST);

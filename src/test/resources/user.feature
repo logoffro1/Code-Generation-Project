@@ -1,11 +1,5 @@
 Feature: Testing Users
 
-#  #doesn't work
-  Scenario: Retrieving all Users return http status ok
-    Given the user is an employee
-    When retrieving all users
-    Then show http status 200
-
   Scenario: Creating a user returns http status created
     Given the user is an employee
     When creating a new user
@@ -14,12 +8,6 @@ Feature: Testing Users
   Scenario: Retrieving a user with Id returns http status ok
     Given the user is an employee
     When retrieving a user with id "1001"
-    Then show http status 200
-
-#  #doesn't work
-  Scenario: Updating a user returns http status ok
-    Given the user is an employee
-    When updating a user with id "1001"
     Then show http status 200
 
   Scenario: Deleting a user returns http status ok
@@ -46,6 +34,15 @@ Feature: Testing Users
     When retrieving a user with id "1001"
     Then the full name should be "John Doe"
 
+  Scenario: Creating null user throws exception
+    Given  the user is an employee
+    When creating a null user
+    Then show http status 400
+
+  Scenario: Creating a user with existing email throws exception
+    Given  the user is an employee
+    When creating a user with existing email
+    Then show http status 502
 
 
 

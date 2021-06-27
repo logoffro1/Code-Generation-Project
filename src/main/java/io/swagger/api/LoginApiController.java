@@ -40,6 +40,11 @@ public class LoginApiController implements LoginApi {
         this.request = request;
     }
 
+    /**
+     * Login method for user
+     * @param body
+     * @return token
+     */
     public ResponseEntity<TokenDTO> login(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody UserLogin body) {
 
         try {
@@ -53,7 +58,6 @@ public class LoginApiController implements LoginApi {
             e.printStackTrace();
             return new ResponseEntity<TokenDTO>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
 }

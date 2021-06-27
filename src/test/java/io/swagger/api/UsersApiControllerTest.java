@@ -1,10 +1,12 @@
 package io.swagger.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.User;
 import io.swagger.repository.UserRepository;
 import io.swagger.service.UserService;
 import io.swagger.service.UserServiceImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,11 +115,13 @@ public class UsersApiControllerTest {
     @Test
     public void CreateUserShouldNotBeNull() throws Exception{
 
-        assertThrows(NullPointerException.class,
+        User user = null;
+        Exception exception = assertThrows(ApiRequestException.class,
                 ()-> this.mvc.perform(
                         post("/users")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(null)))
+                                .content(mapper.writeValueAsString(user)))
         );
+        Assertions.assertEquals("User can't be null", exception.getMessage());
     }
 }

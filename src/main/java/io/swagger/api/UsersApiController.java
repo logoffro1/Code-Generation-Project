@@ -5,7 +5,6 @@ import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.service.AccountService;
 import io.swagger.service.UserService;
-import io.swagger.util.LoggedInUser;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -55,12 +54,17 @@ public class UsersApiController implements UsersApi {
 
     }
 
+    /**
+     * Creates a user, authorized only for employee
+     * @param userDTO
+     * @return created user
+     */
     @PreAuthorize("hasRole('EMPLOYEE')")
     @RequestMapping(value="",
             method = RequestMethod.POST ,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CreateUserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "User registered", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO userDTO)
-{
+    public ResponseEntity<CreateUserDTO> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "User registered", required=true, schema=@Schema()) @Valid @RequestBody CreateUserDTO userDTO) {
+
         try {
             userService.createUser(convertFromCreateUserDtoToUser(userDTO));
             return new ResponseEntity<CreateUserDTO>(HttpStatus.CREATED).status(201).body(userDTO);
@@ -68,9 +72,12 @@ public class UsersApiController implements UsersApi {
         } catch (Exception e) {
             throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
         }
-
     }
 
+    /**
+     * Deletes a user, authorized only for employee
+     * @param userId
+     */
     @PreAuthorize("hasRole('EMPLOYEE')")
     @RequestMapping(value="/{userId}",
             method = RequestMethod.DELETE )
@@ -86,33 +93,42 @@ public class UsersApiController implements UsersApi {
         }
     }
 
+    /**
+     * Gets a users by Id, Employee can get all users, customer can only retrieve himself
+     * @param userId
+     * @return the user with the specified id
+     * @throws Exception
+     */
     @RequestMapping(value="/{userId}",
             method = RequestMethod.GET ,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getUserById(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId) throws Exception {
 
-        if(!LoggedInUser.isEmployee())
-        {
-            if (! userId.equals(LoggedInUser.getUserId()))
-            {
-                throw new ApiRequestException("You are not allowed to get this user details",HttpStatus.UNAUTHORIZED);
-            }
+        try {
+            User user = userService.getUserById(userId);
+            return new ResponseEntity<User>(HttpStatus.FOUND).status(200).body(user);
+
+        } catch (Exception e) {
+            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
         }
-        User user = userService.getUserById(userId);
-        return new ResponseEntity<User>(HttpStatus.FOUND).status(200).body(user);
     }
 
+    /**
+     * Returns a list of user, authorized only for employees
+     * @param offset
+     * @param limit
+     * @return list of users
+     */
     @PreAuthorize("hasRole('EMPLOYEE')")
     @RequestMapping(value="",
             method = RequestMethod.GET ,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "The number of pages to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of users to return per page" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
 
-        List<UserDTO> publicUsers = new ArrayList<>();
-
+        //convertying the user to user dto before displaying
         try {
-
+            List<UserDTO> publicUsers = new ArrayList<>();
             List<User> users = userService.getUsers(limit, offset);
             for (User user: users) {
                 publicUsers.add(convertFromUserToUserDTO(user));
@@ -120,11 +136,15 @@ public class UsersApiController implements UsersApi {
             return new ResponseEntity<List<User>>(HttpStatus.ACCEPTED).status(200).body(users);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
         }
     }
 
+    /**
+     * Updates a user
+     * @param userId
+     * @param user
+     */
     @PreAuthorize("hasRole('EMPLOYEE')")
     @RequestMapping(value="/{userId}",
             method = RequestMethod.PUT,
@@ -136,21 +156,44 @@ public class UsersApiController implements UsersApi {
             userService.updateUser(user,userId);
             return new ResponseEntity<Void>(HttpStatus.OK);
 
-        } catch (Exception e){
-
-            return new ResponseEntity<List<User>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        } catch (Exception e) {
+            throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
         }
     }
 
+    /**
+     * Converts a user to userDTO
+     * @param user
+     * @return converted user
+     */
     private UserDTO convertFromUserToUserDTO(User user) {
-        return new UserDTO(user.getFirstName(),user.getLastName(),user.getPhoneNumber() ,user.getEmail(), Arrays.asList(user.getRole().values()));
+        if(user != null)
+            return new UserDTO(user.getFirstName(),user.getLastName(),user.getPhoneNumber() ,user.getEmail(), Arrays.asList(user.getRole().values()));
+        else
+            return null;
     }
 
+    /**
+     * Converts a createUser Dto to user
+     * @param userDTO
+     * @return converted user
+     */
     private User convertFromCreateUserDtoToUser(CreateUserDTO userDTO){
-        return new User(userDTO.getFirstName(),userDTO.getLastName(), userDTO.getEmailAddress(),userDTO.getPassword(),userDTO.getPhoneNumber(),userDTO.getRole() );
+        if(userDTO != null)
+            return new User(userDTO.getFirstName(),userDTO.getLastName(), userDTO.getEmailAddress(),userDTO.getPassword(),userDTO.getPhoneNumber(),userDTO.getRole() );
+        else
+            return null;
     }
 
+    /**
+     * Converts a ModifyUserDto to user
+     * @param userDTO
+     * @return converted user
+     */
     private User convertFromModifyUserDtoToUser(ModifyUserDTO userDTO){
-        return new User(userDTO.getFirstName(),userDTO.getLastName(), userDTO.getEmailAddress(),userDTO.getPassword(),userDTO.getPhoneNumber());
+        if(userDTO != null)
+            return new User(userDTO.getFirstName(),userDTO.getLastName(), userDTO.getEmailAddress(),userDTO.getPassword(),userDTO.getPhoneNumber());
+        else
+            return null;
     }
 }

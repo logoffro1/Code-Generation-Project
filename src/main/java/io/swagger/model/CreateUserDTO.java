@@ -5,13 +5,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NonNull;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import java.util.Collection;
-
+/**
+ * DTO class for creating user
+ */
 @Data
 public class CreateUserDTO {
-
 
     @JsonProperty("firstName")
     private String firstName;

@@ -7,6 +7,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+/**
+ * Authorized User Model class
+ * authorizes the user based on role
+ */
 public class AuthorizedUser implements UserDetails {
 
   ArrayList<GrantedAuthority> authorities = null;
