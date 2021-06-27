@@ -19,15 +19,31 @@ Feature: Account Tests
     When I want to get all acounts
     Then Display Http Status 200
 
-   #  POST account happy flow
+   #  POST account happy flow for creating customer
   Scenario: Employee creates a saving account for a customer
     Given I am Employee
     When I want to create a new account for Customer with user id of 1001 a balance of 2000 with an absolute limit of 200 with an enum of  "CURRENT" and with a status of "ACTIVE"
     Then Display Http Status 201
 
-    # GET by iban happy flow
+   #  POST account happy flow for creating employee
+  Scenario: Employee creates a saving account for an Employee
+    Given I am Employee
+    When I want to create a new account for Customer with user id of 1003 a balance of 2000 with an absolute limit of 200 with an enum of  "CURRENT" and with a status of "ACTIVE"
+    Then Display Http Status 201
+
+
+    # GET by iban happy flow for customer
   Scenario:  Customer wants to see account balance
     Given I am Customer
+    When  I enter my Iban "NL03INHO0778852694" to get my account
+    Then  I see my balance 9000.00
+    Then  Display Http Status 200
+
+#      NOTE: the difference between the scenario above and below is: Employee can see other accounts information too whereas customer
+#   can only see her/his own account. In the next scenario employee sees the account of the customer.
+      # GET by iban happy flow for employee
+  Scenario:  Employee wants to see account balance
+    Given I am Employee
     When  I enter my Iban "NL03INHO0778852694" to get my account
     Then  I see my balance 9000.00
     Then  Display Http Status 200
