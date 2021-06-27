@@ -129,14 +129,6 @@ class AccountServiceImplTest {
 
 
     @Test
-    void updateAccountShouldChangeAccountType() {
-        if(this.modifyAccountDTO.getType()== Account.TypeEnum.CURRENT){
-            this.account.setType(Account.TypeEnum.SAVINGS);
-
-        }
-    }
-
-    @Test
     void getAllAccounts() {
 
         List<Account> accountList=new ArrayList<>();

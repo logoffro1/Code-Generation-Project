@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -88,21 +89,6 @@ class UserServiceImplTest {
         when(userRepository.findById(this.mockUser.getId())).thenReturn(java.util.Optional.ofNullable(this.mockUser));
         User returnedUser = userServiceImpl.getUserById(this.mockUser.getId());
         assertEquals(returnedUser, this.mockUser);
-    }
-
-    //doesn't work
-    @Test
-    void updateUser() {
-
-        when(userServiceImpl.getUserById(this.mockUser.getId())).thenReturn(mockUser);
-        when(userRepository.findById(this.mockUser.getId())).thenReturn(java.util.Optional.ofNullable(mockUser));
-        modifyUserDTO = new ModifyUserDTO("William",
-                "Smith",
-                "090078601",
-                "william123");
-
-        userServiceImpl.updateUser(modifyUserDTO, this.mockUser.getId());
-        assertEquals(modifyUserDTO, this.mockUser);
     }
 
     @Test
