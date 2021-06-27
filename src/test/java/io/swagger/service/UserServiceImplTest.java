@@ -64,7 +64,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void getAllUsers(){
+    public void getAllUsers() {
 
         userRepository.save(mockUser);
         when(userRepository.findAll()).thenReturn(userList);
@@ -74,7 +74,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void addCreatedUser(){
+    public void addCreatedUser() {
 
         userRepository.save(mockUser);
         when(userRepository.findAll()).thenReturn(userList);
@@ -87,24 +87,26 @@ class UserServiceImplTest {
 
         when(userRepository.findById(this.mockUser.getId())).thenReturn(java.util.Optional.ofNullable(this.mockUser));
         User returnedUser = userServiceImpl.getUserById(this.mockUser.getId());
-        assertEquals(returnedUser,this.mockUser);
+        assertEquals(returnedUser, this.mockUser);
     }
 
     //doesn't work
     @Test
     void updateUser() {
 
+        when(userServiceImpl.getUserById(this.mockUser.getId())).thenReturn(mockUser);
+        when(userRepository.findById(this.mockUser.getId())).thenReturn(java.util.Optional.ofNullable(mockUser));
         modifyUserDTO = new ModifyUserDTO("William",
                 "Smith",
                 "090078601",
                 "william123");
 
-        userServiceImpl.updateUser(modifyUserDTO,this.mockUser.getId());
-        assertEquals(modifyUserDTO,this.mockUser);
+        userServiceImpl.updateUser(modifyUserDTO, this.mockUser.getId());
+        assertEquals(modifyUserDTO, this.mockUser);
     }
 
     @Test
-    void gettingUserByIdThrowsExceptionIfUserDoesnotExist(){
+    void gettingUserByIdThrowsExceptionIfUserDoesnotExist() {
 
         Exception exception = assertThrows(ApiRequestException.class,
                 () -> userServiceImpl.getUserById(1005L));
@@ -113,7 +115,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void gettingUserByIdThrowsExceptionIfIdIsNotInTheRangeOf1000(){
+    void gettingUserByIdThrowsExceptionIfIdIsNotInTheRangeOf1000() {
 
         Exception exception = assertThrows(ApiRequestException.class,
                 () -> userServiceImpl.getUserById(1L));
@@ -123,7 +125,7 @@ class UserServiceImplTest {
 
     //doesn't work
     @Test
-    void creatingUserWithTheSameEmailThrowsException(){
+    void creatingUserWithTheSameEmailThrowsException() {
 
         User mockUser2 = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.ROLE_CUSTOMER);
 
@@ -135,11 +137,11 @@ class UserServiceImplTest {
 
 
     @Test
-    public void CreateUserShouldNotBeNull() throws Exception{
+    public void CreateUserShouldNotBeNull() throws Exception {
 
         User user = null;
         ApiRequestException exception = assertThrows(ApiRequestException.class,
-                ()-> userServiceImpl.createUser(null));
+                () -> userServiceImpl.createUser(null));
         Assertions.assertEquals("User can't be null", exception.getMessage());
     }
 }

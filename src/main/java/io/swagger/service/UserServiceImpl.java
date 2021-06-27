@@ -62,7 +62,6 @@ public class UserServiceImpl implements UserService{
 
         // A user with same email address shouldn't be created because it's used as a username(two users can't have the same username)
         List<User> users = getAllUsers();
-        System.out.println(users.size());
         for (User u : users) {
             if(u.getEmail().equals(user.getEmail())){
                 throw new ApiRequestException("This email is already in use.",HttpStatus.BAD_REQUEST);
