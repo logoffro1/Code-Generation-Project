@@ -109,12 +109,6 @@ public class UserServiceImpl implements UserService{
             throw new ApiRequestException("Nothing was updated",HttpStatus.NOT_MODIFIED);
         }
 
-        //user shoulnot be able to modify the email address because its used as a username
-        if(!modifyUser.getEmailAddress().equals(user.getEmail()))
-        {
-            throw new ApiRequestException("Email cannot be modified",HttpStatus.BAD_REQUEST);
-        }
-
         if (modifyUser.getFirstName() != null && !modifyUser.getFirstName().isEmpty()) {
             user.setFirstName(modifyUser.getFirstName());
         }
