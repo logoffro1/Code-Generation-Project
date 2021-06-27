@@ -50,7 +50,7 @@ public class UsersApiControllerTest {
         user.setId(1003);
     }
 
-    @WithMockUser
+    @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
     public void getUsersShouldReturnJsonArray() throws Exception{
         this.mvc.perform(
@@ -87,7 +87,6 @@ public class UsersApiControllerTest {
                 .andExpect(status().isOk());
     }
 
-    //doesn't work
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
     void CanDeleteUser() throws Exception {
@@ -112,7 +111,7 @@ public class UsersApiControllerTest {
     //doesn't work
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
-    public void CreateUserShouldBeNull() throws Exception{
+    public void CreateUserShouldNotBeNull() throws Exception{
 
         assertThrows(NullPointerException.class,
                 ()-> this.mvc.perform(
