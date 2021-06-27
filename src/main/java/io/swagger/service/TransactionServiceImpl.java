@@ -51,6 +51,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     public void createTransaction(Transaction transaction) {
 
+
+
         //check if users are null
         //THIS WILL PROBABLY NEVER BE THE CASE AT THIS POINT
         User senderUser = transaction.getSenderAccount().getUser(); //store sender
@@ -60,6 +62,10 @@ public class TransactionServiceImpl implements TransactionService {
 
         if (receiverUser == null)
             throw new ApiRequestException("Could not retrieve receiver user!", HttpStatus.BAD_REQUEST);
+
+        //if the user is a customer but he's not the sender show error
+        if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionRepository.findById(senderUser.getId()).get().getTransactionDTO().getSenderUserID()))
+            throw new ApiRequestException("You cannot access this transaction.", HttpStatus.BAD_REQUEST);
 
         //if the amount is less than 0 or it's more than the limit
         if (transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit())
