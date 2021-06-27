@@ -1,0 +1,25 @@
+-------------------------------------------------------------------------------
+Test set: io.swagger.service.TransactionServiceImplTest
+-------------------------------------------------------------------------------
+Tests run: 10, Failures: 3, Errors: 0, Skipped: 0, Time elapsed: 0.098 s <<< FAILURE! - in io.swagger.service.TransactionServiceImplTest
+createTransactionUserTransactionLimitShouldNotBeMoreThanAmount  Time elapsed: 0.004 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception type thrown ==> expected: <io.swagger.exceptions.ApiRequestException> but was: <java.lang.NullPointerException>
+	at io.swagger.service.TransactionServiceImplTest.createTransactionUserTransactionLimitShouldNotBeMoreThanAmount(TransactionServiceImplTest.java:186)
+Caused by: java.lang.NullPointerException: Cannot invoke "org.springframework.security.core.Authentication.getPrincipal()" because the return value of "org.springframework.security.core.context.SecurityContext.getAuthentication()" is null
+	at io.swagger.service.TransactionServiceImplTest.lambda$createTransactionUserTransactionLimitShouldNotBeMoreThanAmount$7(TransactionServiceImplTest.java:187)
+	at io.swagger.service.TransactionServiceImplTest.createTransactionUserTransactionLimitShouldNotBeMoreThanAmount(TransactionServiceImplTest.java:186)
+
+createTransactionAccountShouldNotBeClosed  Time elapsed: 0.005 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception type thrown ==> expected: <io.swagger.exceptions.ApiRequestException> but was: <java.lang.NullPointerException>
+	at io.swagger.service.TransactionServiceImplTest.createTransactionAccountShouldNotBeClosed(TransactionServiceImplTest.java:177)
+Caused by: java.lang.NullPointerException: Cannot invoke "org.springframework.security.core.Authentication.getPrincipal()" because the return value of "org.springframework.security.core.context.SecurityContext.getAuthentication()" is null
+	at io.swagger.service.TransactionServiceImplTest.lambda$createTransactionAccountShouldNotBeClosed$6(TransactionServiceImplTest.java:178)
+	at io.swagger.service.TransactionServiceImplTest.createTransactionAccountShouldNotBeClosed(TransactionServiceImplTest.java:177)
+
+createTransactionDailyLimitAmountShouldNotBeExceeded  Time elapsed: 0.005 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception type thrown ==> expected: <io.swagger.exceptions.ApiRequestException> but was: <java.lang.NullPointerException>
+	at io.swagger.service.TransactionServiceImplTest.createTransactionDailyLimitAmountShouldNotBeExceeded(TransactionServiceImplTest.java:195)
+Caused by: java.lang.NullPointerException: Cannot invoke "org.springframework.security.core.Authentication.getPrincipal()" because the return value of "org.springframework.security.core.context.SecurityContext.getAuthentication()" is null
+	at io.swagger.service.TransactionServiceImplTest.lambda$createTransactionDailyLimitAmountShouldNotBeExceeded$8(TransactionServiceImplTest.java:196)
+	at io.swagger.service.TransactionServiceImplTest.createTransactionDailyLimitAmountShouldNotBeExceeded(TransactionServiceImplTest.java:195)
+
