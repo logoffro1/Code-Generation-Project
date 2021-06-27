@@ -1,10 +1,11 @@
 package io.swagger.api;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.service.AccountServiceImpl;
 import io.swagger.service.TransactionServiceImpl;
-import io.swagger.util.LoggedInUser;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.NotAcceptableStatusException;
 
-import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -54,6 +54,7 @@ public class TransactionsApiController implements TransactionsApi {
     public ResponseEntity<List<TransactionDTO>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results", schema = @Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return", schema = @Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
         try
         {
+            //looping through all the transactions and converting each one to transactionDTO
             List<TransactionDTO> transactions = new ArrayList<>();
             for (Transaction t : transactionService.getAllTransactions(offset, limit))
                 transactions.add(t.getTransactionDTO());
@@ -73,6 +74,7 @@ public class TransactionsApiController implements TransactionsApi {
     public ResponseEntity<CreateTransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody CreateTransactionDTO transactionDTO) {
         try
         {
+            //creating new transaction and passing it to the service
             Transaction transaction = new Transaction(accountService.getAccountByIbanForTransactions(transactionDTO.getSenderIBAN()),
                     accountService.getAccountByIbanForTransactions(transactionDTO.getReceiverIBAN()), transactionDTO.getAmount(), transactionDTO.getCurrencyType());
             transactionService.createTransaction(transaction);
@@ -90,7 +92,6 @@ public class TransactionsApiController implements TransactionsApi {
     public ResponseEntity<TransactionDTO> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Integer transactionId) {
         try
         {
-           //Transaction transaction = transactionService.getTransactionById(transactionId);
             transactionService.deleteTransactionById(transactionId);
             return new ResponseEntity<TransactionDTO>(HttpStatus.ACCEPTED).status(200).body(null);
         } catch (NotAcceptableStatusException e)
@@ -99,6 +100,7 @@ public class TransactionsApiController implements TransactionsApi {
             return new ResponseEntity<TransactionDTO>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
     @PreAuthorize("hasAnyRole('EMPLOYEE','CUSTOMER')")
     public ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Long transactionId) {
         try

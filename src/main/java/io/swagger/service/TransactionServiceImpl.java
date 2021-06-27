@@ -23,30 +23,37 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionRepository transactionRepository;
 
     public List<Transaction> getAllTransactions(Integer offset, Integer limit) {
+        //iff offset or limit are not set / invalid, give them a default value
+
         if (offset == null || offset < 0)
             offset = 0; //default 0
 
         if (limit == null || limit < 0)
             limit = 15; //default limit
 
-
+//we need to use pageable or else nothing works
         Pageable pageable = PageRequest.of(offset, limit);
         return transactionRepository.findAll(pageable).getContent();
     }
 
     public Transaction getTransactionById(long id) {
+        //check if id is valid with built in function
         if (!transactionRepository.findById(id).isPresent())
             throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
 
+        //if the user is a customer but the transaction doesn't belong to it, throw error
         if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionRepository.findById(id).get().getTransactionDTO().getSenderUserID()))
             throw new ApiRequestException("You cannot access this transaction.", HttpStatus.BAD_REQUEST);
-
 
 
         return transactionRepository.findById(id).get();
     }
 
     public void createTransaction(Transaction transaction) {
+
+
+        //check if users are null
+        //THIS WILL PROBABLY NEVER BE THE CASE AT THIS POINT
         User senderUser = transaction.getSenderAccount().getUser(); //store sender
         User receiverUser = transaction.getReceiverAccount().getUser(); //store receiver
         if (senderUser == null)
@@ -54,6 +61,11 @@ public class TransactionServiceImpl implements TransactionService {
 
         if (receiverUser == null)
             throw new ApiRequestException("Could not retrieve receiver user!", HttpStatus.BAD_REQUEST);
+
+        //if the user is a customer but he's not the sender show error
+        if (!LoggedInUser.userIsNull())
+            if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionRepository.findById(senderUser.getId()).get().getTransactionDTO().getSenderUserID()))
+                throw new ApiRequestException("You cannot create this transaction.", HttpStatus.BAD_REQUEST);
 
         //if the amount is less than 0 or it's more than the limit
         if (transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit())
