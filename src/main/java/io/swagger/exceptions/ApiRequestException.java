@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 //If you have questions about using ask me {egehan}
 public class ApiRequestException extends RuntimeException {
 
+    //This is the class used to throw exceptions.
     // HOW TO USE:
     private HttpStatus status;
 

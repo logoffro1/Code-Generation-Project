@@ -3,6 +3,7 @@ package io.swagger.service;
 import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.*;
 import io.swagger.repository.AccountRepository;
+import io.swagger.util.LoggedInUser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
@@ -28,8 +32,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -50,7 +53,7 @@ class AccountServiceImplTest {
 
     private Account account;
 
-    private AccountDTO postAccount;
+    private CreateAccountDTO postAccount;
 
     private ModifyAccountDTO modifyAccountDTO;
 
@@ -58,19 +61,76 @@ class AccountServiceImplTest {
 
     @BeforeEach
      void initialize(){
-        mockUser = new User("firstName","lastName","email","password","090078601", User.RoleEnum.ROLE_EMPLOYEE);
+        mockUser = new User("firstName","lastName","email","password","090078601", User.RoleEnum.ROLE_CUSTOMER);
         mockUser.setId(1003);
 
         modifyAccountDTO= new ModifyAccountDTO(Account.TypeEnum.CURRENT);
         this.account = new Account(ibanGenerator.generateIban(), BigDecimal.valueOf(200), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000));
-        this.postAccount= new AccountDTO(BigDecimal.valueOf(200),mockUser, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000), Account.TypeEnum.CURRENT);
+        this.postAccount= new CreateAccountDTO(BigDecimal.valueOf(200),mockUser.getId(), Account.StatusEnum.ACTIVE, BigDecimal.valueOf(2000), Account.TypeEnum.CURRENT);
     }
 
+    @Test
+    void getAccountByIbanReturnsIbanNotPresentExceptionMessage() {
+        //Changing the iban to something that wouldnt work
+
+        this.account.setIBAN("NLNOTAVALIDIBAN00");
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.getAccountByIban(this.account.getIBAN()));
+        Assertions.assertEquals("Iban is not present, please input a valid iban", exception.getMessage());
+    }
+
+    @Test
+    void createAccountWithInvalidIbanReturnsIbanNotPresentExceptionMessage() {
+        //Changing the iban to something that wouldnt work
+
+        this.account.setIBAN("NLNOTAVALIDIBAN00000");
+
+        when(accountRepo.findByIBAN(this.account.getIBAN())).thenThrow(new ApiRequestException("Iban is not present, please input a valid iban",HttpStatus.NOT_FOUND));
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.createAccount(this.account));
+        Assertions.assertEquals("Iban is not present, please input a valid iban", exception.getMessage());
+    }
+
+    @Test
+    void getAccountByIbanReturnsExceptionIfUserIsNotSame() {
+        //Mock authorization
+        AuthorizedUser user = new AuthorizedUser(mockUser);
+        Authentication authentication= mock(Authentication.class);
+        SecurityContext securityContext= mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
+
+        //Change user id to be inconsistent to create error
+        User emptyUser = new User();
+        emptyUser.setId(101);
+
+        this.account.setUser(emptyUser);
+        when(accountRepo.findByIBAN(this.account.getIBAN())).thenReturn(this.account);
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.getAccountByIban(this.account.getIBAN()));
+        Assertions.assertEquals("Customers can not look for accounts that does not belong to them", exception.getMessage());
+    }
+
+    @Test
+    void convertDTOReturnsResponseAccountDTOObject(){
+        ResponseAccountDTO responseAccountDTO= new ResponseAccountDTO(
+                account.getUser().getFirstName()+" "+account.getUser().getLastName(),
+                account.getIBAN(),
+                account.getStatus(),
+                account.getType(),
+                account.getBalance(),
+                account.getAbsoluteLimit());
+
+        ResponseAccountDTO result= accountServiceImpl.convertToResponseAccountDTO(this.account);
+        assertThat(result).isEqualToComparingFieldByField(responseAccountDTO);
+    }
 
 
     @Test
     void updateAccountShouldChangeAccountType() {
         if(this.modifyAccountDTO.getType()== Account.TypeEnum.CURRENT){
+            this.account.setType(Account.TypeEnum.SAVINGS);
 
         }
     }
@@ -109,16 +169,39 @@ class AccountServiceImplTest {
     }
     @Test
     void createdAccountShouldntHaveNullUser(){
-        postAccount.setUser(null);
-        Account account1= new Account("iban1",postAccount.getAbsoluteLimit(),postAccount.getUser(),postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
+
+        Account createdAccount= new Account("iban1",postAccount.getAbsoluteLimit(),null,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
         ApiRequestException exception = assertThrows(ApiRequestException.class,
-                () -> accountServiceImpl.createAccount(account1));
+                () -> accountServiceImpl.createAccount(createdAccount));
         Assertions.assertEquals("User can not be null", exception.getMessage());
 
+    }
+    //By bank account I refer to the banks actual account. eg. ING's initial account.
+    @Test
+    void bankAccountCanNotBeUpdated(){
+        this.account.setIBAN("NL01INHO00000001");
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.updateAccount(this.account,new ModifyAccountDTO(Account.TypeEnum.CURRENT)));
+        Assertions.assertEquals("Bank's own account can not be updated by employees", exception.getMessage());
+    }
+
+    //By bank account I refer to the banks actual account. eg. ING's initial account.
+    @Test
+    void bankAccountCantBeClosed(){
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.softDeleteAccount("NL01INHO00000001"));
+        Assertions.assertEquals("Bank's own account can not be updated by employees", exception.getMessage());
     }
 
     @Test
     void getAccountByIbanShouldReturnTheRightAccount() {
+
+        AuthorizedUser user = new AuthorizedUser(mockUser);
+        Authentication authentication= mock(Authentication.class);
+        SecurityContext securityContext= mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
         //We mock the data to see if everything is working right.
         when(accountRepo.findByIBAN(this.account.getIBAN())).thenReturn(this.account);
         Account returnedAccount = accountServiceImpl.getAccountByIban(this.account.getIBAN());
@@ -148,7 +231,24 @@ class AccountServiceImplTest {
     }
 
     @Test
+    void createClosedAccountShouldThrowApiRequestException(){
+        this.account.setStatus(Account.StatusEnum.CLOSED);
+
+        ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> accountServiceImpl.createAccount(this.account));
+        Assertions.assertEquals("Account must not be closed when it is created", exception.getMessage());
+    }
+
+
+    @Test
     void isIbanPresentShouldNotReturnFalse() {
+        //Mocking Authorization
+        AuthorizedUser user = new AuthorizedUser(mockUser);
+        Authentication authentication= mock(Authentication.class);
+        SecurityContext securityContext= mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
 
         Account account= new Account(ibanGenerator.generateIban(),postAccount.getAbsoluteLimit(),mockUser,postAccount.getType(),postAccount.getStatus(),postAccount.getBalance());
         accountServiceImpl.createAccount(account);
@@ -157,8 +257,16 @@ class AccountServiceImplTest {
         assertThat(accountServiceImpl.getAccountByIban(account.getIBAN())).isEqualTo(account);
     }
 
+
     @Test
     void softDeleteAccountShouldChangeTheStatusOfAccount() {
+        //Mocking Authorization
+        AuthorizedUser user = new AuthorizedUser(mockUser);
+        Authentication authentication= mock(Authentication.class);
+        SecurityContext securityContext= mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
         //In case it was closed
         this.account.setStatus(Account.StatusEnum.ACTIVE);
         when(accountRepo.findByIBAN(this.account.getIBAN())).thenReturn(this.account);
@@ -166,8 +274,18 @@ class AccountServiceImplTest {
         assertEquals(this.account.getStatus(), Account.StatusEnum.CLOSED);
     }
 
+
     @Test
     void ifAccountClosedThrowAccountAlreadyClosedMessage() {
+
+        //Mocking Authorization
+        AuthorizedUser user = new AuthorizedUser(mockUser);
+        Authentication authentication= mock(Authentication.class);
+        SecurityContext securityContext= mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
+
         //In case it was closed
         this.account.setStatus(Account.StatusEnum.CLOSED);
         when(accountRepo.findByIBAN(this.account.getIBAN())).thenReturn(this.account);

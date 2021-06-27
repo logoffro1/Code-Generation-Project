@@ -6,6 +6,7 @@ import io.swagger.model.ModifyTransactionDTO;
 import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.repository.TransactionRepository;
+import io.swagger.util.LoggedInUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,36 +16,44 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Service
-public class TransactionServiceImpl implements TransactionService
-{
+@Service("transactionsService")
+public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private TransactionRepository transactionRepository;
 
-    public List<Transaction> getAllTransactions(Integer offset, Integer limit)
-    {
+    public List<Transaction> getAllTransactions(Integer offset, Integer limit) {
+        //iff offset or limit are not set / invalid, give them a default value
+
         if (offset == null || offset < 0)
-            throw new ApiRequestException("Offset can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
+            offset = 0; //default 0
 
         if (limit == null || limit < 0)
-            throw new ApiRequestException("Limit can't be lower than 1 or NULL.", HttpStatus.BAD_REQUEST);
+            limit = 15; //default limit
 
-
+//we need to use pageable or else nothing works
         Pageable pageable = PageRequest.of(offset, limit);
         return transactionRepository.findAll(pageable).getContent();
     }
 
-    public Transaction getTransactionById(long id)
-    {
+    public Transaction getTransactionById(long id) {
+        //check if id is valid with built in function
         if (!transactionRepository.findById(id).isPresent())
             throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
+
+        //if the user is a customer but the transaction doesn't belong to it, throw error
+        if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionRepository.findById(id).get().getTransactionDTO().getSenderUserID()))
+            throw new ApiRequestException("You cannot access this transaction.", HttpStatus.BAD_REQUEST);
+
 
         return transactionRepository.findById(id).get();
     }
 
-    public void createTransaction(Transaction transaction)
-    {
+    public void createTransaction(Transaction transaction) {
+
+
+        //check if users are null
+        //THIS WILL PROBABLY NEVER BE THE CASE AT THIS POINT
         User senderUser = transaction.getSenderAccount().getUser(); //store sender
         User receiverUser = transaction.getReceiverAccount().getUser(); //store receiver
         if (senderUser == null)
@@ -52,6 +61,12 @@ public class TransactionServiceImpl implements TransactionService
 
         if (receiverUser == null)
             throw new ApiRequestException("Could not retrieve receiver user!", HttpStatus.BAD_REQUEST);
+
+        //if the user is a customer but he's not the sender show error
+        if (!LoggedInUser.userIsNull())
+            if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionRepository.findById(senderUser.getId()).get().getTransactionDTO().getSenderUserID()))
+                throw new ApiRequestException("You cannot create this transaction.", HttpStatus.BAD_REQUEST);
+
         //if the amount is less than 0 or it's more than the limit
         if (transaction.getAmount() <= 0 || transaction.getAmount() > transaction.getAmountLimit())
             throw new ApiRequestException("Invalid amount!", HttpStatus.BAD_REQUEST);
@@ -78,7 +93,7 @@ public class TransactionServiceImpl implements TransactionService
         if (transaction.getSenderAccount().getType() == Account.TypeEnum.SAVINGS
                 || transaction.getReceiverAccount().getType() == Account.TypeEnum.SAVINGS)
             if (senderUser != receiverUser)
-                throw new ApiRequestException("Invalid request", HttpStatus.BAD_REQUEST);
+                throw new ApiRequestException("Invalid request!", HttpStatus.BAD_REQUEST);
 
 
         //transfer money
@@ -88,45 +103,42 @@ public class TransactionServiceImpl implements TransactionService
     }
 
     @Override
-    public void deleteTransactionById(long id)
-    {
+    public void deleteTransactionById(long id) {
 
         if (!transactionRepository.findById(id).isPresent())
             throw new ApiRequestException("Transaction with the specified ID not found.", HttpStatus.BAD_REQUEST);
-        Transaction transaction = getTransactionById(id);
+        Transaction transaction = transactionRepository.findById(id).get();
 
         //send the money  back
         sendMoney(transaction.getReceiverAccount(), transaction.getSenderAccount(), transaction.getAmount());
         transactionRepository.deleteById(id);
     }
 
-    @Override
-    public void deleteTransaction(Transaction transaction)
-    {
+/*    @Override
+    public void deleteTransaction(Transaction transaction) {
         if (transaction == null)
             throw new ApiRequestException("Transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
 
         //send the money back
         sendMoney(transaction.getReceiverAccount(), transaction.getSenderAccount(), transaction.getAmount());
         transactionRepository.delete(transaction);
-    }
+    }*/
 
-    @Override
-    public void updateTransaction(Transaction oldTransaction, ModifyTransactionDTO newTransaction)
-    {
+/*    @Override
+    public void updateTransaction(Transaction oldTransaction, ModifyTransactionDTO newTransaction) {
+        throw new ApiRequestException("ACCESS DENIED!", HttpStatus.BAD_REQUEST);
 
-        if (oldTransaction == null)
+      *//*  if (oldTransaction == null)
             throw new ApiRequestException("Old transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
         if (newTransaction == null)
             throw new ApiRequestException("New transaction cannot be NULL.", HttpStatus.BAD_REQUEST);
 
 
         oldTransaction.setAmount(newTransaction.getAmount());
-        transactionRepository.save(oldTransaction);
-    }
+        transactionRepository.save(oldTransaction);*//*
+    }*/
 
-    private void sendMoney(Account senderAccount, Account receiverAccount, Double amount)
-    {
+    private void sendMoney(Account senderAccount, Account receiverAccount, Double amount) {
         //subtract money from the sender and save
         senderAccount.setBalance(senderAccount.getBalance().subtract(BigDecimal.valueOf(amount)));
 

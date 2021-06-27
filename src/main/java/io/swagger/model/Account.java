@@ -25,6 +25,8 @@ import javax.validation.constraints.*;
 @Entity
 public class Account   {
 
+  //This is the main class that is going to be in the database.
+
   @Id
   @GeneratedValue
   private long accountId;

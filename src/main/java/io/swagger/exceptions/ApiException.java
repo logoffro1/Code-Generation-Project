@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 
 import java.time.ZonedDateTime;
 
+
+//Exception class that contains the data such as message and status.
 public class ApiException {
     private final String message;
     private final HttpStatus httpStatus;

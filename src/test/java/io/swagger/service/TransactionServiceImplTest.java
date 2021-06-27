@@ -137,13 +137,13 @@ class TransactionServiceImplTest {
     @Test
     void createTransactionAmountShouldBeValid() {
 
-        ApiRequestException exception = assertThrows(ApiRequestException.class,
+         ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.createTransaction(new Transaction(senderAccount,receiverAccount,-1.00,"EUR")));
         Assertions.assertEquals("Invalid amount!", exception.getMessage());
 
         transaction.setAmount(transaction.getAmountLimit() + 1000.00);
 
-        exception = assertThrows(ApiRequestException.class,
+         exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.createTransaction(transaction));
         Assertions.assertEquals("Invalid amount!", exception.getMessage());
     }

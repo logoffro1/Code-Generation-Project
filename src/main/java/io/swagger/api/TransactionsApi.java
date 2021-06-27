@@ -5,8 +5,10 @@
  */
 package io.swagger.api;
 
+import io.swagger.model.CreateTransactionDTO;
 import io.swagger.model.ModifyTransactionDTO;
 import io.swagger.model.Transaction;
+import io.swagger.model.TransactionDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -54,7 +56,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<Transaction>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit);
+    ResponseEntity<List<TransactionDTO>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit);
 
 
     @Operation(summary = "", description = "Create a transaction", security = {
@@ -73,7 +75,7 @@ public interface TransactionsApi {
         produces = { "application/json" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Transaction> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Transaction body);
+    ResponseEntity<CreateTransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody CreateTransactionDTO body);
 
 
     @Operation(summary = "", description = "", security = {
@@ -90,7 +92,7 @@ public interface TransactionsApi {
         @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
     @RequestMapping(value = "/{transactionId}",
         method = RequestMethod.DELETE)
-    ResponseEntity<Transaction> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
+    ResponseEntity<TransactionDTO> deleteTransactionByid(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
 
 
     @Operation(summary = "", description = "", security = {
@@ -108,27 +110,7 @@ public interface TransactionsApi {
     @RequestMapping(value = "/{transactionId}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<Transaction> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
-
-
-    @Operation(summary = "", description = "", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Transaction modified."),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden, you do not have access rights"),
-        
-        @ApiResponse(responseCode = "404", description = "Not found"),
-        
-        @ApiResponse(responseCode = "409", description = "Conflict"),
-        
-        @ApiResponse(responseCode = "500", description = "Oops, something went wrong on the server.") })
-    @RequestMapping(value = "/{transactionId}",
-        consumes = { "application/json" }, 
-        method = RequestMethod.PUT)
-    ResponseEntity<Transaction> updateTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody ModifyTransactionDTO body);
+    ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required=true, schema=@Schema()) @PathVariable("transactionId") Long transactionId);
 
 }
 

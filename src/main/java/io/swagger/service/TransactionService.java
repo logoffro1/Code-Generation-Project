@@ -15,7 +15,7 @@ public interface TransactionService
 
     void deleteTransactionById(long id);
 
-    void deleteTransaction(Transaction transaction);
-    void updateTransaction(Transaction oldTransaction, ModifyTransactionDTO newTransaction);
+   // void deleteTransaction(Transaction transaction);
+  //  void updateTransaction(Transaction oldTransaction, ModifyTransactionDTO newTransaction);
 
 }

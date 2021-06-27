@@ -5,8 +5,10 @@ import java.sql.Date;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.exceptions.ApiRequestException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.engine.internal.Cascade;
+import org.springframework.http.HttpStatus;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
@@ -21,8 +23,7 @@ import javax.validation.Valid;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-26T21:36:39.274Z[GMT]")
 
 @Entity
-public class Transaction
-{
+public class Transaction {
 
     @JsonProperty("transactionId")
     @Id
@@ -32,11 +33,12 @@ public class Transaction
     @JsonProperty("dateTimeCreated")
     private OffsetDateTime dateTimeCreated = null;
 
-    @ManyToOne(cascade= CascadeType.ALL)
+    //I added cascade types check if it breaks anything. I couldnt see anything that is broken so far.
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "senderIBAN")
     private Account senderAccount = null;
 
-    @ManyToOne(cascade= CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "receiverIBAN")
     private Account receiverAccount = null;
 
@@ -49,22 +51,25 @@ public class Transaction
     @JsonProperty("currencyType")
     private String currencyType = null;
 
-    public Transaction()
-    {
+    public Transaction() {
     }
 
-    public Transaction(Account senderAccount, Account receiverAccount, Double amount, String currencyType)
-    {
+    public Transaction(Account senderAccount, Account receiverAccount, Double amount, String currencyType) {
         this.senderAccount = senderAccount;
         this.receiverAccount = receiverAccount;
         this.amount = amount;
         this.currencyType = currencyType;
+        this.dateTimeCreated = OffsetDateTime.now();
     }
 
-    public Transaction transactionId(Integer transactionId)
-    {
+    public Transaction transactionId(Integer transactionId) {
         this.transactionId = transactionId;
         return this;
+    }
+
+    //convert Transaction to TransactionDTO
+    public TransactionDTO getTransactionDTO() {
+        return new TransactionDTO(transactionId, dateTimeCreated, senderAccount.getUser().getId(), senderAccount.getIBAN(), receiverAccount.getIBAN(), this.amount, this.currencyType);
     }
 
     /**
@@ -74,18 +79,15 @@ public class Transaction
      **/
     @Schema(example = "2012", description = "")
 
-    public long getTransactionId()
-    {
+    public long getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(Integer transactionId)
-    {
+    public void setTransactionId(Integer transactionId) {
         this.transactionId = transactionId;
     }
 
-    public Transaction dateTimeCreated(OffsetDateTime dateTimeCreated)
-    {
+    public Transaction dateTimeCreated(OffsetDateTime dateTimeCreated) {
         this.dateTimeCreated = dateTimeCreated;
         return this;
     }
@@ -98,18 +100,15 @@ public class Transaction
     @Schema(description = "the date and time the transaction was created")
 
     @Valid
-    public OffsetDateTime getDateTimeCreated()
-    {
+    public OffsetDateTime getDateTimeCreated() {
         return dateTimeCreated;
     }
 
-    public void setDateTimeCreated(OffsetDateTime dateTimeCreated)
-    {
+    public void setDateTimeCreated(OffsetDateTime dateTimeCreated) {
         this.dateTimeCreated = dateTimeCreated;
     }
 
-    public Transaction senderAccount(Account senderAccount)
-    {
+    public Transaction senderAccount(Account senderAccount) {
         this.senderAccount = senderAccount;
         return this;
     }
@@ -121,18 +120,15 @@ public class Transaction
      **/
     @Schema(example = "NL23RABO2298608059", description = "")
 
-    public Account getSenderAccount()
-    {
+    public Account getSenderAccount() {
         return senderAccount;
     }
 
-    public void setSenderAccount(Account senderAccount)
-    {
+    public void setSenderAccount(Account senderAccount) {
         this.senderAccount = senderAccount;
     }
 
-    public Transaction receiverAccount(Account receiverAccount)
-    {
+    public Transaction receiverAccount(Account receiverAccount) {
         this.receiverAccount = receiverAccount;
         return this;
     }
@@ -144,13 +140,11 @@ public class Transaction
      **/
     @Schema(example = "NL67ABNA8265634552", description = "")
 
-    public Account getReceiverAccount()
-    {
+    public Account getReceiverAccount() {
         return receiverAccount;
     }
 
-    public void setReceiverAccount(Account receiverAccount)
-    {
+    public void setReceiverAccount(Account receiverAccount) {
         this.receiverAccount = receiverAccount;
     }
 
@@ -162,8 +156,7 @@ public class Transaction
     @Schema(example = "20939", description = "")
 
 
-    public Transaction amount(Double amount)
-    {
+    public Transaction amount(Double amount) {
         this.amount = amount;
         return this;
     }
@@ -175,13 +168,12 @@ public class Transaction
      **/
     @Schema(example = "4800", description = "")
 
-    public Double getAmount()
-    {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount)
-    {
+    public void setAmount(Double amount) {
+        if (amount <= 0) throw new ApiRequestException("Amount cannot be less or equal to zero.", HttpStatus.BAD_REQUEST);
         this.amount = amount;
     }
 
@@ -197,13 +189,11 @@ public class Transaction
      **/
     @Schema(example = "4800", description = "")
 
-    public Double getAmountLimit()
-    {
+    public Double getAmountLimit() {
         return AMOUNT_LIMIT;
     }
 
-    public Transaction currencyType(String currencyType)
-    {
+    public Transaction currencyType(String currencyType) {
         this.currencyType = currencyType;
         return this;
     }
@@ -215,20 +205,17 @@ public class Transaction
      **/
     @Schema(example = "EUR", description = "")
 
-    public String getCurrencyType()
-    {
+    public String getCurrencyType() {
         return currencyType;
     }
 
-    public void setCurrencyType(String currencyType)
-    {
+    public void setCurrencyType(String currencyType) {
         this.currencyType = currencyType;
     }
 
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o)
         {
             return true;
@@ -248,14 +235,12 @@ public class Transaction
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(transactionId, dateTimeCreated, senderAccount, receiverAccount, amount, AMOUNT_LIMIT, currencyType);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class Transaction {\n");
 
@@ -274,8 +259,7 @@ public class Transaction
      * Convert the given object to string with each line indented by 4 spaces
      * (except the first line).
      */
-    private String toIndentedString(java.lang.Object o)
-    {
+    private String toIndentedString(java.lang.Object o) {
         if (o == null)
         {
             return "null";
