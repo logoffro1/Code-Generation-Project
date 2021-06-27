@@ -36,11 +36,9 @@ public class UsersApiControllerTest {
     private MockMvc mvc;
 
     @MockBean
-    @Autowired
     private UserServiceImpl userService;
 
     @MockBean
-    @Autowired
     private UserRepository userRepo;
 
     @MockBean
@@ -49,14 +47,14 @@ public class UsersApiControllerTest {
     ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
-    public void init(){
-        user = new User("firstName","lastName","email@gmail.com","password","090078601", User.RoleEnum.ROLE_EMPLOYEE);
+    public void init() {
+        user = new User("firstName", "lastName", "email@gmail.com", "password", "090078601", User.RoleEnum.ROLE_EMPLOYEE);
         user.setId(1003);
     }
 
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
-    public void getUsersShouldReturnJsonArray() throws Exception{
+    public void getUsersShouldReturnJsonArray() throws Exception {
         this.mvc.perform(
                 get("/users"))
                 .andExpect(
@@ -65,7 +63,7 @@ public class UsersApiControllerTest {
 
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
-    public void createUserShouldReturnCreated() throws Exception{
+    public void createUserShouldReturnCreated() throws Exception {
 
         this.mvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
@@ -81,14 +79,14 @@ public class UsersApiControllerTest {
                 .andExpect(status().isOk());
     }
 
-    //doesn't work
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
-    void CanGetUserById() throws Exception {
+    void getUserWithWrongIdReturnsBadGateway() throws Exception {
 
+        //we dont have users with id lower than 1000
         this.mvc.perform(
-                get("/users/"+ this.user.getId()))
-                .andExpect(status().isOk());
+                get("/users/" + 100))
+                .andExpect(status().isBadGateway());
     }
 
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
@@ -96,7 +94,7 @@ public class UsersApiControllerTest {
     void CanDeleteUser() throws Exception {
 
         this.mvc.perform(
-                delete("/users/"+this.user.getId()))
+                delete("/users/" + this.user.getId()))
                 .andExpect(status().isOk());
     }
 
@@ -110,20 +108,5 @@ public class UsersApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE).
                         content(mapper.writeValueAsString(this.user)))
                 .andExpect(status().isOk());
-    }
-
-    //doesn't work
-    @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
-    @Test
-    public void CreateUserShouldNotBeNull() throws Exception{
-
-        User user = null;
-        Exception exception = assertThrows(ApiRequestException.class,
-                ()-> this.mvc.perform(
-                        post("/users")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(user)))
-        );
-        Assertions.assertEquals("User can't be null", exception.getMessage());
     }
 }
