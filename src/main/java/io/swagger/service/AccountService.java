@@ -1,10 +1,8 @@
 package io.swagger.service;
 
 import io.swagger.model.Account;
-import io.swagger.model.ModifyAccountDTO;
+import io.swagger.model.dtos.ModifyAccountDTO;
 import org.springframework.data.domain.Page;
-
-import java.util.List;
 
 public interface AccountService {
 

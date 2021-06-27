@@ -1,4 +1,4 @@
-package io.swagger.model;
+package io.swagger.model.dtos;
 
 import lombok.NonNull;
 

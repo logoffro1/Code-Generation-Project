@@ -2,10 +2,9 @@ package io.swagger.service;
 
 import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.Account;
-import io.swagger.model.ModifyAccountDTO;
+import io.swagger.model.dtos.ModifyAccountDTO;
 
-import io.swagger.model.ResponseAccountDTO;
-import io.swagger.model.User;
+import io.swagger.model.dtos.ResponseAccountDTO;
 import io.swagger.util.LoggedInUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,7 +17,6 @@ import io.swagger.repository.AccountRepository;
 
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @Service

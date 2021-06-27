@@ -2,6 +2,8 @@ package io.swagger.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.*;
+import io.swagger.model.dtos.ModifyTransactionDTO;
+import io.swagger.model.dtos.TransactionDTO;
 import io.swagger.service.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +19,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

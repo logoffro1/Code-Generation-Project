@@ -1,7 +1,7 @@
 package io.swagger.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.model.TokenDTO;
+import io.swagger.model.dtos.TokenDTO;
 import io.swagger.model.User;
 import io.swagger.model.UserLogin;
 import io.swagger.repository.UserRepository;

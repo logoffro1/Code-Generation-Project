@@ -1,7 +1,6 @@
 package io.swagger.model.dtos;
 
 import io.swagger.model.Account;
-import io.swagger.model.CreateAccountDTO;
 import io.swagger.model.IbanGenerator;
 import io.swagger.model.User;
 import org.junit.jupiter.api.Assertions;

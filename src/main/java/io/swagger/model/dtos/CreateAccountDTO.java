@@ -1,6 +1,7 @@
-package io.swagger.model;
+package io.swagger.model.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.model.Account;
 import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 

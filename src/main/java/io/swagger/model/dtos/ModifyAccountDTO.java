@@ -1,5 +1,6 @@
-package io.swagger.model;
+package io.swagger.model.dtos;
 
+import io.swagger.model.Account;
 import lombok.NonNull;
 
 import javax.persistence.EnumType;

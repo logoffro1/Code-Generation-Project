@@ -6,9 +6,9 @@
 package io.swagger.api;
 
 import io.swagger.model.Account;
-import io.swagger.model.CreateAccountDTO;
-import io.swagger.model.ModifyAccountDTO;
-import io.swagger.model.ResponseAccountDTO;
+import io.swagger.model.dtos.CreateAccountDTO;
+import io.swagger.model.dtos.ModifyAccountDTO;
+import io.swagger.model.dtos.ResponseAccountDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -33,7 +33,7 @@ import javax.validation.Valid;
 public interface AccountApi {
 
     @Operation(summary = "Creates an account", description = "Creates an account for a normal user only the ID is needed", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts"})
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "For Employee / Accounts"})
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "success"),
         
@@ -47,7 +47,7 @@ public interface AccountApi {
 
 
     @Operation(summary = "edit existed account", description = "get the account by id to edit the info of the account", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "For Employee / Accounts" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "success") })
     @RequestMapping(value = "/{iban}",
@@ -57,7 +57,7 @@ public interface AccountApi {
 
 
     @Operation(summary = "get account by Iban", description = "get account by Iban", security = {
-            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "For Employee / Accounts", "For Customers / Accounts" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = Account.class))) })
     @RequestMapping(value = "/{iban}",
@@ -68,7 +68,7 @@ public interface AccountApi {
 
 
     @Operation(summary = "Get accounts", description = "Get the Accounts according to offset and limit values", security = {
-            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "For Employee / Accounts" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "success", content = @Content(schema = @Schema(implementation = Account.class))),
 
@@ -81,7 +81,7 @@ public interface AccountApi {
     ResponseEntity<Page<ResponseAccountDTO>> getAccounts(@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of transactions to return" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit);
 
     @Operation(summary = "", description = "", security = {
-            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "For Employee / Accounts" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully deleted."),
 

@@ -7,7 +7,7 @@
 package io.swagger.api;
 
 import io.swagger.model.InlineResponse200;
-import io.swagger.model.TokenDTO;
+import io.swagger.model.dtos.TokenDTO;
 import io.swagger.model.UserLogin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

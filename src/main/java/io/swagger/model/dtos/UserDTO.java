@@ -1,30 +1,38 @@
-package io.swagger.model;
+package io.swagger.model.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import io.swagger.model.User;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
+
+import javax.persistence.ElementCollection;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.validation.constraints.NotEmpty;
+import java.util.Collection;
 
 /**
  * DTO class for creating user
  */
-@Data
-public class CreateUserDTO {
+@Getter@Setter
+public class UserDTO {
 
     @JsonProperty("firstName")
+    @NotEmpty
     private String firstName;
 
     @JsonProperty("lastName")
+    @NotEmpty
     private String lastName;
 
     @JsonProperty("phoneNumber")
+    @NotEmpty
     private String phoneNumber;
 
     @JsonProperty("emailAddress")
+    @NotEmpty
     private String emailAddress;
-
-    @JsonProperty("password")
-    private String password;
 
     @JsonProperty("currentTransactionsAmount")
     private Double currentTransactionsAmount = 0.00;
@@ -32,23 +40,20 @@ public class CreateUserDTO {
     @JsonProperty("transactionLimit")
     private Double transactionLimit = null;
 
-    @JsonProperty("role")
-    private User.RoleEnum role;
+    @JsonProperty("roles")
+    @NotEmpty
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(targetClass = User.RoleEnum.class)
+    private Collection<User.RoleEnum> roles;
 
-    public CreateUserDTO(@NonNull String firstName, @NonNull String lastName, @NonNull String phoneNumber, @NonNull String emailAddress,String password, @NonNull User.RoleEnum role) {
+    public UserDTO(@NonNull String firstName, @NonNull String lastName, @NonNull String phoneNumber, @NonNull String emailAddress, @NonNull Collection<User.RoleEnum> roles) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.password = password;
         this.phoneNumber = phoneNumber;
         this.emailAddress = emailAddress;
-        this.role = role;
+        this.roles = roles;
     }
 
-    public CreateUserDTO() {
-
-    }
-
-    @Schema(example = "john", required = true, description = "")
     public String getFirstName() {
         return firstName;
     }
@@ -57,7 +62,6 @@ public class CreateUserDTO {
         this.firstName = firstName;
     }
 
-    @Schema(example = "doe", required = true, description = "")
     public String getLastName() {
         return lastName;
     }
@@ -66,7 +70,6 @@ public class CreateUserDTO {
         this.lastName = lastName;
     }
 
-    @Schema(example = "090078601", required = true, description = "")
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -75,22 +78,12 @@ public class CreateUserDTO {
         this.phoneNumber = phoneNumber;
     }
 
-    @Schema(example = "johnDoe@gmail.com", required = true, description = "")
     public String getEmailAddress() {
         return emailAddress;
     }
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
-    }
-
-    @Schema(example = "whatever", required = true, description = "")
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public Double getCurrentTransactionsAmount() {
@@ -109,12 +102,11 @@ public class CreateUserDTO {
         this.transactionLimit = transactionLimit;
     }
 
-    @Schema(example = "customer", required = true, description = "")
-    public User.RoleEnum getRole() {
-        return role;
+    public Collection<User.RoleEnum> getRoles() {
+        return roles;
     }
 
-    public void setRole(User.RoleEnum role) {
-        this.role = role;
+    public void setRoles(Collection<User.RoleEnum> roles) {
+        this.roles = roles;
     }
 }

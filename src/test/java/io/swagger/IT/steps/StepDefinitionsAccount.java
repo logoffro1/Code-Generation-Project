@@ -2,25 +2,22 @@ package io.swagger.IT.steps;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.cucumber.messages.internal.com.google.gson.JsonArray;
-import io.cucumber.messages.internal.com.google.gson.JsonObject;
 import io.swagger.model.*;
+import io.swagger.model.dtos.CreateAccountDTO;
+import io.swagger.model.dtos.ModifyAccountDTO;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 
 public class StepDefinitionsAccount {
     private String accountUrl = "http://localhost:8080/api/accounts";

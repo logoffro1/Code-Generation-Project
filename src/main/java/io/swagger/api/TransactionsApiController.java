@@ -1,9 +1,9 @@
 package io.swagger.api;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.model.dtos.CreateTransactionDTO;
+import io.swagger.model.dtos.TransactionDTO;
 import io.swagger.service.AccountServiceImpl;
 import io.swagger.service.TransactionServiceImpl;
 import io.swagger.v3.oas.annotations.Parameter;

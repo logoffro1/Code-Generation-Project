@@ -2,7 +2,9 @@ package io.swagger.api;
 
 import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.service.AccountService;
+import io.swagger.model.dtos.CreateAccountDTO;
+import io.swagger.model.dtos.ModifyAccountDTO;
+import io.swagger.model.dtos.ResponseAccountDTO;
 import io.swagger.service.AccountServiceImpl;
 import io.swagger.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Parameter;

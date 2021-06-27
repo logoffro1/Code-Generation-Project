@@ -3,6 +3,8 @@ package io.swagger.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.*;
+import io.swagger.model.dtos.CreateAccountDTO;
+import io.swagger.model.dtos.ModifyAccountDTO;
 import io.swagger.service.AccountServiceImpl;
 import io.swagger.service.IbanGeneratorService;
 import io.swagger.service.UserServiceImpl;
@@ -12,17 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

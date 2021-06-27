@@ -1,7 +1,7 @@
 package io.swagger.service;
 
 import io.swagger.exceptions.ApiRequestException;
-import io.swagger.model.ModifyUserDTO;
+import io.swagger.model.dtos.ModifyUserDTO;
 import io.swagger.model.User;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;

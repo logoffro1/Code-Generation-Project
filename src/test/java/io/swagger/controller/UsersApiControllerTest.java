@@ -1,4 +1,4 @@
-package io.swagger.api;
+package io.swagger.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.exceptions.ApiRequestException;

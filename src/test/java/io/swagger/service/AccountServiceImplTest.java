@@ -2,8 +2,10 @@ package io.swagger.service;
 
 import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.*;
+import io.swagger.model.dtos.CreateAccountDTO;
+import io.swagger.model.dtos.ModifyAccountDTO;
+import io.swagger.model.dtos.ResponseAccountDTO;
 import io.swagger.repository.AccountRepository;
-import io.swagger.util.LoggedInUser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;

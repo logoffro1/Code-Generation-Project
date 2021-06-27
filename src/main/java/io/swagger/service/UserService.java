@@ -1,6 +1,6 @@
 package io.swagger.service;
 
-import io.swagger.model.ModifyUserDTO;
+import io.swagger.model.dtos.ModifyUserDTO;
 import io.swagger.model.User;
 
 import java.util.List;
