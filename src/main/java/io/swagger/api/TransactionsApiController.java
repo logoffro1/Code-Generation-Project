@@ -84,7 +84,7 @@ public class TransactionsApiController implements TransactionsApi {
         {
             e.printStackTrace();
 
-            return new ResponseEntity<CreateTransactionDTO>(HttpStatus.BAD_REQUEST).status(HttpStatus.BAD_REQUEST).body(transactionDTO);
+            return new ResponseEntity<CreateTransactionDTO>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 

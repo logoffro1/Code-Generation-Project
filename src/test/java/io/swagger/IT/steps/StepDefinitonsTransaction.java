@@ -8,9 +8,11 @@ import io.cucumber.java.en.When;
 import io.swagger.model.*;
 import io.swagger.model.dtos.CreateTransactionDTO;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -26,7 +28,6 @@ public class StepDefinitonsTransaction {
     private String token;
     private HttpEntity<String> entity;
     ObjectMapper mapper = new ObjectMapper();
-    private String httpResponseCode;
 
 
     public StepDefinitonsTransaction() {
@@ -42,7 +43,8 @@ public class StepDefinitonsTransaction {
 
         entity = new HttpEntity<>(mapper.writeValueAsString(login), headers);
         responseEntity = template.postForEntity(uri, entity, String.class);
-        token = responseEntity.getBody().substring(7);
+        JSONObject jsonObject = new JSONObject(responseEntity.getBody());
+        token = jsonObject.getString("Token");
     }
 
     @Given("I am an employee")
@@ -54,6 +56,7 @@ public class StepDefinitonsTransaction {
     public void iWantToSeeAllTheTransactions() throws URISyntaxException {
         URI uri = new URI(baseUrl);
         headers.setContentType(MediaType.APPLICATION_JSON);
+        //headers.setBearerAuth(token);
         headers.setBearerAuth(token);
         entity = new HttpEntity<>(headers);
         responseEntity = template.exchange(uri, HttpMethod.GET, entity, String.class);

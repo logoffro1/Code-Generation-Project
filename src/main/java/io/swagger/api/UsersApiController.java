@@ -5,12 +5,15 @@ import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.dtos.CreateUserDTO;
 import io.swagger.model.dtos.ModifyUserDTO;
+import io.swagger.model.dtos.ResponseUserDTO;
 import io.swagger.model.dtos.UserDTO;
 import io.swagger.service.AccountService;
 import io.swagger.service.UserService;
+import io.swagger.util.LoggedInUser;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.apache.coyote.Response;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,12 +108,12 @@ public class UsersApiController implements UsersApi {
     @RequestMapping(value="/{userId}",
             method = RequestMethod.GET ,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getUserById(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
+    public ResponseEntity<ResponseUserDTO> getUserById(@Min(1L)@Parameter(in = ParameterIn.PATH, description = "User id to get from the database", required=true, schema=@Schema(allowableValues={  }, minimum="1"
 )) @PathVariable("userId") Long userId) throws Exception {
 
         try {
             User user = userService.getUserById(userId);
-            return new ResponseEntity<User>(HttpStatus.FOUND).status(200).body(user);
+            return new ResponseEntity<ResponseUserDTO>(HttpStatus.FOUND).status(200).body(convertFromUserToResponseUserDTO(user));
 
         } catch (Exception e) {
             throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
@@ -127,7 +130,7 @@ public class UsersApiController implements UsersApi {
     @RequestMapping(value="",
             method = RequestMethod.GET ,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<User>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "The number of pages to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of users to return per page" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
+    public ResponseEntity<List<ResponseUserDTO>> getUsers(@Parameter(in = ParameterIn.QUERY, description = "The number of pages to skip before starting to collect the query results" ,schema=@Schema()) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Parameter(in = ParameterIn.QUERY, description = "The numbers of users to return per page" ,schema=@Schema()) @Valid @RequestParam(value = "limit", required = false) Integer limit) {
 
         //convertying the user to user dto before displaying
         try {
@@ -136,7 +139,7 @@ public class UsersApiController implements UsersApi {
             for (User user: users) {
                 publicUsers.add(convertFromUserToUserDTO(user));
             }
-            return new ResponseEntity<List<User>>(HttpStatus.ACCEPTED).status(200).body(users);
+            return new ResponseEntity<List<ResponseUserDTO>>(HttpStatus.ACCEPTED).status(200).body(convertFromUserToResponseUserDTOArray(users));
 
         } catch (Exception e) {
             throw new ApiRequestException("Something went wrong!",HttpStatus.BAD_GATEWAY);
@@ -188,6 +191,18 @@ public class UsersApiController implements UsersApi {
             return null;
     }
 
+    private ResponseUserDTO convertFromUserToResponseUserDTO(User user){
+        return new ResponseUserDTO(user.getFirstName(),user.getLastName(),user.getPhoneNumber(),user.getEmail(),user.getRole());
+    }
+
+    private List<ResponseUserDTO> convertFromUserToResponseUserDTOArray (List<User> users){
+        List<ResponseUserDTO> responseUserDTOS= new ArrayList<>();
+        for(User u :users){
+            responseUserDTOS.add(convertFromUserToResponseUserDTO(u));
+        }
+        return responseUserDTOS;
+    }
+
     /**
      * Converts a ModifyUserDto to user
      * @param userDTO
@@ -195,7 +210,7 @@ public class UsersApiController implements UsersApi {
      */
     private User convertFromModifyUserDtoToUser(ModifyUserDTO userDTO){
         if(userDTO != null)
-            return new User(userDTO.getFirstName(),userDTO.getLastName(), userDTO.getEmailAddress(),userDTO.getPassword(),userDTO.getPhoneNumber());
+            return new User(userDTO.getFirstName(),userDTO.getLastName(), LoggedInUser.getUserEmail(), userDTO.getPassword(),userDTO.getPhoneNumber());
         else
             return null;
     }
