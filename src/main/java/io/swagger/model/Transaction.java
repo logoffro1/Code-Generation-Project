@@ -32,11 +32,11 @@ public class Transaction {
 
     //I added cascade types check if it breaks anything. I couldnt see anything that is broken so far.
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "senderIBAN")
+    @JoinColumn(name = "senderId")
     private Account senderAccount = null;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "receiverIBAN")
+    @JoinColumn(name = "receiverId")
     private Account receiverAccount = null;
 
     @JsonProperty("amount")
