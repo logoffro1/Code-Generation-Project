@@ -10,6 +10,7 @@ import io.swagger.model.dtos.ModifyUserDTO;
 import io.swagger.model.User;
 import io.swagger.model.UserLogin;
 import io.swagger.service.UserService;
+import io.swagger.util.LoggedInUser;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
