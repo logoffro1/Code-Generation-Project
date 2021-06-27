@@ -139,8 +139,9 @@ public class StepDefinitionsUser {
     @Then("the emailAddress should be {string}")
     public void theEmailAddressShouldBe(String email) throws JSONException {
         String response = responseEntity.getBody();
+        System.out.println(responseEntity.getBody());
         JSONObject user = new JSONObject(response);
-        Assert.assertEquals(email,user.get("email"));
+        Assert.assertEquals(email,user.get("emailAddress"));
     }
 
     @Then("the full name should be {string}")
