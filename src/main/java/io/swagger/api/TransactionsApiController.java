@@ -71,7 +71,7 @@ public class TransactionsApiController implements TransactionsApi {
     }
 
     @PreAuthorize("hasAnyRole('EMPLOYEE','CUSTOMER')")
-    public ResponseEntity<TransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody CreateTransactionDTO transactionDTO) {
+    public ResponseEntity<CreateTransactionDTO> createTransaction(@Parameter(in = ParameterIn.DEFAULT, description = "", schema = @Schema()) @Valid @RequestBody CreateTransactionDTO transactionDTO) {
         try
         {
             //creating new transaction and passing it to the service
@@ -79,12 +79,12 @@ public class TransactionsApiController implements TransactionsApi {
                     accountService.getAccountByIbanForTransactions(transactionDTO.getReceiverIBAN()), transactionDTO.getAmount(), transactionDTO.getCurrencyType());
             transactionService.createTransaction(transaction);
 
-            return new ResponseEntity<TransactionDTO>(HttpStatus.CREATED).status(201).body(transaction.getTransactionDTO());
+            return new ResponseEntity<CreateTransactionDTO>(HttpStatus.CREATED).status(201).body(transactionDTO);
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
 
-            return new ResponseEntity<TransactionDTO>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return new ResponseEntity<CreateTransactionDTO>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 

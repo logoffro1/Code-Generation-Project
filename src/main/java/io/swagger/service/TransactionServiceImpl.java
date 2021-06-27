@@ -63,7 +63,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         //if the user is a customer but he's not the sender show error
         if (!LoggedInUser.userIsNull())
-            if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionRepository.findById(senderUser.getId()).get().getTransactionDTO().getSenderUserID()))
+            if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transaction.getSenderAccount().getUser().getId()))
                 throw new ApiRequestException("You cannot create this transaction.", HttpStatus.BAD_REQUEST);
 
         //if the amount is less than 0 or it's more than the limit

@@ -136,6 +136,13 @@ class TransactionServiceImplTest {
 
     @Test
     void createTransactionAmountShouldBeValid() {
+        //this is to bypass the authentification
+        AuthorizedUser user = new AuthorizedUser(senderAccount.getUser());
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        lenient().when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
 
          ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.createTransaction(new Transaction(senderAccount,receiverAccount,-1.00,"EUR")));
@@ -150,6 +157,14 @@ class TransactionServiceImplTest {
 
     @Test
     void createTransactionShouldNotLeaveAccountOnNegativeBalance() {
+        //this is to bypass the authentification
+        AuthorizedUser user = new AuthorizedUser(senderAccount.getUser());
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        lenient().when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
+
         transaction.setAmount(6000.00);
         ApiRequestException exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.createTransaction(transaction));

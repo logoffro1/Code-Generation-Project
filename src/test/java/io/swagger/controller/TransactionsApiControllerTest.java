@@ -2,9 +2,9 @@ package io.swagger.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.model.*;
-import io.swagger.model.dtos.ModifyTransactionDTO;
+import io.swagger.model.dtos.CreateTransactionDTO;
 import io.swagger.model.dtos.TransactionDTO;
-import io.swagger.service.TransactionService;
+import io.swagger.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,61 +12,95 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.hamcrest.Matchers.*;
+
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-@ContextConfiguration(classes = {TransactionService.class})
 @SpringBootTest
 @AutoConfigureMockMvc
-public class TransactionsApiControllerTest
-{
+public class TransactionsApiControllerTest {
     @Autowired
     private MockMvc mvc;
 
     @MockBean
-    private TransactionService transactionService;
+    private TransactionServiceImpl transactionService;
+
+    //if i remove this everything breaks
+    @MockBean
+    private AccountServiceImpl accountService;
 
     private Transaction transaction;
 
     @MockBean
     private TransactionDTO transactionDTO;
 
-    @MockBean
-    private ModifyTransactionDTO modifyTransactionDTO;
+    @Autowired
+    private IbanGeneratorService ibanGenerator;
 
+    private User mockUser;
 
     private ObjectMapper mapper = new ObjectMapper();
+    private Account senderAccount;
+    private Account receiverAccount;
 
     @BeforeEach
-    public void init()
-    {
-        User mockUser = new User("firstName", "lastName", "email", "password", "090078601", User.RoleEnum.ROLE_EMPLOYEE);
+    public void init() {
+        mockUser = new User("firstName", "lastName", "email", "password", "090078601", User.RoleEnum.ROLE_EMPLOYEE);
 
-        modifyTransactionDTO = new ModifyTransactionDTO(3000.00);
-        Account senderAccount = new Account("iban1", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
-        Account receiverAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
+        senderAccount = new Account(ibanGenerator.generateIban(), BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
+        receiverAccount = new Account(ibanGenerator.generateIban(), BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
         transaction = new Transaction(senderAccount, receiverAccount, 1000.00, "EUR");
 
     }
 
+    @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
-    void getTransactionsShouldReturnAJsonArray() throws Exception
-    {
-        given(transactionService.getAllTransactions(0, 5)).willReturn(List.of(transaction));
+    void getTransactionsShouldReturnAJsonArray() throws Exception {
+        //return a list of transactions when accessing /transactions
+        when(transactionService.getAllTransactions(0, 100)).thenReturn(List.of(transaction));
         this.mvc.perform(
                 get("/transactions")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(
-                        status().isOk()).andExpect(jsonPath("$",hasSize(1)))
-                .andExpect(jsonPath("$[0].amount",is(transaction.getAmount())));
+                        status().isOk());
+    }
+
+    @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
+    @Test
+    public void whenCreateTransactionsShouldReturnCreated() throws Exception {
+
+        CreateTransactionDTO createTransactionDTO = new CreateTransactionDTO(senderAccount.getIBAN(), receiverAccount.getIBAN(), transaction.getAmount(), transaction.getCurrencyType());
+        this.mvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(createTransactionDTO))).andExpect((status().isCreated()));
+    }
+
+
+    @Test
+    @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMER"})
+    public void getTransactionsByIdShouldReturnOk() throws Exception {
+        //mock the getByTransaction to return this.transaction
+        when(transactionService.getTransactionById(99)).thenReturn(transaction);
+        this.mvc.perform(get("/transactions/99").contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200));
+    }
+
+    @Test
+    @WithMockUser(username = "employee", roles = {"EMPLOYEE"})
+    public void deleteTransactionById() throws Exception {
+        //mock the getByTransaction to return this.transaction
+
+        when(transactionService.getTransactionById(99)).thenReturn(transaction);
+        this.mvc.perform(delete("/transactions/99").contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200));
     }
 }
