@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Service
+@Service("transactionsService")
 public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
@@ -40,6 +40,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionRepository.findById(id).get().getTransactionDTO().getSenderUserID()))
             throw new ApiRequestException("You cannot access this transaction.", HttpStatus.BAD_REQUEST);
+
+
 
         return transactionRepository.findById(id).get();
     }

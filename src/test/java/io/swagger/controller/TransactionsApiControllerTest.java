@@ -15,7 +15,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+
+import javax.annotation.Resource;
+import javax.transaction.TransactionScoped;
+
 import static org.hamcrest.Matchers.*;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -29,16 +34,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class TransactionsApiControllerTest
-{
+public class TransactionsApiControllerTest {
     @Autowired
     private MockMvc mvc;
 
     @Autowired
     private ModelMapper modelMapper;
 
+
     @MockBean
-    @Autowired
     private TransactionServiceImpl transactionService;
 
     @MockBean
@@ -59,25 +63,24 @@ public class TransactionsApiControllerTest
     private TransactionDTO transactionDTO;
 
 
-
     private User mockUser;
 
     private ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
-    public void init()
-    {
+    public void init() {
         mockUser = new User("firstName", "lastName", "email", "password", "090078601", User.RoleEnum.ROLE_EMPLOYEE);
 
         Account senderAccount = new Account("iban1", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
         Account receiverAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
         transaction = new Transaction(senderAccount, receiverAccount, 1000.00, "EUR");
-
+        transaction.setTransactionId(99);
     }
+
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
-    void getTransactionsShouldReturnAJsonArray() throws Exception
-    {
+    void getTransactionsShouldReturnAJsonArray() throws Exception {
+        when(transactionService.getAllTransactions(0,100)).thenReturn(List.of(transaction));
         this.mvc.perform(
                 get("/transactions")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -87,8 +90,8 @@ public class TransactionsApiControllerTest
 
     @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMERS"})
     @Test
-    public void whenCreateTransactionsShouldReturnCreated() throws Exception{
-        TransactionDTO transactionDTO= new TransactionDTO(transaction.getTransactionId(),transaction.getDateTimeCreated(),transaction.getSenderAccount().getUser().getId(),transaction.getSenderAccount().getIBAN(),transaction.getReceiverAccount().getIBAN(),transaction.getAmount(),transaction.getCurrencyType()) ;
+    public void whenCreateTransactionsShouldReturnCreated() throws Exception {
+        TransactionDTO transactionDTO = new TransactionDTO(transaction.getTransactionId(), transaction.getDateTimeCreated(), transaction.getSenderAccount().getUser().getId(), transaction.getSenderAccount().getIBAN(), transaction.getReceiverAccount().getIBAN(), transaction.getAmount(), transaction.getCurrencyType());
 
         this.mvc.perform(post("/transactions")
                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
@@ -96,19 +99,20 @@ public class TransactionsApiControllerTest
     }
 
 
-    @WithMockUser(username = "employee", roles = { "EMPLOYEE", "CUSTOMER" })
     @Test
+    @WithMockUser(username = "employee", roles = {"EMPLOYEE", "CUSTOMER"})
     public void getTransactionsByIdShouldReturnOk() throws Exception {
-
-        this.mvc.perform(get("/transactions/1").contentType(MediaType.APPLICATION_JSON)
+        when(transactionService.getTransactionById(99)).thenReturn(transaction);
+        this.mvc.perform(get("/transactions/99").contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().is(200));
     }
 
     @Test
-    @WithMockUser(username = "employee", roles = { "EMPLOYEE" })
+    @WithMockUser(username = "employee", roles = {"EMPLOYEE"})
     public void deleteTransactionById() throws Exception {
-        this.mvc.perform(delete("/transactions/7").contentType(MediaType.APPLICATION_JSON)
+        when(transactionService.getTransactionById(99)).thenReturn(transaction);
+        this.mvc.perform(delete("/transactions/99").contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(200));
     }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.NotAcceptableStatusException;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -98,21 +99,18 @@ public class TransactionsApiController implements TransactionsApi {
             return new ResponseEntity<TransactionDTO>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
     @PreAuthorize("hasAnyRole('EMPLOYEE','CUSTOMER')")
     public ResponseEntity<TransactionDTO> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "", required = true, schema = @Schema()) @PathVariable("transactionId") Long transactionId) {
         try
         {
-           // System.out.println(String.format("LOGGED: %s \n %LOGGED ID: %d, "));
-            if (!LoggedInUser.isEmployee() && !LoggedInUser.getUserId().equals(transactionService.getTransactionById(transactionId).getTransactionDTO().getSenderUserID()))
-                throw new IllegalArgumentException("You cannot access this transaction.");
+
 
             Transaction transaction = transactionService.getTransactionById(transactionId);
-            return new ResponseEntity<Transaction>(HttpStatus.ACCEPTED).status(200).body(transaction.getTransactionDTO());
+            return new ResponseEntity<TransactionDTO>(HttpStatus.ACCEPTED).status(200).body(transaction.getTransactionDTO());
         } catch (NotAcceptableStatusException e)
         {
             e.printStackTrace();
-            return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return new ResponseEntity<TransactionDTO>(HttpStatus.INTERNAL_SERVER_ERROR).status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
