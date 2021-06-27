@@ -84,7 +84,18 @@ public class User {
     this.creationDate = OffsetDateTime.now();
   }
 
-  /**
+    public User(String firstName, String lastName, String emailAddress, String password, String phoneNumber, double currentTransactionsAmount, double dayLimit, RoleEnum role){
+      this.firstName = firstName;
+      this.lastName = lastName;
+      this.email = email;
+      this.password = password;
+      this.phoneNumber = phoneNumber;
+      this.currentTransactionsAmount=currentTransactionsAmount;
+      this.dayLimit=dayLimit;
+      this.role=role;
+    }
+
+    /**
    * Gets or Sets role
    */
   public enum RoleEnum implements GrantedAuthority

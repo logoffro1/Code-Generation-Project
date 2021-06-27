@@ -1,41 +1,48 @@
-Feature: Users
+Feature: Testing Users
 
-  Scenario: Get All Users (For employee)
+  Scenario: Creating a user returns http status created
     Given the user is an employee
-    When visiting the getUsers endpoint
-    And the http verb is GET
-    And the offset and limit are set
-    Then the employee should be able to retrieve list of all users
+    When creating a new user
+    Then show http status 201
 
-  Scenario: Create a User
+  Scenario: Retrieving a user with Id returns http status ok
     Given the user is an employee
-    When visiting the createUser endpoint
-    And user is given in the request body
-    Then user should be created
+    When retrieving a user with id "1001"
+    Then show http status 200
 
-  Scenario: Get User by ID (For employee)
+  Scenario: Deleting a user returns http status ok
     Given the user is an employee
-    When visiting the getUserById endpoint
-    And the user id is given in the url
-    Then the employee should be able to get the user with the specified id
+    When deleting a user with id "1001"
+    Then show http status 200
 
-  Scenario: Update User (For employee)
-    Given the user is an employee
-    When visiting the updateUser endpoint
-    And the user id is given in the url
-    And the updated information is given in the request body
-    Then the user should be updated in the database
+  Scenario: Getting one User and see the phone number
+    Given  the user is an employee
+    When retrieving a user with id "1001"
+    Then the phone number should be "213712983"
 
-  Scenario: Delete User (For employee)
-    Given the user is an employee
-    When visiting the deleteUser endpoint
-    And the user id is given in the url
-    Then the user should be deleted from the database
+  Scenario: Logging in provides with token
+    Given the user provides "JohnDoe@gmail.com" and "johnnie123"
+    Then the web token is returned
 
-  Scenario: Update User (For customer)
-    Given the user is a customer
-    When visiting the updateUser endpoint
-    And the user id is given in the url
-    And the user information belongs to the user that is logged in
-    And the updated information is given in the request body
-    Then the user should be updated in the database
+  Scenario: Getting one User and see the email address
+    Given  the user is an employee
+    When retrieving a user with id "1001"
+    Then the emailAddress should be "JohnDoe@gmail.com"
+
+  Scenario: Getting one User by Id and see the full name
+    Given  the user is an employee
+    When retrieving a user with id "1001"
+    Then the full name should be "John Doe"
+
+  Scenario: Creating null user throws exception
+    Given  the user is an employee
+    When creating a null user
+    Then show http status 400
+
+  Scenario: Creating a user with existing email throws exception
+    Given  the user is an employee
+    When creating a user with existing email
+    Then show http status 502
+
+
+
