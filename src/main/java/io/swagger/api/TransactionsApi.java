@@ -32,7 +32,7 @@ import java.util.List;
 public interface TransactionsApi {
 
     @Operation(summary = "", description = "Get all current transactions", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "For Employee / Transactions" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Transaction created", content = @Content(schema = @Schema(implementation = Transaction.class))),
         
@@ -52,7 +52,7 @@ public interface TransactionsApi {
 
 
     @Operation(summary = "", description = "Create a transaction", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "For Employee / Transactions", "For Customer / Transactions" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "201", description = "Transaction Created", content = @Content(schema = @Schema(implementation = Transaction.class))),
         
@@ -71,7 +71,7 @@ public interface TransactionsApi {
 
 
     @Operation(summary = "", description = "", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "For Employee / Transactions" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Successfully deleted."),
         
@@ -88,7 +88,7 @@ public interface TransactionsApi {
 
 
     @Operation(summary = "", description = "", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "For Employee / Transactions", "For Customer / Transactions"})
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "Successfully received the transactions of transactionId", content = @Content(schema = @Schema(implementation = Transaction.class))),
         

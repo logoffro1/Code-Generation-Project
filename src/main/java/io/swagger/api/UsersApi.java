@@ -34,7 +34,7 @@ import java.util.List;
 public interface UsersApi {
 
     @Operation(summary = "Creates a new user", description = "Creates a new user, if the logged in user is an employee, and returns the userId", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "User" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={"For Employee / Users"})
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "User registered", content = @Content(schema = @Schema(implementation = CreateUserDTO.class))),
         
@@ -53,7 +53,7 @@ public interface UsersApi {
 
 
     @Operation(summary = "Delete registered user by id", description = "Deletes a user with the specified id", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "User" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={  "For Employee / Users" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "User deleted", content = @Content(array = @ArraySchema(schema = @Schema(implementation = User.class)))),
         
@@ -72,7 +72,7 @@ public interface UsersApi {
 
 
     @Operation(summary = "Finds a user by id", description = "Returns a user with the specified id", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "User" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "For Employee / Users","For Customers / Users" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "User found", content = @Content(array = @ArraySchema(schema = @Schema(implementation = User.class)))),
         
@@ -91,7 +91,7 @@ public interface UsersApi {
 
 
     @Operation(summary = "returns a list of users", description = "Returns a list of users", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "User" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={ "For Employee / Users" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "successfully fetched the list of users", content = @Content(array = @ArraySchema(schema = @Schema(implementation = User.class)))),
         
@@ -111,7 +111,7 @@ public interface UsersApi {
 
 
     @Operation(summary = "Update a user by Id", description = "Updates a user with the specified id", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "User" })
+        @SecurityRequirement(name = "bearerAuth")    }, tags={  "For Employee / Users" })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "User updated"),
         
