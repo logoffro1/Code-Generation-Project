@@ -39,10 +39,10 @@ public class UserServiceImpl implements UserService{
     public List<User> getUsers(Integer limit,Integer offset) {
 
         if (offset == null || offset < 0)
-            throw new ApiRequestException("Offset can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
+            offset = 0; //default 0
 
         if (limit == null || limit < 0)
-            throw new ApiRequestException("Limit can't be lower than 0 or NULL.", HttpStatus.BAD_REQUEST);
+            limit = 20; //default 20
 
         Pageable pageable= PageRequest.of(offset,limit);
         return userRepository.findAll(pageable).getContent();
@@ -108,12 +108,6 @@ public class UserServiceImpl implements UserService{
 
         if (modifyUser.equals(user)){
             throw new ApiRequestException("Nothing was updated",HttpStatus.NOT_MODIFIED);
-        }
-
-        //user shoulnot be able to modify the email address because its used as a username
-        if(!modifyUser.getEmailAddress().equals(user.getEmail()))
-        {
-            throw new ApiRequestException("Email cannot be modified",HttpStatus.BAD_REQUEST);
         }
 
         if (modifyUser.getFirstName() != null && !modifyUser.getFirstName().isEmpty()) {

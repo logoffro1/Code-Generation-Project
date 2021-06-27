@@ -19,17 +19,13 @@ public class ModifyUserDTO {
     @JsonProperty("phoneNumber")
     private String phoneNumber;
 
-    @JsonProperty("emailAddress")
-    private String emailAddress;
-
     @JsonProperty("password")
     private String password;
 
-    public ModifyUserDTO(String firstName,  String lastName,  String phoneNumber,  String emailAddress,  String password) {
+    public ModifyUserDTO(String firstName,  String lastName,  String phoneNumber,  String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
-        this.emailAddress = emailAddress;
         this.password = password;
     }
 
@@ -58,15 +54,6 @@ public class ModifyUserDTO {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    @Schema(example = "johnDoe@gmail.com", required = true, description = "")
-    public String getEmailAddress() {
-        return emailAddress;
-    }
-
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
     }
 
     @Schema(example = "whatever", required = true, description = "")

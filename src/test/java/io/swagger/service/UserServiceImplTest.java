@@ -3,6 +3,7 @@ package io.swagger.service;
 import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.dtos.ModifyUserDTO;
 import io.swagger.model.User;
+import io.swagger.model.dtos.ModifyUserDTO;
 import io.swagger.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -12,15 +13,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -64,7 +70,6 @@ class UserServiceImplTest {
         when(userRepository.findAll()).thenReturn(userList);
         List<User> userList1 = userServiceImpl.getAllUsers();
         assertEquals(userList1, userList);
-        verify(userRepository).findAll();
 
     }
 
@@ -90,10 +95,9 @@ class UserServiceImplTest {
     void updateUser() {
 
         modifyUserDTO = new ModifyUserDTO("William",
-                                           "Smith",
-                                            "090078601",
-                                            "william@gmail.com",
-                                            "william123");
+                "Smith",
+                "090078601",
+                "william123");
 
         userServiceImpl.updateUser(modifyUserDTO,this.mockUser.getId());
         assertEquals(modifyUserDTO,this.mockUser);
