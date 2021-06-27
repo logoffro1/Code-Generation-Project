@@ -6,15 +6,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.ArrayList;
 
-public class LoggedInUser extends User{
+public class LoggedInUser extends User {
 
-    private static AuthorizedUser user ;
+    private static AuthorizedUser user;
 
     public static Boolean isEmployee() {
-        if (LoggedInUser.getUserRoles().contains(User.RoleEnum.ROLE_EMPLOYEE)) {
+        if (LoggedInUser.getUserRoles().contains(User.RoleEnum.ROLE_EMPLOYEE))
+        {
             return true;
         }
         return false;
+    }
+
+    public static Boolean userIsNull() {
+        return user == null;
     }
 
     public static ArrayList<User.RoleEnum> getUserRoles() {
@@ -37,7 +42,7 @@ public class LoggedInUser extends User{
     }
 
     public static Long getUserId() {
-        return (long)user.getId();
+        return (long) user.getId();
     }
 
     public static AuthorizedUser getUserDetails() {

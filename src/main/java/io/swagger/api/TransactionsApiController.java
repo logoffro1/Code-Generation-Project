@@ -1,5 +1,7 @@
 package io.swagger.api;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import io.swagger.exceptions.ApiRequestException;
 import io.swagger.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.service.AccountServiceImpl;
