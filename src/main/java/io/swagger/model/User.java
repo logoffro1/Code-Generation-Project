@@ -84,7 +84,7 @@ public class User {
     this.creationDate = OffsetDateTime.now();
   }
 
-    public User(String firstName, String lastName, String emailAddress, String password, String phoneNumber, double currentTransactionsAmount, double dayLimit, RoleEnum role){
+    public User(String firstName, String lastName, String email, String password, String phoneNumber, double currentTransactionsAmount, double dayLimit, RoleEnum role){
       this.firstName = firstName;
       this.lastName = lastName;
       this.email = email;
@@ -93,6 +93,7 @@ public class User {
       this.currentTransactionsAmount=currentTransactionsAmount;
       this.dayLimit=dayLimit;
       this.role=role;
+      this.creationDate = OffsetDateTime.now();
     }
 
     /**
