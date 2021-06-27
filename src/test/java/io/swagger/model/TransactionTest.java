@@ -1,5 +1,6 @@
 package io.swagger.model;
 
+import io.swagger.exceptions.ApiRequestException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,7 +71,7 @@ class TransactionTest {
 
     @Test
     public void settingAmountBelowZeroShouldThrowException() {
-        Exception exception = assertThrows(IllegalArgumentException.class,
+        Exception exception = assertThrows(ApiRequestException.class,
                 () -> transaction.setAmount(-1.00));
         Assertions.assertEquals("Amount cannot be less or equal to zero.", exception.getMessage());
     }

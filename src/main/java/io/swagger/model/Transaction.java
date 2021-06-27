@@ -5,8 +5,10 @@ import java.sql.Date;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.exceptions.ApiRequestException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.engine.internal.Cascade;
+import org.springframework.http.HttpStatus;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
@@ -65,6 +67,7 @@ public class Transaction {
         return this;
     }
 
+    //convert Transaction to TransactionDTO
     public TransactionDTO getTransactionDTO() {
         return new TransactionDTO(transactionId, dateTimeCreated, senderAccount.getUser().getId(), senderAccount.getIBAN(), receiverAccount.getIBAN(), this.amount, this.currencyType);
     }
@@ -170,7 +173,7 @@ public class Transaction {
     }
 
     public void setAmount(Double amount) {
-        if (amount <= 0) throw new IllegalArgumentException("Amount cannot be less or equal to zero.");
+        if (amount <= 0) throw new ApiRequestException("Amount cannot be less or equal to zero.", HttpStatus.BAD_REQUEST);
         this.amount = amount;
     }
 

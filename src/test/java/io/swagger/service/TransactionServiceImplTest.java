@@ -42,6 +42,7 @@ class TransactionServiceImplTest {
 
     private Transaction transaction;
     private Account senderAccount;
+    private Account receiverAccount;
 
     User mockUser;
 
@@ -49,7 +50,7 @@ class TransactionServiceImplTest {
     public void init() {
         mockUser = new User("John", "Doe", "JohnDoe@gmail.com", "johnnie123", "213712983", User.RoleEnum.ROLE_CUSTOMER);
         senderAccount = new Account("iban1", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(5000));
-        Account receiverAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
+        receiverAccount = new Account("iban2", BigDecimal.valueOf(0), mockUser, Account.TypeEnum.CURRENT, Account.StatusEnum.ACTIVE, BigDecimal.valueOf(10000));
         transaction = new Transaction(senderAccount, receiverAccount, 5000.00, "EUR");
     }
 
@@ -57,13 +58,13 @@ class TransactionServiceImplTest {
     void getAllTransactions() {
         List<Transaction> transactions = new ArrayList<>(List.of(transaction));
 
+        //mock the save method to return this.transaction
         lenient().when(transactionRepository.save(transaction)).thenReturn(transaction);
 
+        //we need to use Page and pageable or everything breaks
         Page<Transaction> transactionListPaged = new PageImpl<>(transactions);
         given(transactionRepository.findAll(PageRequest.of(0, 5))).willReturn(transactionListPaged);
         List<Transaction> expected = transactionService.getAllTransactions(0, 5);
-
-
         assertEquals(expected, transactions);
     }
 
@@ -98,6 +99,7 @@ class TransactionServiceImplTest {
     @Test
     void getTransactionById() {
 
+        //this is to bypass the authentification
         AuthorizedUser user = new AuthorizedUser(mockUser);
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -105,6 +107,7 @@ class TransactionServiceImplTest {
         SecurityContextHolder.setContext(securityContext);
         when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(user);
 
+        //mock the findById method to return this.transaction
         lenient().when(transactionRepository.findById(transaction.getTransactionId())).thenReturn(java.util.Optional.ofNullable(transaction));
 
         Transaction expected = transactionService.getTransactionById(transaction.getTransactionId());
@@ -133,14 +136,14 @@ class TransactionServiceImplTest {
 
     @Test
     void createTransactionAmountShouldBeValid() {
-        transaction.setAmount(-1.00);
-        ApiRequestException exception = assertThrows(ApiRequestException.class,
-                () -> transactionService.createTransaction(transaction));
+
+         ApiRequestException exception = assertThrows(ApiRequestException.class,
+                () -> transactionService.createTransaction(new Transaction(senderAccount,receiverAccount,-1.00,"EUR")));
         Assertions.assertEquals("Invalid amount!", exception.getMessage());
 
         transaction.setAmount(transaction.getAmountLimit() + 1000.00);
 
-        exception = assertThrows(ApiRequestException.class,
+         exception = assertThrows(ApiRequestException.class,
                 () -> transactionService.createTransaction(transaction));
         Assertions.assertEquals("Invalid amount!", exception.getMessage());
     }

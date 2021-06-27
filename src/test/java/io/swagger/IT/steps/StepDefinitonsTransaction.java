@@ -7,22 +7,12 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.swagger.model.*;
-import io.swagger.service.AccountService;
-import io.swagger.service.TransactionServiceImpl;
-import io.swagger.service.UserService;
 import org.json.JSONException;
 import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
-
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.util.Arrays;
 
 
 public class StepDefinitonsTransaction {

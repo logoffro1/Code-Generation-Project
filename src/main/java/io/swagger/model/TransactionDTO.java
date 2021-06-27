@@ -51,6 +51,7 @@ public class TransactionDTO {
         this.currencyType = currencyType;
     }
 
+    //convert TransactionDTO to Transaction
     public Transaction getTransaction(AccountService accountService) {
         return new Transaction(accountService.getAccountByIban(senderIBAN)
                 , accountService.getAccountByIban(receiverIBAN)
