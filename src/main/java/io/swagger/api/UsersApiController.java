@@ -9,6 +9,7 @@ import io.swagger.model.dtos.ResponseUserDTO;
 import io.swagger.model.dtos.UserDTO;
 import io.swagger.service.AccountService;
 import io.swagger.service.UserService;
+import io.swagger.util.LoggedInUser;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -209,7 +210,7 @@ public class UsersApiController implements UsersApi {
      */
     private User convertFromModifyUserDtoToUser(ModifyUserDTO userDTO){
         if(userDTO != null)
-            return new User(userDTO.getFirstName(),userDTO.getLastName(), userDTO.getEmailAddress(),userDTO.getPassword(),userDTO.getPhoneNumber());
+            return new User(userDTO.getFirstName(),userDTO.getLastName(), LoggedInUser.getUserEmail(), userDTO.getPassword(),userDTO.getPhoneNumber());
         else
             return null;
     }
